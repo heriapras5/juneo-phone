@@ -1,0 +1,35 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source "../**/*.blade.php";
+@source "../**/*.js";
+@source "../**/*.vue";
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+[x-cloak] { display: none !important; }
+
+/* ── Sidebar ── */
+.sidebar-text {
+    transition: opacity 0.25s ease-in-out;
+}
+.sidebar-collapsed .sidebar-text {
+    opacity: 0;
+    width: 0;
+    min-width: 0;
+    flex: 0 0 0;
+    overflow: hidden;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255, 215, 0, 0.7); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 215, 0, 0.85); }
+
+/* Sidebar — lebih tipis */
+nav::-webkit-scrollbar { width: 6px; height: 6px; }
