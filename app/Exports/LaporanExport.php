@@ -11,12 +11,16 @@ class LaporanExport implements WithMultipleSheets
     protected $bulan;
     protected $namaToko;
     protected $customerId;
+    protected $fromDate;
+    protected $toDate;
 
-    public function __construct(?int $tahun = null, ?array $bulan = null, ?string $namaToko = null, ?int $customerId = null)
+    public function __construct(?int $tahun = null, ?array $bulan = null, ?string $namaToko = null, ?int $customerId = null, ?string $fromDate = null, ?string $toDate = null)
     {
         $this->tahun = $tahun ?? (int) now()->format('Y');
         $this->namaToko = $namaToko ?? 'Juneo Phone';
         $this->customerId = $customerId;
+        $this->fromDate = $fromDate;
+        $this->toDate = $toDate;
 
         if ($bulan !== null) {
             $this->bulan = $bulan;
@@ -53,10 +57,10 @@ class LaporanExport implements WithMultipleSheets
         $sheets = [];
 
         foreach ($this->bulan as $month => $label) {
-            $sheets[] = new LaporanBulananSheet($month, $label, $this->tahun, $this->namaToko, $this->customerId);
+            $sheets[] = new LaporanBulananSheet($month, $label, $this->tahun, $this->namaToko, $this->customerId, $this->fromDate, $this->toDate);
         }
 
-        $sheets[] = new LaporanRekapSheet($this->bulan ?: [1 => 'Januari'], $this->tahun, $this->namaToko, $this->customerId);
+        $sheets[] = new LaporanRekapSheet($this->bulan ?: [1 => 'Januari'], $this->tahun, $this->namaToko, $this->customerId, $this->fromDate, $this->toDate);
 
         return $sheets;
     }

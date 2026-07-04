@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Setting extends Model
 {
-    protected $fillable = [
-        'key',
-        'value',
-    ];
+    
+    protected $table = 'settings';
+    
+    protected $guarded = [];
 
     protected static $cache = [];
 

@@ -35,6 +35,20 @@ class ReportController extends Controller
 
         $services = $query->paginate(10)->withQueryString();
 
+        // Total aggregates untuk baris agregasi
+        $totalPengeluaran = (clone $query)->sum('pengeluaran');
+        $totalOmzet = (clone $query)->sum('jasa');
+        $totalKeuntungan = (clone $query)->sum('keuntungan');
+
+        $kebutuhanPribadi = \App\Models\BiayaHarian::query()
+            ->when($from && $to, function ($q) use ($from, $to) {
+                $q->whereDate('tanggal', '>=', $from)
+                  ->whereDate('tanggal', '<=', $to);
+            }, function ($q) use ($tahun) {
+                $q->whereYear('tanggal', $tahun);
+            })
+            ->sum('jumlah');
+
         $customers = Customer::orderBy('nama')->limit(200)->get(['id', 'nama', 'no_hp']);
 
         $tahunTersedia = Service::where('status', '!=', 'batal')
@@ -48,7 +62,8 @@ class ReportController extends Controller
             ->toArray();
 
         return view('reports.index', compact(
-            'services', 'customers', 'tahun', 'tahunTersedia', 'from', 'to'
+            'services', 'customers', 'tahun', 'tahunTersedia', 'from', 'to',
+            'totalPengeluaran', 'totalOmzet', 'totalKeuntungan', 'kebutuhanPribadi'
         ));
     }
 
@@ -56,11 +71,37 @@ class ReportController extends Controller
     {
         $from       = request('from');
         $to         = request('to');
-        $tahun      = $from && $to ? null : (int) request('tahun', now()->format('Y'));
         $customerId = request('customer_id') ? (int) request('customer_id') : null;
         $namaToko   = Setting::getValue('nama_toko', 'Juneo Phone');
         $slug       = str_replace(' ', '-', $namaToko);
-        $dateLabel  = $tahun ?? $from . '-' . $to;
+
+        if ($from && $to) {
+            // Kalkulasi bulan-bulan tercakup dalam rentang tanggal
+            $namaBulan = [
+                1 => 'Januari', 2 => 'Februari', 3 => 'Maret',
+                4 => 'April', 5 => 'Mei', 6 => 'Juni',
+                7 => 'Juli', 8 => 'Agustus', 9 => 'September',
+                10 => 'Oktober', 11 => 'November', 12 => 'Desember',
+            ];
+            $start = \Carbon\Carbon::parse($from)->startOfMonth();
+            $end   = \Carbon\Carbon::parse($to)->startOfMonth();
+            $bulanMap = [];
+            $current = $start->copy();
+            while ($current->lte($end)) {
+                $bulanMap[(int) $current->format('m')] = $namaBulan[(int) $current->format('m')];
+                $current->addMonth();
+            }
+            $tahun = (int) $start->format('Y');
+            // Untuk rentang lintas tahun, ambil tahun pertama — sheet akan filter per bulan
+            $dateLabel = $from . '-' . $to;
+            return Excel::download(
+                new LaporanExport($tahun, $bulanMap, $namaToko, $customerId, $from, $to),
+                'Laporan-Service-' . $dateLabel . '-' . $slug . '.xlsx'
+            );
+        }
+
+        $tahun      = (int) request('tahun', now()->format('Y'));
+        $dateLabel  = (string) $tahun;
 
         return Excel::download(
             new LaporanExport($tahun, null, $namaToko, $customerId),

@@ -21,14 +21,18 @@ class LaporanRekapSheet implements FromArray, WithHeadings, WithTitle, WithStyle
     protected $tahun;
     protected $namaToko;
     protected $customerId;
+    protected $fromDate;
+    protected $toDate;
     protected $data;
 
-    public function __construct(array $bulan, int $tahun, ?string $namaToko = null, ?int $customerId = null)
+    public function __construct(array $bulan, int $tahun, ?string $namaToko = null, ?int $customerId = null, ?string $fromDate = null, ?string $toDate = null)
     {
         $this->bulan = $bulan;
         $this->tahun = $tahun;
         $this->namaToko = $namaToko ?? 'Juneo Phone';
         $this->customerId = $customerId;
+        $this->fromDate = $fromDate;
+        $this->toDate = $toDate;
         $this->loadData();
     }
 
@@ -38,13 +42,24 @@ class LaporanRekapSheet implements FromArray, WithHeadings, WithTitle, WithStyle
         $labelTotal = 'TOTAL ' . count($allKeys) . ' BULAN';
 
         foreach ($this->bulan as $month => $label) {
-            $services = Service::whereYear('tanggal', $this->tahun)
-                ->whereMonth('tanggal', $month)
-                ->where('status', '!=', 'batal')
+            $services = Service::where('status', '!=', 'batal')
+                ->when($this->fromDate && $this->toDate, function ($q) {
+                    $q->whereDate('tanggal', '>=', $this->fromDate)
+                      ->whereDate('tanggal', '<=', $this->toDate);
+                }, function ($q) {
+                    $q->whereYear('tanggal', $this->tahun)
+                      ->whereMonth('tanggal', $month);
+                })
                 ->when($this->customerId, fn($q, $v) => $q->where('customer_id', $v));
 
-            $biayaHarian = BiayaHarian::whereYear('tanggal', $this->tahun)
-                ->whereMonth('tanggal', $month)
+            $biayaHarian = BiayaHarian::query()
+                ->when($this->fromDate && $this->toDate, function ($q) {
+                    $q->whereDate('tanggal', '>=', $this->fromDate)
+                      ->whereDate('tanggal', '<=', $this->toDate);
+                }, function ($q) {
+                    $q->whereYear('tanggal', $this->tahun)
+                      ->whereMonth('tanggal', $month);
+                })
                 ->sum('jumlah');
 
             $totalJasa = (clone $services)->sum('jasa');
@@ -86,9 +101,9 @@ class LaporanRekapSheet implements FromArray, WithHeadings, WithTitle, WithStyle
         return [
             'Bulan',
             'Total Service',
-            'Pendapatan',
-            'Modal',
-            'Biaya Harian',
+            'Omzet',
+            'Pengeluaran',
+            'Kebutuhan Pribadi',
             'Keuntungan Bersih',
         ];
     }

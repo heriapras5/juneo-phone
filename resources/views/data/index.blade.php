@@ -12,7 +12,7 @@
             <div class="w-1 h-6 bg-blue-500 rounded-full"></div>
             <span class="text-sm font-semibold text-gray-700">Backup Data</span>
         </div>
-        <p class="text-xs text-gray-500 mb-4">Download seluruh data transaksional (Service, Pelanggan, Biaya Harian, Gaji Karyawan) dalam format Excel (.xlsx).</p>
+        <p class="text-xs text-gray-500 mb-4">Download seluruh data transaksional (Service, Pelanggan, Kebutuhan Pribadi, Gaji Karyawan) dalam format Excel (.xlsx).</p>
 
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
             <div class="bg-gray-50 rounded-lg p-3 text-center">
@@ -25,7 +25,7 @@
             </div>
             <div class="bg-gray-50 rounded-lg p-3 text-center">
                 <p class="text-lg font-bold text-gray-800">{{ number_format($biayaCount, 0, ',', '.') }}</p>
-                <p class="text-[10px] text-gray-500">Biaya Harian</p>
+                <p class="text-[10px] text-gray-500">Kebutuhan Pribadi</p>
             </div>
             <div class="bg-gray-50 rounded-lg p-3 text-center">
                 <p class="text-lg font-bold text-gray-800">{{ number_format($gajiCount, 0, ',', '.') }}</p>
@@ -55,7 +55,7 @@
                 <i class="fas fa-exclamation-triangle text-red-500 mt-0.5"></i>
                 <div>
                     <p class="text-sm font-medium text-red-700">Peringatan!</p>
-                    <p class="text-xs text-red-600">Tindakan ini akan menghapus SEMUA data service, pelanggan, biaya harian, dan gaji karyawan. Data tidak dapat dikembalikan. <strong>Backup data terlebih dahulu sebelum reset.</strong></p>
+                    <p class="text-xs text-red-600">Tindakan ini akan menghapus SEMUA data service, pelanggan, Kebutuhan Pribadi, dan gaji karyawan. Data tidak dapat dikembalikan. <strong>Backup data terlebih dahulu sebelum reset.</strong></p>
                 </div>
             </div>
         </div>
@@ -66,7 +66,7 @@
             <button type="button" @click="Swal.fire({
                 icon: 'warning',
                 title: 'Reset Semua Data?',
-                text: 'Data service, pelanggan, biaya harian, dan gaji karyawan akan dihapus permanen!',
+                text: 'Data service, pelanggan, Kebutuhan Pribadi, dan gaji karyawan akan dihapus permanen!',
                 showCancelButton: true,
                 confirmButtonColor: '#EF4444',
                 cancelButtonColor: '#6B7280',

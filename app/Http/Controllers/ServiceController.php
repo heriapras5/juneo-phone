@@ -350,9 +350,6 @@ class ServiceController extends Controller
         if ($request->filled('garansi')) {
             $data['garansi'] = $request->garansi;
         }
-        if ($requested === 'diambil') {
-            $data['tanggal_selesai'] = now();
-        }
         $service->update($data);
 
         $statusCount = Service::select('status', DB::raw('COUNT(*) as total'))

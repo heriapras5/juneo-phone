@@ -43,7 +43,7 @@ class ServicesExport implements FromQuery, WithHeadings, WithMapping, WithStyles
             'Pelanggan',
             'Type HP',
             'Kerusakan',
-            'Modal',
+            'Pengeluaran',
             'Jasa',
             'Teknisi',
             'Keuntungan',

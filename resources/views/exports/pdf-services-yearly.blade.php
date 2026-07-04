@@ -56,7 +56,7 @@
                     <th style="width:12%;">Pelanggan</th>
                     <th style="width:10%;">Type HP</th>
                     <th style="width:20%;">Kerusakan</th>
-                    <th style="width:10%;">Modal</th>
+                    <th style="width:10%;">Pengeluaran</th>
                     <th style="width:10%;">Jasa</th>
                     <th style="width:7%;">Teknisi</th>
                     <th style="width:10%;">Keuntungan</th>
@@ -107,7 +107,7 @@
                     <td class="text-right">Rp {{ number_format($rekap['totalJasa'] - $rekap['totalPengeluaran'] - $rekap['biayaHarian'], 0, ',', '.') }}</td>
                 </tr>
                 <tr>
-                    <td colspan="6" class="text-right" style="font-size:7px; color:#888;">Biaya Harian</td>
+                    <td colspan="6" class="text-right" style="font-size:7px; color:#888;">Kebutuhan Pribadi</td>
                     <td></td>
                     <td></td>
                     <td></td>
@@ -125,16 +125,16 @@
 
     <table class="grand-table" style="width:60%; margin-left:auto; margin-right:auto;">
         <tr>
-            <td class="label">Pendapatan</td>
+            <td class="label">Omzet</td>
             <td class="value">Rp {{ number_format($grandJasa, 0, ',', '.') }}</td>
         </tr>
         <tr>
-            <td class="label">Modal</td>
+            <td class="label">Pengeluaran</td>
             <td class="value">Rp {{ number_format($grandPengeluaran, 0, ',', '.') }}</td>
         </tr>
         <tr><td colspan="2" style="padding:2px;"></td></tr>
         <tr>
-            <td class="label">Biaya Harian</td>
+            <td class="label">Kebutuhan Pribadi</td>
             <td class="value">Rp {{ number_format($grandBiayaHarian, 0, ',', '.') }}</td>
         </tr>
         <tr><td colspan="2" style="padding:2px;"></td></tr>

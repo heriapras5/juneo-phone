@@ -38,7 +38,7 @@ class BiayaHarianSheetExport implements FromCollection, WithHeadings, WithMappin
 
     public function title(): string
     {
-        return 'Biaya Harian';
+        return 'Kebutuhan Pribadi';
     }
 
     public function columnWidths(): array

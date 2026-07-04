@@ -86,7 +86,7 @@
                         <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Pelanggan</th>
                         <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Type HP</th>
                         <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Kerusakan</th>
-                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right whitespace-nowrap">Modal</th>
+                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right whitespace-nowrap">Pengeluaran</th>
                         <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right whitespace-nowrap">Jasa</th>
                         <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap">Teknisi</th>
                         <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Keterangan</th>
@@ -157,6 +157,37 @@
             {{ $services->links() }}
         </div>
     </div>
+
+    @php $profit = $totalOmzet - $totalPengeluaran - $kebutuhanPribadi; @endphp
+    @if($services->total() > 0)
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm">
+        <div class="px-5 py-4">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="h-4 w-1 rounded-full bg-gradient-to-b from-yellow-500 to-amber-500"></span>
+                <h3 class="text-sm font-bold text-gray-800 uppercase tracking-wide">Ringkasan Periode</h3>
+            </div>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="p-4 bg-red-50 rounded-xl border border-red-100">
+                    <p class="text-[10px] text-red-500 uppercase tracking-wider font-medium">Pengeluaran</p>
+                    <p class="text-lg font-bold text-red-600 mt-1">Rp {{ number_format($totalPengeluaran, 0, ',', '.') }}</p>
+                </div>
+                <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
+                    <p class="text-[10px] text-emerald-500 uppercase tracking-wider font-medium">Omzet</p>
+                    <p class="text-lg font-bold text-emerald-600 mt-1">Rp {{ number_format($totalOmzet, 0, ',', '.') }}</p>
+                </div>
+                <div class="p-4 bg-orange-50 rounded-xl border border-orange-100">
+                    <p class="text-[10px] text-orange-500 uppercase tracking-wider font-medium">Kebutuhan Pribadi</p>
+                    <p class="text-lg font-bold text-orange-600 mt-1">Rp {{ number_format($kebutuhanPribadi, 0, ',', '.') }}</p>
+                </div>
+                <div class="p-4 {{ $profit >= 0 ? 'bg-emerald-50 border-emerald-100' : 'bg-red-50 border-red-100' }} rounded-xl border">
+                    <p class="text-[10px] {{ $profit >= 0 ? 'text-emerald-500' : 'text-red-500' }} uppercase tracking-wider font-medium">Profit</p>
+                    <p class="text-lg font-bold {{ $profit >= 0 ? 'text-emerald-600' : 'text-red-600' }} mt-1">Rp {{ number_format($profit, 0, ',', '.') }}</p>
+                </div>
+            </div>
+            <div class="mt-3 text-[11px] text-gray-400 italic">Omzet - Pengeluaran - Kebutuhan Pribadi = Profit</div>
+        </div>
+    </div>
+    @endif
 
     {{-- Loading Overlay PDF --}}
     <div x-show="loading" x-cloak

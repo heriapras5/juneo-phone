@@ -19,7 +19,8 @@
             'dikerjakan_batal': 'Yakin ingin membatalkan service yang sedang dikerjakan?',
             'selesai_diambil': 'Konfirmasi bahwa HP sudah diambil pelanggan?',
         };
-        let key = status + '_' + label;
+        // Pemanggilan: confirmAction(id, toStatus, fromStatus) -> key = from_to
+        let key = label + '_' + status;
         this.confirmData = { id: id, status: status, label: label, message: messages[key] || 'Yakin?' };
         this.showConfirm = true;
     },

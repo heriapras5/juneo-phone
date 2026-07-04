@@ -17,7 +17,6 @@ class DashboardController extends Controller
         $from   = request('from');
         $to     = request('to');
 
-        // Auto-detect period jika tidak ada filter manual
         if (!$period && !$from && !$to) {
             $latestService = Service::where('status', '!=', 'batal')
                 ->orderBy('tanggal', 'desc')
@@ -57,31 +56,17 @@ class DashboardController extends Controller
         $periodTotals = $service->getPeriodTotals($fromDate, $toDate);
         $prevPeriodTotals = $service->getPreviousPeriodTotals($fromDate, $toDate);
 
-        $profitMargin = $periodTotals->revenue > 0 ? round(($periodTotals->net_profit / $periodTotals->revenue) * 100, 1) : 0;
-        $avgProfitPerService = $periodTotals->services > 0 ? round($periodTotals->net_profit / $periodTotals->services) : 0;
-
-        $changeRev   = $prevPeriodTotals->revenue > 0 ? round((($periodTotals->revenue - $prevPeriodTotals->revenue) / $prevPeriodTotals->revenue) * 100, 1) : ($periodTotals->revenue > 0 ? null : 0);
-        $changeBiaya = $prevPeriodTotals->biaya_harian > 0 ? round((($periodTotals->biaya_harian - $prevPeriodTotals->biaya_harian) / $prevPeriodTotals->biaya_harian) * 100, 1) : ($periodTotals->biaya_harian > 0 ? null : 0);
-        $changeNet   = $prevPeriodTotals->net_profit > 0 ? round((($periodTotals->net_profit - $prevPeriodTotals->net_profit) / $prevPeriodTotals->net_profit) * 100, 1) : ($periodTotals->net_profit > 0 ? null : 0);
-
-        $prevMargin = $prevPeriodTotals->revenue > 0 ? round(($prevPeriodTotals->net_profit / $prevPeriodTotals->revenue) * 100, 1) : 0;
-        $changeMargin = $prevMargin > 0 ? round((($profitMargin - $prevMargin) / $prevMargin) * 100, 1) : ($profitMargin > 0 ? null : 0);
-        $prevAvgProfit = $prevPeriodTotals->services > 0 ? round($prevPeriodTotals->net_profit / $prevPeriodTotals->services) : 0;
-        $changeAvgProfit = $prevAvgProfit > 0 ? round((($avgProfitPerService - $prevAvgProfit) / $prevAvgProfit) * 100, 1) : ($avgProfitPerService > 0 ? null : 0);
-
-        $prevJago = $prevPeriodTotals->bank_jago ?? 0;
-        $changeJago = $prevJago > 0 ? round((($periodTotals->bank_jago - $prevJago) / $prevJago) * 100, 1) : ($periodTotals->bank_jago > 0 ? null : 0);
+        $changeOmzet   = $prevPeriodTotals->omzet > 0 ? round((($periodTotals->omzet - $prevPeriodTotals->omzet) / $prevPeriodTotals->omzet) * 100, 1) : ($periodTotals->omzet > 0 ? null : 0);
+        $changePengeluaran = $prevPeriodTotals->pengeluaran > 0 ? round((($periodTotals->pengeluaran - $prevPeriodTotals->pengeluaran) / $prevPeriodTotals->pengeluaran) * 100, 1) : ($periodTotals->pengeluaran > 0 ? null : 0);
+        $changeKebutuhan = $prevPeriodTotals->kebutuhan_pribadi > 0 ? round((($periodTotals->kebutuhan_pribadi - $prevPeriodTotals->kebutuhan_pribadi) / $prevPeriodTotals->kebutuhan_pribadi) * 100, 1) : ($periodTotals->kebutuhan_pribadi > 0 ? null : 0);
+        $changeProfit   = $prevPeriodTotals->profit > 0 ? round((($periodTotals->profit - $prevPeriodTotals->profit) / $prevPeriodTotals->profit) * 100, 1) : ($periodTotals->profit > 0 ? null : 0);
 
         $biayaCount = BiayaHarian::whereDate('tanggal', now()->toDateString())->exists();
 
         $isPeriodComplete = $toDate->toDateString() < now()->toDateString();
 
-        $hariKerja = $service->countWorkingDays($fromDate, $toDate);
-
         return view('dashboard.index', compact(
             'totalCustomers',
-            'profitMargin',
-            'avgProfitPerService',
             'chartData',
             'period',
             'fromDate',
@@ -92,16 +77,10 @@ class DashboardController extends Controller
             'prevPeriodTotals',
             'biayaCount',
             'isPeriodComplete',
-            'hariKerja',
-            'changeRev',
-            'changeBiaya',
-            'changeNet',
-            'changeMargin',
-            'changeAvgProfit',
-            'changeJago',
-            'prevMargin',
-            'prevAvgProfit',
-            'prevJago',
+            'changeOmzet',
+            'changePengeluaran',
+            'changeKebutuhan',
+            'changeProfit',
         ));
     }
 
@@ -140,20 +119,28 @@ class DashboardController extends Controller
 
         [$fromDate, $toDate] = $service->deriveDateRange($period, $from, $to);
 
-        $chartData = $service->getChartData($period, $fromDate, $toDate);
+        // Tentukan granularitas chart yang sesuai berdasarkan durasi rentang
+        $chartPeriod = $period;
+        if ($from && $to) {
+            $days = $fromDate->diffInDays($toDate) + 1;
+            $chartPeriod = match (true) {
+                $days <= 31  => 'daily',
+                $days <= 90  => 'weekly',
+                default      => 'monthly',
+            };
+        }
+        $chartData = $service->getChartData($chartPeriod, $fromDate, $toDate);
 
         $periodTotals = $service->getPeriodTotals($fromDate, $toDate);
         $prevTotals   = $service->getPreviousPeriodTotals($fromDate, $toDate);
 
-        $profitMargin = $periodTotals->revenue > 0 ? round(($periodTotals->net_profit / $periodTotals->revenue) * 100, 1) : 0;
-        $avgProfit    = $periodTotals->services > 0 ? round($periodTotals->net_profit / $periodTotals->services) : 0;
         $isComplete   = $toDate->toDateString() < now()->toDateString();
-        $hariKerja    = $service->countWorkingDays($fromDate, $toDate);
         $biayaCount   = BiayaHarian::whereDate('tanggal', now()->toDateString())->exists();
 
-        $changeRev   = $prevTotals->revenue > 0 ? round((($periodTotals->revenue - $prevTotals->revenue) / $prevTotals->revenue) * 100, 1) : ($periodTotals->revenue > 0 ? null : 0);
-        $changeBiaya = $prevTotals->biaya_harian > 0 ? round((($periodTotals->biaya_harian - $prevTotals->biaya_harian) / $prevTotals->biaya_harian) * 100, 1) : ($periodTotals->biaya_harian > 0 ? null : 0);
-        $changeNet   = $prevTotals->net_profit > 0 ? round((($periodTotals->net_profit - $prevTotals->net_profit) / $prevTotals->net_profit) * 100, 1) : ($periodTotals->net_profit > 0 ? null : 0);
+        $changeOmzet   = $prevTotals->omzet > 0 ? round((($periodTotals->omzet - $prevTotals->omzet) / $prevTotals->omzet) * 100, 1) : ($periodTotals->omzet > 0 ? null : 0);
+        $changePengeluaran = $prevTotals->pengeluaran > 0 ? round((($periodTotals->pengeluaran - $prevTotals->pengeluaran) / $prevTotals->pengeluaran) * 100, 1) : ($periodTotals->pengeluaran > 0 ? null : 0);
+        $changeKebutuhan = $prevTotals->kebutuhan_pribadi > 0 ? round((($periodTotals->kebutuhan_pribadi - $prevTotals->kebutuhan_pribadi) / $prevTotals->kebutuhan_pribadi) * 100, 1) : ($periodTotals->kebutuhan_pribadi > 0 ? null : 0);
+        $changeProfit   = $prevTotals->profit > 0 ? round((($periodTotals->profit - $prevTotals->profit) / $prevTotals->profit) * 100, 1) : ($periodTotals->profit > 0 ? null : 0);
 
         return response()->json([
             'fromDate'      => $fromDate->format('d M Y'),
@@ -163,35 +150,26 @@ class DashboardController extends Controller
             'period'        => $period,
             'hasCustomRange' => $from && $to,
             'isComplete'    => $isComplete,
-            'hariKerja'     => $hariKerja,
             'biayaCount'    => $biayaCount,
 
             'chartData'     => $chartData,
             'totalCustomers' => Customer::count(),
 
-            'revenue'       => $periodTotals->revenue,
-            'pengeluaran'   => $periodTotals->pengeluaran,
-            'net_profit'    => $periodTotals->net_profit,
-            'services'      => $periodTotals->services,
-            'expenses'      => $periodTotals->expenses,
-            'needs'         => $periodTotals->needs,
-            'total_gaji'    => $periodTotals->total_gaji,
-            'biaya_harian'  => $periodTotals->biaya_harian,
-            'bank_jago'     => $periodTotals->bank_jago,
-            'gaji_edi'      => $periodTotals->gaji_edi,
-            'gaji_nur'      => $periodTotals->gaji_nur,
+            'omzet'            => $periodTotals->omzet,
+            'pengeluaran'      => $periodTotals->pengeluaran,
+            'keuntungan'       => $periodTotals->keuntungan,
+            'kebutuhan_pribadi' => $periodTotals->kebutuhan_pribadi,
+            'profit'           => $periodTotals->profit,
+            'services'         => $periodTotals->services,
+            'bank_jago'        => $periodTotals->bank_jago,
+            'gaji_edi'         => $periodTotals->gaji_edi,
+            'gaji_nur'         => $periodTotals->gaji_nur,
+            'lainnya'          => $periodTotals->lainnya,
 
-            'profitMargin'       => $profitMargin,
-            'avgProfitPerService' => $avgProfit,
-
-            'prevRevenue'   => $prevTotals->revenue,
-            'prevBiaya'     => $prevTotals->biaya_harian,
-            'prevNet'       => $prevTotals->net_profit,
-            'prevServices'  => $prevTotals->services,
-
-            'changeRev'   => $changeRev,
-            'changeBiaya' => $changeBiaya,
-            'changeNet'   => $changeNet,
+            'changeOmzet'       => $changeOmzet,
+            'changePengeluaran' => $changePengeluaran,
+            'changeKebutuhan'   => $changeKebutuhan,
+            'changeProfit'      => $changeProfit,
         ]);
     }
 }

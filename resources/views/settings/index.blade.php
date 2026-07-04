@@ -61,13 +61,13 @@
                 </div>
             </div>
 
-        {{-- Biaya Harian & Pengaturan Nota --}}
+        {{-- Kebutuhan Pribadi & Pengaturan Nota --}}
         <div class="mt-6">
                 <div class="flex items-center gap-2 mb-3">
                     <div class="w-1 h-5 bg-orange-500 rounded-full"></div>
-                    <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Biaya Harian (Default)</span>
+                    <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Kebutuhan Pribadi (Default)</span>
                 </div>
-                <p class="text-xs text-gray-500 mb-4">Nominal biaya harian default. Akan otomatis tercatat setiap hari. Bisa diubah per hari di halaman Biaya Harian.</p>
+                <p class="text-xs text-gray-500 mb-4">Nominal default Kebutuhan Pribadi. Akan otomatis tercatat setiap hari. Bisa diubah per hari di halaman Kebutuhan Pribadi.</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Bank Jago</label>

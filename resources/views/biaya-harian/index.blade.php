@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Biaya Harian')
-@section('page-title', 'Biaya Harian')
+@section('title', 'Kebutuhan Pribadi')
+@section('page-title', 'Kebutuhan Pribadi')
 
 @section('content')
 <div x-data="{ confirmReset: false }" class="space-y-4">
@@ -10,7 +10,7 @@
         <div class="flex items-center justify-between gap-2 mb-4">
             <div class="flex items-center gap-2">
                 <div class="w-1 h-6 bg-orange-500 rounded-full"></div>
-                <span class="text-sm font-semibold text-gray-700">Biaya Harian</span>
+                <span class="text-sm font-semibold text-gray-700">Kebutuhan Pribadi</span>
             </div>
             <div>
                 <input type="date" id="datePicker" value="{{ $date }}"
@@ -35,7 +35,7 @@
                     <div class="flex-1 min-w-[120px]">
                         <label class="block text-xs font-medium text-gray-600">{{ $nama }}</label>
                         @if($kat === 'lainnya')
-                        <p class="text-[10px] text-gray-400">Biaya harian lainnya (makan, jajan, dll)</p>
+                        <p class="text-[10px] text-gray-400">Kebutuhan lainnya (makan, jajan, dll)</p>
                         @endif
                     </div>
                     <div class="w-36">
@@ -58,7 +58,7 @@
 
             <div class="mt-4 flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                    <p class="text-xs text-gray-400">Biaya default dapat diubah di menu Pengaturan</p>
+                    <p class="text-xs text-gray-400">Default dapat diubah di menu Pengaturan</p>
                     <button type="button" @click="confirmReset = true"
                         class="text-xs text-red-500 hover:text-red-600 underline">
                         <i class="fas fa-undo-alt mr-1"></i>Reset
@@ -68,7 +68,7 @@
                     class="px-5 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm disabled:opacity-50">
                     <i class="fas fa-spinner fa-spin" x-show="loading" x-cloak></i>
                     <i class="fas fa-save" x-show="!loading"></i>
-                    Simpan Biaya
+                    Simpan
                 </button>
             </div>
         </form>
@@ -89,7 +89,7 @@
                 <thead>
                     <tr class="bg-gray-50">
                         <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left">Tanggal</th>
-                        <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right">Total Biaya</th>
+                        <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right">Total</th>
                         <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -103,7 +103,7 @@
                             <button type="button"
                                 @click="Swal.fire({
                                     icon: 'warning',
-                                    title: 'Hapus Biaya?',
+                                    title: 'Hapus Data?',
                                     text: 'Semua biaya untuk tanggal {{ \Carbon\Carbon::parse($cleanTanggal)->format('d/m/Y') }} akan dihapus.',
                                     showCancelButton: true,
                                     confirmButtonColor: '#EF4444',
@@ -128,7 +128,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="3" class="px-4 py-8 text-center text-gray-400">Tidak ada biaya harian di bulan ini</td>
+                        <td colspan="3" class="px-4 py-8 text-center text-gray-400">Tidak ada data di bulan ini</td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -160,7 +160,7 @@
                     <i class="fas fa-undo-alt text-orange-500 text-xl"></i>
                 </div>
                 <h3 class="text-lg font-semibold text-gray-900 mb-2">Konfirmasi Reset</h3>
-                <p class="text-sm text-gray-600 mb-6">Reset semua biaya harian untuk tanggal ini ke default?</p>
+                <p class="text-sm text-gray-600 mb-6">Reset semua Kebutuhan Pribadi untuk tanggal ini ke default?</p>
                 <div class="flex gap-3 justify-center">
                     <button @click="confirmReset = false"
                         class="px-5 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl">

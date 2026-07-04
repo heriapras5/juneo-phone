@@ -46,7 +46,7 @@ $namaTeknisi = match($service->teknisi) {
             <td style="padding: 2px 3px; vertical-align: top;">:</td>
             <td style="padding: 2px 3px; vertical-align: top;">{{ $service->customer->no_hp ?? '-' }}</td>
         </tr>
-        @if($service->customer->alamat)
+        @if($service->customer?->alamat)
         <tr>
             <td style="font-weight: bold; color: #000; padding: 2px 3px; vertical-align: top;">Alamat</td>
             <td style="padding: 2px 3px; vertical-align: top;">:</td>
@@ -58,6 +58,20 @@ $namaTeknisi = match($service->teknisi) {
             <td style="padding: 2px 3px; vertical-align: top;">:</td>
             <td style="padding: 2px 3px; vertical-align: top;">{{ $namaTeknisi }}</td>
         </tr>
+        @if($service->garansi)
+        <tr>
+            <td style="font-weight: bold; color: #000; padding: 2px 3px; vertical-align: top;">Garansi</td>
+            <td style="padding: 2px 3px; vertical-align: top;">:</td>
+            <td style="padding: 2px 3px; vertical-align: top;">{{ $service->garansi }}</td>
+        </tr>
+        @endif
+        @if($service->keterangan)
+        <tr>
+            <td style="font-weight: bold; color: #000; padding: 2px 3px; vertical-align: top;">Ket.</td>
+            <td style="padding: 2px 3px; vertical-align: top;">:</td>
+            <td style="padding: 2px 3px; vertical-align: top;">{{ $service->keterangan }}</td>
+        </tr>
+        @endif
     </table>
 
     @php
@@ -102,22 +116,12 @@ $namaTeknisi = match($service->teknisi) {
         </tbody>
     </table>
 
-    <div style="margin: 4px 0; padding-top: 3px; border-top: 2px solid #000; text-align: right;">
+    <div style="margin: 4px 0; padding-top: 3px; border-top: 1px solid #000; text-align: right;">
         <div style="font-size: 12px; font-weight: bold; color: #000; margin-top: 2px;">
             Total: Rp {{ number_format($service->jasa, 0, ',', '.') }}
         </div>
     </div>
 
-    @if($service->garansi)
-    <div style="margin: 4px 0; padding: 3px 6px; background: #fff; border: 1px solid #000; font-size: 8px; color: #000; text-align: center;">
-        <strong>Garansi:</strong> {{ $service->garansi }}
-    </div>
-    @endif
 
-    @if($service->keterangan)
-    <div style="margin: 4px 0; padding: 3px 6px; background: #f9f9f9; border-left: 2px solid #000; font-size: 8px; color: #000;">
-        <strong>Catatan:</strong> {{ $service->keterangan }}
-    </div>
-    @endif
 
 </div>

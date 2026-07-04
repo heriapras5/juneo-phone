@@ -163,7 +163,7 @@
                     <span class="w-8 h-8 flex items-center justify-center rounded-lg {{ request()->routeIs('biaya-harian.*') ? 'bg-yellow-500/20' : '' }}">
                         <i class="fas fa-wallet w-5 text-center {{ request()->routeIs('biaya-harian.*') ? 'text-yellow-400' : '' }}"></i>
                     </span>
-                    <span class="sidebar-text">Biaya Harian</span>
+                    <span class="sidebar-text">Kebutuhan Pribadi</span>
                 </a>
 
                 {{-- Section: REPORTS --}}
@@ -268,7 +268,7 @@
                 </a>
                 <a href="{{ route('biaya-harian.index') }}" @click="sidebarMobileOpen = false"
                     class="flex items-center gap-3 pl-4 pr-3 py-2.5 text-sm {{ request()->routeIs('biaya-harian.*') ? 'bg-gradient-to-r from-yellow-500/15 to-amber-500/5 border-r-2 border-yellow-500 text-yellow-400' : 'text-gray-400 hover:bg-white/5 hover:text-yellow-400' }}">
-                    <span class="w-8 h-8 flex items-center justify-center rounded-lg {{ request()->routeIs('biaya-harian.*') ? 'bg-yellow-500/20' : '' }}"><i class="fas fa-wallet w-5 text-center"></i></span> Biaya Harian
+                    <span class="w-8 h-8 flex items-center justify-center rounded-lg {{ request()->routeIs('biaya-harian.*') ? 'bg-yellow-500/20' : '' }}"><i class="fas fa-wallet w-5 text-center"></i></span> Kebutuhan Pribadi
                 </a>
                 <div class="text-[10px] font-semibold text-gray-600 uppercase tracking-[2px] px-4 pt-4 pb-1">LAPORAN</div>
 

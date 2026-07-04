@@ -3,6 +3,8 @@
 @section('title', 'Dashboard')
 @section('page-title', 'Dashboard')
 
+{{-- No extra styles needed --}}
+
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 @endpush
@@ -14,29 +16,41 @@ $periodIcons = ['daily' => 'fa-calendar-day', 'weekly' => 'fa-calendar-week', 'm
 $hasCustomRange = request()->has('from') && request()->has('to');
 @endphp
 
-<div class="space-y-6" x-data="{ loading: false }" id="dashboard-app">
-    {{-- Period Filter Tabs (AJAX) --}}
-    <div class="flex flex-wrap items-center gap-1">
-        <span class="text-[10px] text-gray-400 italic mr-1">Filter waktu:</span>
+<div class="space-y-6" id="dashboard-app">
+
+    {{-- ============ Period Filter Bar (AJAX) ============ --}}
+    <div x-data="{ df: '{{ $fromDate->format('Y-m-d') }}', dt: '{{ $toDate->format('Y-m-d') }}' }" id="dashFilterBar" class="bg-white border border-gray-200 rounded-xl shadow-sm px-4 py-3 flex flex-wrap items-center gap-2">
+        <span class="text-[11px] text-gray-500 font-medium mr-1 flex items-center gap-1.5">
+            <i class="fas fa-filter text-yellow-500"></i> Filter waktu:
+        </span>
         @foreach(['daily', 'weekly', 'monthly', 'yearly'] as $p)
         <button data-period="{{ $p }}"
-            class="period-btn px-4 py-2 text-sm font-medium rounded-lg {{ $period === $p && !$hasCustomRange ? 'bg-gradient-to-r from-yellow-500 to-amber-500 text-white shadow-sm' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 shadow-sm' }}">
+            class="period-btn px-3.5 py-2 text-sm font-medium rounded-lg transition-colors {{ $period === $p && !$hasCustomRange ? 'bg-gradient-to-r from-yellow-500 to-amber-500 text-white shadow-sm' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 shadow-sm' }}">
             <i class="fas {{ $periodIcons[$p] }} mr-1.5"></i>{{ $periodLabels[$p] }}
         </button>
         @endforeach
-        <span class="text-[10px] text-gray-400 italic mx-1">Dari:</span>
-        <input type="date" id="filterFrom" value="{{ $fromDate->format('Y-m-d') }}"
-            class="px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
-        <span class="text-[10px] text-gray-400 italic">Sampai:</span>
-        <input type="date" id="filterTo" value="{{ $toDate->format('Y-m-d') }}"
-            class="px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
-        <button id="applyDateBtn"
-            class="px-3 py-2 text-sm font-medium bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white rounded-lg shadow-sm">
-            <i class="fas fa-check"></i> Terapkan
-        </button>
+
+        <span class="hidden sm:inline text-gray-200">|</span>
+
+        <div class="flex flex-wrap items-center gap-2">
+            <span class="text-[11px] text-gray-500 font-medium">Dari</span>
+            <input type="date" id="filterFrom" x-model="df"
+                class="px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
+            <span class="text-[11px] text-gray-500 font-medium">Sampai</span>
+            <input type="date" id="filterTo" x-model="dt"
+                class="px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
+            <button id="applyDateBtn"
+                class="px-4 py-2 text-sm font-medium bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white rounded-lg shadow-sm flex items-center gap-2">
+                <i class="fas fa-check"></i> Terapkan
+            </button>
+            <button id="resetDateBtn"
+                class="px-4 py-2 text-sm font-medium bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg shadow-sm flex items-center gap-2">
+                <i class="fas fa-undo"></i> Reset
+            </button>
+        </div>
     </div>
 
-    {{-- Period Info Bar --}}
+    {{-- ============ Period Info Bar ============ --}}
     <div class="bg-white border border-gray-200 rounded-xl shadow-sm px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-3">
         <div class="flex items-center gap-3 text-sm text-gray-700">
             <span class="flex items-center justify-center w-9 h-9 rounded-lg bg-yellow-50 text-yellow-500">
@@ -63,13 +77,13 @@ $hasCustomRange = request()->has('from') && request()->has('to');
         </div>
     </div>
 
-    {{-- Notif Biaya Harian --}}
+    {{-- ============ Notif Kebutuhan Pribadi ============ --}}
     <div id="biayaNotifWrap">
         @if(!$biayaCount)
         <div class="bg-orange-50 border border-orange-200 text-orange-700 px-4 py-3 rounded-xl flex items-center gap-3 shadow-sm">
             <i class="fas fa-clock text-orange-500 text-lg"></i>
             <div class="flex-1">
-                Biaya harian hari ini <strong>belum tercatat</strong>
+                Kebutuhan Pribadi hari ini <strong>belum tercatat</strong>
             </div>
             <a href="{{ route('biaya-harian.index') }}" class="px-4 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium">
                 Catat Sekarang
@@ -81,121 +95,136 @@ $hasCustomRange = request()->has('from') && request()->has('to');
     {{-- Empty State (AJAX) --}}
     <div id="emptyStateWrap"></div>
 
-    {{-- Row 1: Financial KPI (AJAX update) --}}
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="rowKpi">
-        @include('dashboard._partials.kpi-cards', [
-            'periodLabels' => $periodLabels,
-            'period' => $period,
-            'fromDate' => $fromDate,
-            'toDate' => $toDate,
-            'periodTotals' => $periodTotals,
-            'prevPeriodTotals' => $prevPeriodTotals,
-            'changeRev' => $changeRev,
-            'changeBiaya' => $changeBiaya,
-            'changeNet' => $changeNet,
-        ])
-    </div>
+    {{-- SVG Gradient Defs for sparklines --}}
+    <svg width="0" height="0" style="position:absolute;pointer-events:none">
+        <defs>
+            <linearGradient id="sparkAmber" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#F59E0B"/>
+                <stop offset="100%" stop-color="#D97706"/>
+            </linearGradient>
+            <linearGradient id="sparkEmerald" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#10B981"/>
+                <stop offset="100%" stop-color="#059669"/>
+            </linearGradient>
+        </defs>
+    </svg>
 
-    {{-- Row 2: Extra Metrics (AJAX update) --}}
-    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4" id="rowMetrics">
-        @include('dashboard._partials.metrics', [
-            'profitMargin' => $profitMargin,
-            'changeMargin' => $changeMargin,
-            'avgProfitPerService' => $avgProfitPerService,
-            'changeAvgProfit' => $changeAvgProfit,
-            'periodTotals' => $periodTotals,
-            'prevPeriodTotals' => $prevPeriodTotals,
-            'changeBiaya' => $changeBiaya,
-            'totalCustomers' => $totalCustomers,
-        ])
-    </div>
-
-    {{-- Row 3: Gaji Detail + Bank Jago (AJAX update) --}}
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="rowGaji">
-        @include('dashboard._partials.gaji', [
-            'periodTotals' => $periodTotals,
-            'prevPeriodTotals' => $prevPeriodTotals,
-            'hariKerja' => $hariKerja,
-            'changeJago' => $changeJago,
-        ])
-    </div>
-
-    {{-- Row 4: Chart + Status --}}
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="lg:col-span-2 bg-white border border-gray-200 rounded-xl shadow-sm p-5">
-            <h3 class="text-sm font-semibold text-gray-700 mb-1 flex items-center gap-2">
-                <i class="fas fa-chart-bar text-yellow-500"></i>
-                Grafik <span id="chartPeriodLabel">{{ $periodLabels[$period] }}</span>
-            </h3>
-            <p class="text-[10px] text-gray-400 italic mb-3">Perbandingan Pendapatan, Pengeluaran &amp; Keuntungan Bersih per periode</p>
-            <div class="relative" style="height: 260px;">
-                <canvas id="revenueChart" style="max-height:100%;max-width:100%;"></canvas>
-            </div>
+    {{-- ============ BAGIAN A: Ringkasan Keuangan ============ --}}
+    {{-- 4 KPI utama: Pengeluaran | Omzet | Kebutuhan Pribadi | Profit --}}
+    <section class="space-y-3" id="kpiSection">
+        <div class="flex items-center gap-2">
+            <span class="h-5 w-1.5 rounded-full bg-gradient-to-b from-yellow-500 to-amber-500"></span>
+            <h2 class="text-sm font-bold text-gray-800 uppercase tracking-wide">Ringkasan Keuangan</h2>
+            <span class="text-[11px] text-gray-400 italic hidden sm:inline">— Pengeluaran, Omzet, Kebutuhan Pribadi &amp; Profit</span>
         </div>
-        <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5">
-            <h3 class="text-sm font-semibold text-gray-700 mb-1 flex items-center gap-2">
-                <i class="fas fa-chart-donut text-yellow-500"></i>
-                Status Service
-            </h3>
-            <p class="text-[10px] text-gray-400 italic mb-3">Persentase status pengerjaan service saat ini</p>
-            <div class="relative" style="height: 260px;">
-                <canvas id="statusChart" style="max-height:100%;max-width:100%;"></canvas>
-            </div>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 items-stretch" id="rowKpi">
+            @include('dashboard._partials.kpi-cards', [
+                'periodLabels' => $periodLabels,
+                'period' => $period,
+                'fromDate' => $fromDate,
+                'toDate' => $toDate,
+                'periodTotals' => $periodTotals,
+                'prevPeriodTotals' => $prevPeriodTotals,
+                'changePengeluaran' => $changePengeluaran,
+                'changeOmzet' => $changeOmzet,
+                'changeKebutuhan' => $changeKebutuhan,
+                'changeProfit' => $changeProfit,
+            ])
         </div>
-    </div>
+    </section>
 
-    {{-- Row 5: Recent Services --}}
-    <div class="bg-white border border-gray-200 rounded-xl shadow-sm">
-        <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-            <div>
-                <h3 class="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                    <i class="fas fa-clock-rotate-left text-yellow-500"></i>
-                    Service Terbaru
+    {{-- ============ BAGIAN B: Grafik & Status ============ --}}
+    <section class="space-y-3" id="chartSection">
+        <div class="flex items-center gap-2">
+            <span class="h-5 w-1.5 rounded-full bg-gradient-to-b from-yellow-500 to-amber-500"></span>
+            <h2 class="text-sm font-bold text-gray-800 uppercase tracking-wide">Grafik &amp; Status</h2>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 bg-white border border-gray-200 rounded-xl shadow-sm p-5 transition-all duration-200 ease-in-out hover:-translate-y-1 hover:shadow-lg">
+                <h3 class="text-sm font-semibold text-gray-700 mb-1 flex items-center gap-2">
+                    <i class="fas fa-chart-bar text-yellow-500"></i>
+                    Grafik <span id="chartPeriodLabel">{{ $periodLabels[$period] }}</span>
                 </h3>
-                <p class="text-[10px] text-gray-400 italic mt-0.5">10 service terakhir yang dicatat</p>
+                <p class="text-[10px] text-gray-400 italic mb-3">Perbandingan Omzet, Pengeluaran &amp; Profit per periode</p>
+                <div class="relative" style="height: 260px;">
+                    <canvas id="revenueChart" style="max-height:100%;max-width:100%;"></canvas>
+                </div>
+            </div>
+            <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5 transition-all duration-200 ease-in-out hover:-translate-y-1 hover:shadow-lg">
+                <h3 class="text-sm font-semibold text-gray-700 mb-1 flex items-center gap-2">
+                    <i class="fas fa-chart-donut text-yellow-500"></i>
+                    Status Service
+                </h3>
+                <p class="text-[10px] text-gray-400 italic mb-3">Persentase status pengerjaan service saat ini</p>
+                <div class="relative" style="height: 260px;">
+                    <canvas id="statusChart" style="max-height:100%;max-width:100%;"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {{-- ============ BAGIAN C: Service Terbaru ============ --}}
+    <section class="space-y-3">
+        <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+                <span class="h-5 w-1.5 rounded-full bg-gradient-to-b from-yellow-500 to-amber-500"></span>
+                <h2 class="text-sm font-bold text-gray-800 uppercase tracking-wide">Service Terbaru</h2>
             </div>
             <a href="{{ route('services.index') }}" class="text-xs text-yellow-600 hover:text-yellow-700 font-medium">Lihat Semua →</a>
         </div>
-        <div class="divide-y divide-gray-100" id="recentServicesList">
-            @forelse($recentServices as $service)
-            <div class="px-5 py-3 flex items-center justify-between hover:bg-gray-50/50">
-                <div class="flex items-center gap-3 min-w-0">
-                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-yellow-50 to-amber-100 flex items-center justify-center flex-shrink-0">
-                        <i class="fas fa-mobile-alt text-yellow-600 text-xs"></i>
+        <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+            <p class="px-5 pt-3 text-[10px] text-gray-400 italic">10 service terakhir yang dicatat</p>
+            <div class="divide-y divide-gray-100" id="recentServicesList">
+                @forelse($recentServices as $service)
+                <div class="px-5 py-3 flex items-center justify-between hover:bg-gray-50/50">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-yellow-50 to-amber-100 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-mobile-alt text-yellow-600 text-xs"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-sm font-medium text-gray-900 truncate">{{ $service->customer?->nama ?? '-' }}</p>
+                            @php $kr = is_string($service->kerusakan) ? json_decode($service->kerusakan, true) : $service->kerusakan; @endphp
+                            <p class="text-xs text-gray-500 truncate">{{ $service->type_hp }} — {{ is_array($kr) ? implode(', ', $kr) : $service->kerusakan }}</p>
+                        </div>
                     </div>
-                    <div class="min-w-0">
-                        <p class="text-sm font-medium text-gray-900 truncate">{{ $service->customer?->nama ?? '-' }}</p>
-                        @php $kr = is_string($service->kerusakan) ? json_decode($service->kerusakan, true) : $service->kerusakan; @endphp
-                        <p class="text-xs text-gray-500 truncate">{{ $service->type_hp }} — {{ is_array($kr) ? implode(', ', $kr) : $service->kerusakan }}</p>
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        @php
+                        $cls = match($service->status) { 'menunggu' => 'bg-yellow-100 text-yellow-700', 'dikerjakan' => 'bg-blue-100 text-blue-700', 'selesai' => 'bg-emerald-100 text-emerald-700', 'diambil' => 'bg-gray-100 text-gray-600', 'batal' => 'bg-red-100 text-red-700', default => 'bg-gray-100 text-gray-600' };
+                        $label = match($service->status) { 'menunggu' => 'Menunggu', 'dikerjakan' => 'Dikerjakan', 'selesai' => 'Selesai', 'diambil' => 'Diambil', 'batal' => 'Batal', default => $service->status };
+                        @endphp
+                        <span class="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-medium min-w-[90px] leading-none {{ $cls }}">{{ $label }}</span>
+                        <span class="text-xs text-gray-400 w-10 text-right">{{ $service->tanggal->format('d/m') }}</span>
                     </div>
                 </div>
-                <div class="flex items-center gap-2 flex-shrink-0">
-                    @php
-                    $cls = match($service->status) { 'menunggu' => 'bg-yellow-100 text-yellow-700', 'dikerjakan' => 'bg-blue-100 text-blue-700', 'selesai' => 'bg-emerald-100 text-emerald-700', 'diambil' => 'bg-gray-100 text-gray-600', 'batal' => 'bg-red-100 text-red-700', default => 'bg-gray-100 text-gray-600' };
-                    $label = match($service->status) { 'menunggu' => 'Menunggu', 'dikerjakan' => 'Dikerjakan', 'selesai' => 'Selesai', 'diambil' => 'Diambil', 'batal' => 'Batal', default => $service->status };
-                    @endphp
-                    <span class="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-medium min-w-[90px] leading-none {{ $cls }}">{{ $label }}</span>
-                    <span class="text-xs text-gray-400 w-10 text-right">{{ $service->tanggal->format('d/m') }}</span>
+                @empty
+                <div class="px-5 py-8 text-center text-gray-400">
+                    <i class="fas fa-inbox text-2xl mb-1 block"></i>
+                    Belum ada service
                 </div>
+                @endforelse
             </div>
-            @empty
-            <div class="px-5 py-8 text-center text-gray-400">
-                <i class="fas fa-inbox text-2xl mb-1 block"></i>
-                Belum ada service
-            </div>
-            @endforelse
         </div>
-    </div>
+    </section>
 </div>
 @endsection
 
 @push('scripts')
 <script>
 var periodLabels = @json($periodLabels);
-var periodIcons = @json($periodIcons);
 var statusCounts = @json($statusCounts);
 var chartInstance = null;
 var statusChartInstance = null;
+var lastUserAction = Date.now();
+var refreshParams = {};
+var dateFilterApi = {
+    df: '{{ $fromDate->format('Y-m-d') }}',
+    dt: '{{ $toDate->format('Y-m-d') }}',
+    set: function(from, to) {
+        this.df = from; this.dt = to;
+        var el = document.getElementById('dashFilterBar');
+        if (el) { try { Alpine.$data(el).df = from; Alpine.$data(el).dt = to; } catch(e) {} }
+    }
+};
 
 function fmtRp(val) {
     return 'Rp ' + Number(val).toLocaleString('id-ID');
@@ -209,9 +238,9 @@ function updateTabActive(period, hasCustom) {
     document.querySelectorAll('.period-btn').forEach(function(btn) {
         var p = btn.dataset.period;
         if (p === period && !hasCustom) {
-            btn.className = 'period-btn px-4 py-2 text-sm font-medium rounded-lg bg-gradient-to-r from-yellow-500 to-amber-500 text-white shadow-sm';
+            btn.className = 'period-btn px-3.5 py-2 text-sm font-medium rounded-lg transition-colors bg-gradient-to-r from-yellow-500 to-amber-500 text-white shadow-sm';
         } else {
-            btn.className = 'period-btn px-4 py-2 text-sm font-medium rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 shadow-sm';
+            btn.className = 'period-btn px-3.5 py-2 text-sm font-medium rounded-lg transition-colors bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 shadow-sm';
         }
     });
 }
@@ -219,10 +248,10 @@ function updateTabActive(period, hasCustom) {
 function updateChart(newChartData) {
     if (chartInstance) {
         chartInstance.data.labels = newChartData.labels;
-        chartInstance.data.datasets[0].data = newChartData.revenue;
+        chartInstance.data.datasets[0].data = newChartData.omzet;
         chartInstance.data.datasets[1].data = newChartData.pengeluaran;
-        chartInstance.data.datasets[2].data = newChartData.net_profit;
-        chartInstance.update('none');
+        chartInstance.resize();
+        chartInstance.update();
     }
 }
 
@@ -272,16 +301,131 @@ function updateRecentServices(services) {
     wrap.innerHTML = html;
 }
 
+{{-- Bangun SATU kartu KPI dengan struktur div seimbang (buka = tutup).
+    Inilah kunci fix bug "angka hilang setelah filter tanggal": sebelumnya 4 kartu
+    dibangun jadi satu rantai string yang saling bersarang tanpa </div> penutup. --}}
+function kpiCardHTML(cfg) {
+    var changeHtml;
+    if (cfg.change !== null && cfg.change !== undefined) {
+        var up = cfg.change >= 0;
+        var good = cfg.upIsGood ? up : !up;       {{-- naik=bagus atau turun=bagus --}}
+        var color = good ? 'emerald' : 'red';
+        changeHtml = '<div class="flex items-center gap-1 mt-1">'
+            + '<i class="fas fa-' + (up ? 'arrow-up' : 'arrow-down') + ' text-' + color + '-500 text-xs"></i>'
+            + '<span class="text-xs font-medium text-' + color + '-600">' + fmtPct(cfg.change) + '</span>'
+            + '<span class="text-xs text-gray-400">vs periode lalu</span>'
+            + '</div>';
+    } else {
+        changeHtml = '<div class="flex items-center gap-1 mt-1"><span class="text-xs font-medium text-gray-400">— vs periode lalu</span></div>';
+    }
+
+    var foot  = cfg.foot  ? '<p class="text-xs text-gray-400 mt-1">' + cfg.foot + '</p>' : '';
+    var extra = cfg.extra || '';
+
+    return ''
+    + '<div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden group flex flex-col h-full transition-all duration-200 ease-in-out hover:-translate-y-1 hover:shadow-lg">'
+    +   '<div class="p-5 flex-1">'
+    +     '<div class="flex items-start justify-between">'
+    +       '<div class="flex-1 min-w-0">'
+    +         '<p class="text-xs text-gray-500 uppercase tracking-wider font-medium">' + cfg.title + '</p>'
+    +         '<p class="text-[10px] text-gray-400 italic mt-1">' + cfg.desc + '</p>'
+    +         '<p class="text-2xl font-bold mt-1 ' + cfg.valueCls + '">' + fmtRp(cfg.value) + '</p>'
+    +         extra
+    +         foot
+    +         changeHtml
+    +       '</div>'
+    +       '<div class="w-11 h-11 rounded-xl bg-gradient-to-br ' + cfg.iconBg + ' flex items-center justify-center shadow-md flex-shrink-0">'
+    +         '<i class="fas ' + cfg.icon + ' text-' + cfg.iconColor + ' text-lg"></i>'
+    +       '</div>'
+    +     '</div>'
+    +     '<div class="mt-3">'
+    +       '<svg class="w-full h-8" viewBox="0 0 200 30" preserveAspectRatio="none">'
+    +         '<path d="' + cfg.sparkPath + '" fill="none" stroke="' + cfg.sparkStroke + '" stroke-width="2" stroke-linecap="round"/>'
+    +         '<path d="' + cfg.sparkPath + ' L200,30 L0,30 Z" fill="' + cfg.sparkFill + '" opacity="0.15"/>'
+    +       '</svg>'
+    +     '</div>'
+    +   '</div>'
+    +   '<div class="h-1 ' + cfg.barCls + '"></div>'
+    + '</div>';
+}
+
+function buildKpiCardsHTML(d, periodLabel) {
+    var profitPositive = d.profit >= 0;
+    var cards = [
+        kpiCardHTML({
+            title: 'Pengeluaran ' + periodLabel,
+            desc: 'Modal sparepart — total biaya beli komponen service',
+            value: d.pengeluaran, valueCls: 'text-red-500',
+            icon: 'fa-cart-shopping', iconBg: 'from-red-50 to-rose-100', iconColor: 'red-600',
+            change: d.changePengeluaran, upIsGood: false,
+            foot: d.services + ' service tercatat',
+            sparkPath: 'M0,25 Q20,20 40,22 T80,15 T120,18 T160,8 T200,10',
+            sparkStroke: '#EF4444', sparkFill: 'url(#sparkAmber)',
+            barCls: 'bg-red-500'
+        }),
+        kpiCardHTML({
+            title: 'Omzet ' + periodLabel,
+            desc: 'Total tagihan jasa service ke pelanggan — belum dipotong biaya apapun',
+            value: d.omzet, valueCls: 'text-gray-900',
+            icon: 'fa-money-bill-wave', iconBg: 'from-emerald-50 to-green-100', iconColor: 'emerald-600',
+            change: d.changeOmzet, upIsGood: true,
+            foot: d.services + ' service tercatat',
+            sparkPath: 'M0,25 Q25,15 45,20 T85,10 T125,14 T165,6 T200,12',
+            sparkStroke: '#10B981', sparkFill: 'url(#sparkEmerald)',
+            barCls: 'bg-emerald-500'
+        }),
+        kpiCardHTML({
+            title: 'Kebutuhan Pribadi ' + periodLabel,
+            desc: 'Bank Jago + Gaji Edi + Gaji Nur + Lainnya — total biaya kebutuhan harian',
+            value: d.kebutuhan_pribadi, valueCls: 'text-orange-600',
+            icon: 'fa-wallet', iconBg: 'from-orange-50 to-amber-100', iconColor: 'orange-600',
+            change: d.changeKebutuhan, upIsGood: false,
+            extra: '<div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs">'
+                + '<span class="text-gray-400">Bank Jago:</span><span class="font-medium text-blue-600">' + fmtRp(d.bank_jago) + '</span>'
+                + '<span class="text-gray-300">|</span>'
+                + '<span class="text-gray-400">Gaji Edi:</span><span class="font-medium text-purple-600">' + fmtRp(d.gaji_edi) + '</span>'
+                + '<span class="text-gray-300">|</span>'
+                + '<span class="text-gray-400">Gaji Nur:</span><span class="font-medium text-purple-600">' + fmtRp(d.gaji_nur) + '</span>'
+                + '<span class="text-gray-300">|</span>'
+                + '<span class="text-gray-400">Lainnya:</span><span class="font-medium text-amber-600">' + fmtRp(d.lainnya) + '</span>'
+                + '</div>',
+            sparkPath: 'M0,25 Q20,20 40,22 T80,15 T120,18 T160,8 T200,10',
+            sparkStroke: '#F59E0B', sparkFill: 'url(#sparkAmber)',
+            barCls: 'bg-orange-500'
+        }),
+        kpiCardHTML({
+            title: 'Profit ' + periodLabel,
+            desc: 'Sisa keuntungan setelah dikurangi seluruh Kebutuhan Pribadi',
+            value: d.profit, valueCls: profitPositive ? 'text-emerald-600' : 'text-red-600',
+            icon: 'fa-coins', iconBg: 'from-emerald-50 to-green-100', iconColor: 'emerald-600',
+            change: d.changeProfit, upIsGood: true,
+            foot: 'Omzet - Pengeluaran - Kebutuhan Pribadi',
+            sparkPath: 'M0,22 Q30,18 50,20 T100,12 T140,16 T180,5 T200,8',
+            sparkStroke: profitPositive ? '#10B981' : '#EF4444',
+            sparkFill: profitPositive ? 'url(#sparkEmerald)' : 'url(#sparkAmber)',
+            barCls: profitPositive ? 'bg-emerald-500' : 'bg-red-500'
+        })
+    ];
+    return cards.join('');
+}
+
 function updateCards(d) {
+    // Update refreshParams untuk auto-refresh
+    if (d.hasCustomRange) {
+        refreshParams = { from: d.fromDateInput, to: d.toDateInput };
+    } else if (d.period) {
+        refreshParams = { period: d.period };
+    }
+
     // Tab highlight
     updateTabActive(d.period, d.hasCustomRange);
+
+    var periodLabel = d.hasCustomRange ? 'Rentang Kustom' : (periodLabels[d.period] || '');
 
     // Info bar
     document.getElementById('infoFromDate').textContent = d.fromDate;
     document.getElementById('infoToDate').textContent = d.toDate;
-    document.getElementById('chartPeriodLabel').textContent = d.hasCustomRange ? 'Rentang Kustom' : (periodLabels[d.period] || 'Kustom');
-
-    var periodLabel = d.hasCustomRange ? 'Rentang Kustom' : (periodLabels[d.period] || '');
+    document.getElementById('chartPeriodLabel').textContent = periodLabel;
     document.getElementById('infoPeriodLabel').textContent = periodLabel;
 
     // Badge
@@ -294,16 +438,26 @@ function updateCards(d) {
     if (isComp) { endDate.style.display = 'none'; }
     else { endDate.style.display = ''; document.getElementById('infoEndDateText').textContent = d.toDate; }
 
-    // Input date values
-    document.getElementById('filterFrom').value = d.fromDateInput;
-    document.getElementById('filterTo').value = d.toDateInput;
+    // Input date values — Alpine x-model akan sikronkan ke DOM
+    dateFilterApi.set(d.fromDateInput, d.toDateInput);
 
-    // Biaya harian notif
+    // Notif Kebutuhan Pribadi, empty state, KPI, chart
+    updateKpiOnly(d, periodLabel);
+}
+
+function updateKpiOnly(d, periodLabel) {
+    // Restore date inputs via Alpine x-model — tahan terhadap Chrome autofill
+    if (d.fromDateInput && d.toDateInput) dateFilterApi.set(d.fromDateInput, d.toDateInput);
+    if (!periodLabel) {
+        periodLabel = d.hasCustomRange ? 'Rentang Kustom' : (periodLabels[d.period] || '');
+    }
+
+    // Notif Kebutuhan Pribadi
     var bw = document.getElementById('biayaNotifWrap');
     if (!d.biayaCount) {
         bw.innerHTML = '<div class="bg-orange-50 border border-orange-200 text-orange-700 px-4 py-3 rounded-xl flex items-center gap-3 shadow-sm">'
             + '<i class="fas fa-clock text-orange-500 text-lg"></i>'
-            + '<div class="flex-1">Biaya harian hari ini <strong>belum tercatat</strong></div>'
+            + '<div class="flex-1">Kebutuhan Pribadi hari ini <strong>belum tercatat</strong></div>'
             + '<a href="{{ route('biaya-harian.index') }}" class="px-4 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium">Catat Sekarang</a>'
             + '</div>';
     } else {
@@ -322,133 +476,15 @@ function updateCards(d) {
         ew.innerHTML = '';
     }
 
-    // === Row 1: KPI Cards ===
-    var kpi = document.getElementById('rowKpi');
-    kpi.innerHTML = ''
-        + '<div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden group">'
-        +   '<div class="p-5"><div class="flex items-start justify-between">'
-        +     '<div class="flex-1 min-w-0">'
-        +       '<p class="text-xs text-gray-500 uppercase tracking-wider font-medium">Pendapatan ' + periodLabel + '</p>'
-        +       '<p class="text-[10px] text-gray-400">' + d.fromDate + ' — ' + d.toDate + '</p>'
-        +       '<p class="text-[10px] text-gray-400 italic mt-0.5">Total uang masuk dari jasa service — belum dipotong biaya apapun</p>'
-        +       '<p class="text-2xl font-bold mt-1" style="color:#1F2937;">' + fmtRp(d.revenue) + '</p>'
-        +       (d.changeRev !== null
-        ?         '<div class="flex items-center gap-1 mt-1.5"><i class="fas fa-' + (d.changeRev >= 0 ? 'arrow-up' : 'arrow-down') + ' text-' + (d.changeRev >= 0 ? 'emerald' : 'red') + '-500 text-xs"></i><span class="text-xs font-medium text-' + (d.changeRev >= 0 ? 'emerald' : 'red') + '-600">' + fmtPct(d.changeRev) + '</span><span class="text-xs text-gray-400">vs periode lalu</span></div>'
-        :         '<div class="flex items-center gap-1 mt-1.5"><span class="text-xs font-medium text-gray-400">— vs periode lalu</span></div>')
-        +     '</div>'
-        +     '<div class="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-50 to-green-100 flex items-center justify-center shadow-md flex-shrink-0"><i class="fas fa-money-bill-wave text-emerald-600 text-lg"></i></div>'
-        +   '</div><p class="text-xs text-gray-400 mt-2">' + d.services + ' service tercatat</p>'
-        +   '<div class="mt-1"><svg class="w-full h-8" viewBox="0 0 200 30" preserveAspectRatio="none"><path d="M0,25 Q25,15 45,20 T85,10 T125,14 T165,6 T200,12" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round"/><path d="M0,25 Q25,15 45,20 T85,10 T125,14 T165,6 T200,12 L200,30 L0,30 Z" fill="url(#sparkEmerald)" opacity="0.15"/></svg></div>'
-        + '</div></div>'
+    // === 4 KPI Cards — Pengeluaran | Omzet | Kebutuhan Pribadi | Profit ===
+    document.getElementById('rowKpi').innerHTML = buildKpiCardsHTML(d, periodLabel);
 
-        + '<div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden group">'
-        +   '<div class="p-5"><div class="flex items-start justify-between">'
-        +     '<div class="flex-1 min-w-0">'
-        +       '<p class="text-xs text-gray-500 uppercase tracking-wider font-medium">Pengeluaran ' + periodLabel + '</p>'
-        +       '<p class="text-[10px] text-gray-400">' + d.fromDate + ' — ' + d.toDate + '</p>'
-        +       '<p class="text-[10px] text-gray-400 italic mt-0.5">Sparepart + Kebutuhan Pribadi + Gaji + Biaya Operasional</p>'
-        +       '<p class="text-2xl font-bold mt-1 text-red-500">' + fmtRp(d.pengeluaran) + '</p>'
-        +       '<div class="flex items-center gap-2 mt-1.5 text-xs">'
-        +         '<span class="text-gray-400">Modal:</span><span class="font-medium text-red-500">' + fmtRp(d.expenses) + '</span>'
-        +         '<span class="text-gray-300">|</span>'
-        +         '<span class="text-gray-400">Gaji:</span><span class="font-medium text-purple-600">' + fmtRp(d.total_gaji) + '</span>'
-        +         '<span class="text-gray-300">|</span>'
-        +         '<span class="text-gray-400">Operasional:</span><span class="font-medium text-orange-600">' + fmtRp(d.biaya_harian) + '</span>'
-        +       '</div>'
-        +       (d.changeRev !== null
-        ?         '<div class="flex items-center gap-1 mt-1.5"><i class="fas fa-' + (d.changeBiaya >= 0 ? 'arrow-up' : 'arrow-down') + ' text-' + (d.changeBiaya >= 0 ? 'red' : 'emerald') + '-500 text-xs"></i><span class="text-xs font-medium text-' + (d.changeBiaya >= 0 ? 'red' : 'emerald') + '-600">' + fmtPct(d.changeBiaya) + '</span><span class="text-xs text-gray-400">vs periode lalu</span></div>'
-        :         '<div class="flex items-center gap-1 mt-1.5"><span class="text-xs font-medium text-gray-400">— vs periode lalu</span></div>')
-        +     '</div>'
-        +     '<div class="w-11 h-11 rounded-xl bg-gradient-to-br from-red-50 to-rose-100 flex items-center justify-center shadow-md flex-shrink-0"><i class="fas fa-cart-shopping text-red-600 text-lg"></i></div>'
-        +   '</div></div></div>'
-
-        + '<div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden group">'
-        +   '<div class="p-5"><div class="flex items-start justify-between">'
-        +     '<div class="flex-1 min-w-0">'
-        +       '<p class="text-xs text-gray-500 uppercase tracking-wider font-medium">Keuntungan Bersih ' + periodLabel + '</p>'
-        +       '<p class="text-[10px] text-gray-400">' + d.fromDate + ' — ' + d.toDate + '</p>'
-        +       '<p class="text-[10px] text-gray-400 italic mt-0.5">Sisa uang setelah Pendapatan dikurangi seluruh Pengeluaran</p>'
-        +       '<p class="text-2xl font-bold mt-1 ' + (d.net_profit >= 0 ? 'text-emerald-600' : 'text-red-600') + '">' + fmtRp(d.net_profit) + '</p>'
-        +       '<p class="text-xs text-gray-400 mt-1.5">Pendapatan - Pengeluaran</p>'
-        +       (d.changeNet !== null
-        ?         '<div class="flex items-center gap-1 mt-1"><i class="fas fa-' + (d.changeNet >= 0 ? 'arrow-up' : 'arrow-down') + ' text-' + (d.changeNet >= 0 ? 'emerald' : 'red') + '-500 text-xs"></i><span class="text-xs font-medium text-' + (d.changeNet >= 0 ? 'emerald' : 'red') + '-600">' + fmtPct(d.changeNet) + '</span><span class="text-xs text-gray-400">vs periode lalu</span></div>'
-        :         '<div class="flex items-center gap-1 mt-1"><span class="text-xs font-medium text-gray-400">— vs periode lalu</span></div>')
-        +     '</div>'
-        +     '<div class="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-50 to-green-100 flex items-center justify-center shadow-md flex-shrink-0"><i class="fas fa-coins text-emerald-600 text-lg"></i></div>'
-        +   '</div></div></div>';
-
-    // === Row 2: Metrics ===
-    var metric = document.getElementById('rowMetrics');
-    metric.innerHTML = ''
-        + '<div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5 flex items-center gap-4">'
-        +   '<div class="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-50 to-amber-100 flex items-center justify-center flex-shrink-0 shadow-md"><i class="fas fa-percent text-yellow-600 text-lg"></i></div>'
-        +   '<div><p class="text-xs text-gray-500 uppercase tracking-wider font-medium">Margin Keuntungan</p>'
-        +   '<p class="text-[10px] text-gray-400 italic leading-tight">Persentase keuntungan bersih dari pendapatan</p>'
-        +   '<p class="text-xl font-bold mt-0.5" style="color:#1F2937;">' + Number(d.profitMargin).toFixed(1) + '%</p>'
-        +   (d.prevRevenue > 0
-        ?     '<div class="flex items-center gap-1 mt-0.5"><i class="fas fa-' + ((d.profitMargin - ((d.prevNet/d.prevRevenue)*100)) >= 0 ? 'arrow-up' : 'arrow-down') + ' text-' + ((d.profitMargin - ((d.prevNet/d.prevRevenue)*100)) >= 0 ? 'emerald' : 'red') + '-500 text-[10px]"></i><span class="text-[10px] font-medium text-gray-400">vs periode lalu</span></div>'
-        :     '<div class="flex items-center gap-1 mt-0.5"><span class="text-[10px] font-medium text-gray-400">— vs periode lalu</span></div>')
-        + '</div></div>'
-
-        + '<div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5 flex items-center gap-4">'
-        +   '<div class="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-50 to-purple-100 flex items-center justify-center flex-shrink-0 shadow-md"><i class="fas fa-calculator text-violet-600 text-lg"></i></div>'
-        +   '<div><p class="text-xs text-gray-500 uppercase tracking-wider font-medium">Rata-rata Keuntungan/Service</p>'
-        +   '<p class="text-[10px] text-gray-400 italic leading-tight">Rata-rata keuntungan bersih dari setiap service</p>'
-        +   '<p class="text-xl font-bold mt-0.5" style="color:#1F2937;">' + fmtRp(d.avgProfitPerService) + '</p>'
-        +   (d.prevServices > 0
-        ?     '<div class="flex items-center gap-1 mt-0.5"><span class="text-[10px] font-medium text-gray-400">vs periode lalu</span></div>'
-        :     '<div class="flex items-center gap-1 mt-0.5"><span class="text-[10px] font-medium text-gray-400">— vs periode lalu</span></div>')
-        + '</div></div>'
-
-        + '<div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5 flex items-center gap-4">'
-        +   '<div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-50 to-amber-100 flex items-center justify-center flex-shrink-0 shadow-md"><i class="fas fa-receipt text-orange-600 text-lg"></i></div>'
-        +   '<div><p class="text-xs text-gray-500 uppercase tracking-wider font-medium">Biaya Harian</p>'
-        +   '<p class="text-[10px] text-gray-400 italic leading-tight">Biaya Operasional Harian (Bank Jago + Lainnya) — di luar gaji karyawan</p>'
-        +   '<p class="text-xl font-bold mt-0.5 text-orange-600">' + fmtRp(d.biaya_harian) + '</p>'
-        +   '<div class="flex items-center gap-2 mt-1 text-[10px] text-gray-400">'
-        +     '<span>Bank Jago: <span class="font-medium text-gray-600">' + fmtRp(d.bank_jago) + '</span></span>'
-        +     '<span class="text-gray-300">|</span>'
-        +     '<span>Lainnya: <span class="font-medium text-gray-600">' + fmtRp(d.biaya_harian - d.bank_jago) + '</span></span>'
-        +   '</div></div></div>'
-
-        + '<div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5 flex items-center gap-4">'
-        +   '<div class="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-50 to-blue-100 flex items-center justify-center flex-shrink-0 shadow-md"><i class="fas fa-users text-blue-600 text-lg"></i></div>'
-        +   '<div><p class="text-xs text-gray-500 uppercase tracking-wider font-medium">Total Pelanggan</p>'
-        +   '<p class="text-[10px] text-gray-400 italic leading-tight">Jumlah seluruh pelanggan yang pernah tercatat</p>'
-        +   '<p class="text-xl font-bold mt-0.5" style="color:#1F2937;">' + Number(d.totalCustomers).toLocaleString('id-ID') + '</p>'
-        +   '<p class="text-xs text-gray-400">Seluruh masa</p></div></div>';
-
-    // === Row 3: Gaji ===
-    var gaji = document.getElementById('rowGaji');
-    gaji.innerHTML = ''
-        + '<div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5 flex items-center gap-4">'
-        +   '<div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center flex-shrink-0 shadow-md"><i class="fas fa-user-tie text-blue-600 text-lg"></i></div>'
-        +   '<div><p class="text-xs text-gray-500 uppercase tracking-wider font-medium">Gaji Edi</p>'
-        +   '<p class="text-[10px] text-gray-400 italic leading-tight">Rp 60.000/hari × ' + d.hariKerja + ' hari kerja</p>'
-        +   '<p class="text-xl font-bold mt-0.5" style="color:#1F2937;">' + fmtRp(d.gaji_edi) + '</p>'
-        +   '<p class="text-xs text-gray-400 mt-0.5">' + d.hariKerja + ' hari kerja</p></div></div>'
-
-        + '<div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5 flex items-center gap-4">'
-        +   '<div class="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-50 to-rose-100 flex items-center justify-center flex-shrink-0 shadow-md"><i class="fas fa-user-tie text-rose-600 text-lg"></i></div>'
-        +   '<div><p class="text-xs text-gray-500 uppercase tracking-wider font-medium">Gaji Nur</p>'
-        +   '<p class="text-[10px] text-gray-400 italic leading-tight">Rp 30.000/hari × ' + d.hariKerja + ' hari kerja</p>'
-        +   '<p class="text-xl font-bold mt-0.5" style="color:#1F2937;">' + fmtRp(d.gaji_nur) + '</p>'
-        +   '<p class="text-xs text-gray-400 mt-0.5">' + d.hariKerja + ' hari kerja</p></div></div>'
-
-        + '<div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5 flex items-center gap-4">'
-        +   '<div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-50 to-sky-100 flex items-center justify-center flex-shrink-0 shadow-md"><i class="fas fa-piggy-bank text-blue-600 text-lg"></i></div>'
-        +   '<div><p class="text-xs text-gray-500 uppercase tracking-wider font-medium">Tabungan Bank Jago</p>'
-        +   '<p class="text-xl font-bold mt-0.5 text-blue-600">' + fmtRp(d.bank_jago) + '</p>'
-        +   (d.prevBiaya > 0
-        ?     '<div class="flex items-center gap-1 mt-0.5"><span class="text-[10px] font-medium text-gray-400">vs periode lalu</span></div>'
-        :     '<div class="flex items-center gap-1 mt-0.5"><span class="text-[10px] font-medium text-gray-400">— vs periode lalu</span></div>')
-        + '</div></div>';
-
-    // Chart
+    // Grafik
     updateChart(d.chartData);
 }
 
 function fetchData(params) {
+    lastUserAction = Date.now();
     var url = '/dashboard/data?' + new URLSearchParams(params).toString();
     return fetch(url).then(function(r) { return r.json(); });
 }
@@ -463,20 +499,20 @@ document.addEventListener('DOMContentLoaded', function() {
             data: {
                 labels: chartData.labels,
                 datasets: [
-                    { label: 'Pendapatan', data: chartData.revenue, backgroundColor: 'rgba(16,185,129,0.7)', borderColor: '#10B981', borderWidth: 1, borderRadius: 4, order: 3 },
-                    { label: 'Pengeluaran', data: chartData.pengeluaran, backgroundColor: 'rgba(239,68,68,0.5)', borderColor: '#EF4444', borderWidth: 1, borderRadius: 4, order: 3 },
-                    { label: 'Keuntungan Bersih', data: chartData.net_profit, backgroundColor: 'rgba(59,130,246,0.5)', borderColor: '#3B82F6', borderWidth: 1, borderRadius: 4 },
+                    { label: 'Omzet', data: chartData.omzet, backgroundColor: 'rgba(16,185,129,0.7)', borderColor: '#10B981', borderWidth: 1, borderRadius: 4, barPercentage: 0.7, categoryPercentage: 0.75 },
+                    { label: 'Pengeluaran', data: chartData.pengeluaran, backgroundColor: 'rgba(239,68,68,0.5)', borderColor: '#EF4444', borderWidth: 1, borderRadius: 4, barPercentage: 0.7, categoryPercentage: 0.75 },
                 ]
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
+                layout: { padding: { top: 5, right: 10 } },
                 plugins: {
                     legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12, font: { size: 11 } } },
                     tooltip: { mode: 'index', intersect: false }
                 },
                 scales: {
                     y: { beginAtZero: true, ticks: { callback: function(v) { return 'Rp ' + v.toLocaleString('id-ID'); }, font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.06)' } },
-                    x: { grid: { display: false }, ticks: { maxRotation: 0, font: { size: 10 }, autoSkip: true, maxTicksLimit: 15 } }
+                    x: { grid: { display: false }, ticks: { maxRotation: 45, font: { size: 10 }, autoSkip: true, maxTicksLimit: 12 } }
                 }
             }
         });
@@ -510,33 +546,43 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Apply date filter
+    // Apply date filter — baca dari Alpine data, bukan DOM (tahan terhadap Chrome autofill)
     document.getElementById('applyDateBtn').addEventListener('click', function() {
-        var from = document.getElementById('filterFrom').value;
-        var to = document.getElementById('filterTo').value;
+        var el = document.getElementById('dashFilterBar');
+        var from, to;
+        if (el) { try { var a = Alpine.$data(el); from = a.df; to = a.dt; } catch(e) {} }
+        if (!from || !to) { from = document.getElementById('filterFrom').value; to = document.getElementById('filterTo').value; }
         if (!from || !to) { alert('Harap isi tanggal Dari dan Sampai terlebih dahulu.'); return; }
         if (from > to) { alert('Tanggal "Dari" tidak boleh lebih besar dari tanggal "Sampai".'); return; }
+        dateFilterApi.set(from, to);
         fetchData({ from: from, to: to }).then(function(data) { updateCards(data); });
     });
 
-    // Auto-refresh every 30s
+    // Reset filter — reload halaman tanpa parameter (auto-detect period)
+    document.getElementById('resetDateBtn').addEventListener('click', function() {
+        window.location.href = '{{ route("dashboard") }}';
+    });
+
+    // Auto-refresh tiap 30 detik (gentle: lewati jika user baru saja berinteraksi)
     var currentParams = new URLSearchParams(window.location.search);
-    var refreshParams = {};
-    if (currentParams.get('period')) refreshParams.period = currentParams.get('period');
-    else if (currentParams.get('from') && currentParams.get('to')) { refreshParams.from = currentParams.get('from'); refreshParams.to = currentParams.get('to'); }
-    else refreshParams.period = '{{ $period }}';
+    if (currentParams.get('period')) refreshParams = { period: currentParams.get('period') };
+    else if (currentParams.get('from') && currentParams.get('to')) { refreshParams = { from: currentParams.get('from'), to: currentParams.get('to') }; }
+    else refreshParams = { period: '{{ $period }}' };
 
     setInterval(function() {
-        Promise.all([
-            fetch('/dashboard/data?' + new URLSearchParams(refreshParams).toString()).then(function(r) { return r.json(); }),
-            fetch('/dashboard/recent-services').then(function(r) { return r.json(); })
-        ]).then(function(results) {
-            var dashData = results[0];
-            var recentData = results[1];
-            updateCards(dashData);
-            updateRecentServices(recentData.recentServices);
-            updateStatusChart(recentData.statusCounts);
-        }).catch(function() {});
+        if (Date.now() - lastUserAction < 15000) return; {{-- jangan ganggu saat user aktif --}}
+        {{-- Fetch dashboard data terpisah dari recent-services agar error satu tidak blokir yang lain --}}
+        fetch('/dashboard/data?' + new URLSearchParams(refreshParams).toString())
+            .then(function(r) { return r.json(); })
+            .then(function(dashData) { updateKpiOnly(dashData); })
+            .catch(function() {});
+        fetch('/dashboard/recent-services')
+            .then(function(r) { return r.json(); })
+            .then(function(recentData) {
+                updateRecentServices(recentData.recentServices);
+                updateStatusChart(recentData.statusCounts);
+            })
+            .catch(function() {});
     }, 30000);
 
     window.addEventListener('resize', function() {

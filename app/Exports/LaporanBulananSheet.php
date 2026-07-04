@@ -21,26 +21,35 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
     protected $tahun;
     protected $namaToko;
     protected $customerId;
+    protected $fromDate;   // Optional: Carbon date for custom range start
+    protected $toDate;     // Optional: Carbon date for custom range end
     protected $no = 0;
     protected $cached = null;
     protected $cachedBiayaHarian = null;
 
-    public function __construct(int $month, string $label, int $tahun, ?string $namaToko = null, ?int $customerId = null)
+    public function __construct(int $month, string $label, int $tahun, ?string $namaToko = null, ?int $customerId = null, ?string $fromDate = null, ?string $toDate = null)
     {
         $this->month = $month;
         $this->label = $label;
         $this->tahun = $tahun;
         $this->namaToko = $namaToko ?? 'Juneo Phone';
         $this->customerId = $customerId;
+        $this->fromDate = $fromDate ? \Carbon\Carbon::parse($fromDate)->startOfMonth() : null;
+        $this->toDate = $toDate ? \Carbon\Carbon::parse($toDate)->endOfMonth() : null;
     }
 
     public function collection()
     {
         if ($this->cached) return $this->cached;
         $this->cached = Service::with('customer')
-            ->whereYear('tanggal', $this->tahun)
-            ->whereMonth('tanggal', $this->month)
             ->where('status', '!=', 'batal')
+            ->when($this->fromDate && $this->toDate, function ($q) {
+                $q->whereDate('tanggal', '>=', $this->fromDate)
+                  ->whereDate('tanggal', '<=', $this->toDate);
+            }, function ($q) {
+                $q->whereYear('tanggal', $this->tahun)
+                  ->whereMonth('tanggal', $this->month);
+            })
             ->when($this->customerId, fn($q, $v) => $q->where('customer_id', $v))
             ->orderBy('tanggal')
             ->orderBy('created_at')
@@ -51,8 +60,14 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
     protected function getBiayaHarian(): float
     {
         if ($this->cachedBiayaHarian !== null) return $this->cachedBiayaHarian;
-        $this->cachedBiayaHarian = BiayaHarian::whereYear('tanggal', $this->tahun)
-            ->whereMonth('tanggal', $this->month)
+        $this->cachedBiayaHarian = BiayaHarian::query()
+            ->when($this->fromDate && $this->toDate, function ($q) {
+                $q->whereDate('tanggal', '>=', $this->fromDate)
+                  ->whereDate('tanggal', '<=', $this->toDate);
+            }, function ($q) {
+                $q->whereYear('tanggal', $this->tahun)
+                  ->whereMonth('tanggal', $this->month);
+            })
             ->sum('jumlah');
         return $this->cachedBiayaHarian;
     }
@@ -66,7 +81,7 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
             'Pelanggan',
             'Type',
             'Kerusakan',
-            'Modal',
+            'Pengeluaran',
             'Jasa',
             'Teknisi',
             'Keterangan',
@@ -153,9 +168,9 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
                 $biayaHarian = $this->getBiayaHarian();
 
                 $summary = [
-                    ['Pendapatan', $totalJasa],
-                    ['Modal', $totalPengeluaran],
-                    ['Biaya Harian', $biayaHarian],
+                    ['Omzet', $totalJasa],
+                    ['Pengeluaran', $totalPengeluaran],
+                    ['Kebutuhan Pribadi', $biayaHarian],
                 ];
 
                 $startSummaryRow = 5;

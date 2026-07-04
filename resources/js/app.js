@@ -375,10 +375,11 @@ Alpine.data('servicePage', () => ({
                 var row = document.querySelector('tr[data-row="' + serviceId + '"]');
                 if (row) {
                     if (newStatus === 'batal') {
+                        // Kolom: 0:No 1:NoService 2:Tgl 3:TglSelesai 4:Pelanggan 5:Status 6:TypeHP 7:Kerusakan 8:Modal 9:Jasa 10:Keuntungan
                         var cells = row.querySelectorAll('td');
-                        if (cells[7]) cells[7].textContent = 'Rp 0';
                         if (cells[8]) cells[8].textContent = 'Rp 0';
-                        if (cells[9]) { cells[9].textContent = 'Rp 0'; cells[9].className = cells[9].className.replace(/text-\w+-\d+/g, '').trim() + ' text-emerald-600'; }
+                        if (cells[9]) cells[9].textContent = 'Rp 0';
+                        if (cells[10]) { cells[10].textContent = 'Rp 0'; cells[10].className = cells[10].className.replace(/text-\w+-\d+/g, '').trim() + ' text-emerald-600'; }
                     }
                     var badge = row.querySelector('[data-status-badge]');
                     if (badge) {

@@ -34,51 +34,54 @@ window._pageData = {
     @endif
 };
 </script>
+<div class="space-y-4">
+    <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+        <div class="flex flex-wrap items-end gap-3">
+            <form method="GET" class="flex flex-wrap items-end gap-3 flex-1">
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 mb-1">Cari</label>
+                    <input type="text" name="search" value="{{ request('search') }}"
+                        placeholder="No. service, tipe HP, pelanggan..."
+                        class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 placeholder-gray-400 outline-none w-64">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 mb-1">Dari Tanggal</label>
+                    <input type="date" name="date_from" value="{{ request('date_from') }}"
+                        class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 text-gray-900 outline-none" autocomplete="off">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 mb-1">Sampai Tanggal</label>
+                    <input type="date" name="date_to" value="{{ request('date_to') }}"
+                        class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 text-gray-900 outline-none" autocomplete="off">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 mb-1">Status</label>
+                    <select name="status" class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 text-gray-900 outline-none">
+                        <option value="">Semua Status</option>
+                        @foreach(\App\Models\Service::statusLabels() as $key => $label)
+                        <option value="{{ $key }}" {{ request('status') === $key ? 'selected' : '' }}>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <button type="submit" class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 text-white rounded-lg text-sm font-medium hover:from-yellow-400 hover:to-amber-400 shadow-sm">
+                    <i class="fas fa-search"></i> Filter
+                </button>
+                @if(request()->anyFilled(['search', 'date_from', 'date_to', 'status']))
+                    <a href="{{ route('services.index') }}" class="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm hover:bg-gray-200 ">
+                        <i class="fas fa-times"></i> Reset
+                    </a>
+                @endif
+            </form>
+            <button type="button" onclick="Alpine.$data(document.querySelector('[x-data=&quot;servicePage&quot;]')).openCreateModal()"
+                class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm flex-shrink-0">
+                <i class="fas fa-plus"></i> Tambah Service
+            </button>
+        </div>
+    </div>
+</div>
+
 <div x-data="servicePage" x-init="if (window._pageData?.editService) { $nextTick(() => openEditModal(window._pageData.editService)); }">
     <div class="space-y-4">
-        <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
-            <div class="flex flex-wrap items-end gap-3">
-                <form method="GET" class="flex flex-wrap items-end gap-3 flex-1">
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 mb-1">Cari</label>
-                        <input type="text" name="search" value="{{ request('search') }}"
-                            placeholder="No. service, tipe HP, pelanggan..."
-                            class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 placeholder-gray-400 outline-none w-64">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 mb-1">Dari Tanggal</label>
-                        <input type="date" name="date_from" value="{{ request('date_from') }}"
-                            class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 text-gray-900 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 mb-1">Sampai Tanggal</label>
-                        <input type="date" name="date_to" value="{{ request('date_to') }}"
-                            class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 text-gray-900 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 mb-1">Status</label>
-                        <select name="status" class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 text-gray-900 outline-none">
-                            <option value="">Semua Status</option>
-                            @foreach(\App\Models\Service::statusLabels() as $key => $label)
-                            <option value="{{ $key }}" {{ request('status') === $key ? 'selected' : '' }}>{{ $label }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <button type="submit" class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 text-white rounded-lg text-sm font-medium hover:from-yellow-400 hover:to-amber-400 shadow-sm">
-                        <i class="fas fa-search"></i> Filter
-                    </button>
-                    @if(request()->anyFilled(['search', 'date_from', 'date_to', 'status']))
-                        <a href="{{ route('services.index') }}" class="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm hover:bg-gray-200 ">
-                            <i class="fas fa-times"></i> Reset
-                        </a>
-                    @endif
-                </form>
-                <button type="button" @click="openCreateModal()"
-                    class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm flex-shrink-0">
-                    <i class="fas fa-plus"></i> Tambah Service
-                </button>
-            </div>
-        </div>
 
         <div class="bg-white border border-gray-200 rounded-xl shadow-sm">
             <div class="overflow-x-auto rounded-xl">
@@ -93,9 +96,10 @@ window._pageData = {
                         <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap">Status</th>
                         <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Type HP</th>
                         <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Kerusakan</th>
-                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right whitespace-nowrap">Modal</th>
+                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right whitespace-nowrap">Pengeluaran</th>
                         <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right whitespace-nowrap">Jasa</th>
                         <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right whitespace-nowrap">Keuntungan</th>
+                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Keterangan</th>
                         <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap">Estimasi</th>
                         <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap">Teknisi</th>
                         <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap w-16">Aksi</th>
@@ -188,6 +192,7 @@ window._pageData = {
                         <td class="px-5 py-3 text-sm text-right whitespace-nowrap tabular-nums {{ $service->keuntungan >= 0 ? 'text-emerald-600' : 'text-red-600' }} font-semibold">
                             Rp {{ number_format($service->keuntungan, 0, ',', '.') }}
                         </td>
+                        <td class="px-5 py-3 text-sm text-gray-600 max-w-[180px] truncate whitespace-nowrap">{{ $service->keterangan ?? '-' }}</td>
                         <td class="px-5 py-3 text-sm text-center whitespace-nowrap">
                             @if($service->estimasi_selesai)
                                 @php
@@ -240,7 +245,7 @@ window._pageData = {
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="14" class="px-5 py-12 text-center text-gray-400">
+                        <td colspan="15" class="px-5 py-12 text-center text-gray-400">
                             <i class="fas fa-inbox text-3xl mb-2 block"></i>
                             Belum ada data service
                         </td>
@@ -494,7 +499,7 @@ window._pageData = {
                                         </div>
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-medium text-gray-500 mb-1.5">Modal</label>
+                                        <label class="block text-xs font-medium text-gray-500 mb-1.5">Pengeluaran</label>
                                         <input type="text" inputmode="numeric"
                                             :value="displayNumber(item.pengeluaran)"
                                             @input="formatCurrencyItem(index, 'pengeluaran', $event)"
@@ -536,7 +541,7 @@ window._pageData = {
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="p-3 bg-white border border-gray-200 rounded-lg">
-                            <div class="text-xs text-gray-500 mb-1">Total Modal</div>
+                            <div class="text-xs text-gray-500 mb-1">Total Pengeluaran</div>
                             <div class="text-lg font-semibold text-gray-900" x-text="'Rp ' + totalPengeluaran.toLocaleString('id-ID')"></div>
                             @error('pengeluaran') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                         </div>
@@ -615,11 +620,6 @@ window._pageData = {
                                 </template>
                             </select>
                             @error('status') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                            <div x-show="formData.status === 'diambil'" class="mt-2" x-cloak>
-                                <label class="block text-xs font-medium text-gray-500 mb-1">Garansi</label>
-                                <input type="text" name="garansi" x-model="formData.garansi" placeholder="Keterangan garansi (opsional)..."
-                                    class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
-                            </div>
                         </div>
                     </div>
                 </div>

@@ -40,10 +40,10 @@ class Service extends Model
     protected function casts(): array
     {
         return [
-            'tanggal' => 'date',
-            'tanggal_dikerjakan' => 'date',
-            'tanggal_selesai' => 'date',
-            'estimasi_selesai' => 'date',
+            'tanggal' => 'date:Y-m-d',
+            'tanggal_dikerjakan' => 'date:Y-m-d',
+            'tanggal_selesai' => 'date:Y-m-d',
+            'estimasi_selesai' => 'date:Y-m-d',
             'pengeluaran' => 'decimal:2',
             'jasa' => 'decimal:2',
             'keuntungan' => 'decimal:2',
@@ -274,7 +274,7 @@ class Service extends Model
                 if ($newStatus === static::STATUS_DIKERJAKAN && !$service->getOriginal('tanggal_dikerjakan')) {
                     $service->tanggal_dikerjakan = now();
                 }
-                if (in_array($newStatus, [static::STATUS_SELESAI, static::STATUS_DIAMBIL]) && !$service->getOriginal('tanggal_selesai')) {
+                if ($newStatus === static::STATUS_SELESAI && !$service->getOriginal('tanggal_selesai')) {
                     $service->tanggal_selesai = now();
                 }
                 if ($newStatus === static::STATUS_BATAL) {

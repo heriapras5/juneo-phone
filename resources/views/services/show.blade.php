@@ -74,7 +74,7 @@
             <div>
                 <div class="space-y-4">
                     <div>
-                        <p class="text-xs text-gray-500 uppercase tracking-wider">Pengeluaran (Modal)</p>
+                        <p class="text-xs text-gray-500 uppercase tracking-wider">Pengeluaran</p>
                         <p class="text-sm font-medium text-gray-900">Rp {{ number_format($service->pengeluaran, 0, ',', '.') }}</p>
                     </div>
                     <div>
@@ -115,7 +115,7 @@
                     <tr class="border-b border-gray-100">
                         <th class="text-left py-2 px-2 text-xs text-gray-500 uppercase tracking-wider">Type HP</th>
                         <th class="text-left py-2 px-2 text-xs text-gray-500 uppercase tracking-wider">Kerusakan</th>
-                        <th class="text-right py-2 px-2 text-xs text-gray-500 uppercase tracking-wider">Modal</th>
+                        <th class="text-right py-2 px-2 text-xs text-gray-500 uppercase tracking-wider">Pengeluaran</th>
                         <th class="text-right py-2 px-2 text-xs text-gray-500 uppercase tracking-wider">Jasa</th>
                     </tr>
                 </thead>
