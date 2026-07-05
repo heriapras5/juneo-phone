@@ -61,7 +61,7 @@ class ServiceController extends Controller
             ->when(request('date_to'), fn($q, $v) => $q->whereDate('tanggal', '<=', $v))
             ->when(request('status'), fn($q, $v) => $q->where('status', $v))
             ->orderBy('created_at', 'desc')
-            ->paginate(10)
+            ->paginate(15)
             ->withQueryString();
 
         $customers = Customer::orderBy('nama')->get(['id', 'nama', 'no_hp']);

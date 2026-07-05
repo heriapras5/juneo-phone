@@ -199,6 +199,7 @@
                 @endif
 
                 {{-- Section: LAINNYA --}}
+                @if(false)
                 <div class="sidebar-text text-[10px] font-semibold text-gray-600 uppercase tracking-[2px] px-4 pt-4 pb-1">LAINNYA</div>
 
                 <a href="{{ route('reports.import') }}"
@@ -216,6 +217,7 @@
                     </span>
                     <span class="sidebar-text">Backup & Reset</span>
                 </a>
+                @endif
             </nav>
 
         </aside>
@@ -290,6 +292,7 @@
                 </a>
                 @endif
 
+                @if(false)
                 <div class="text-[10px] font-semibold text-gray-600 uppercase tracking-[2px] px-4 pt-4 pb-1">LAINNYA</div>
 
                 <a href="{{ route('reports.import') }}" @click="sidebarMobileOpen = false"
@@ -300,6 +303,7 @@
                     class="flex items-center gap-3 pl-4 pr-3 py-2.5 text-sm {{ request()->routeIs('data.*') ? 'bg-gradient-to-r from-yellow-500/15 to-amber-500/5 border-r-2 border-yellow-500 text-yellow-400' : 'text-gray-400 hover:bg-white/5 hover:text-yellow-400' }}">
                     <span class="w-8 h-8 flex items-center justify-center rounded-lg {{ request()->routeIs('data.*') ? 'bg-yellow-500/20' : '' }}"><i class="fas fa-database w-5 text-center"></i></span> Backup & Reset
                 </a>
+                @endif
             </nav>
 
         </aside>

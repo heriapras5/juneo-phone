@@ -100,4 +100,4 @@ Route::get('storage/{path}', function (string $path) {
     return response()->file($fullPath, [
         'Cache-Control' => 'public, max-age=31536000, immutable',
     ]);
-})->where('path', '.*');
+})->where('path', '.*')->name('storage.file');
