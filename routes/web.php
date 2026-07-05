@@ -94,7 +94,7 @@ Route::middleware(['auth'])->group(function () {
 
 
 
-Route::get('storage/{path}', function (string $path) {
+Route::get('storage-files/{path}', function (string $path) {
     $fullPath = storage_path('app/public/' . $path);
     abort_unless(file_exists($fullPath), 404);
     return response()->file($fullPath, [

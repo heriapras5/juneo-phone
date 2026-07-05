@@ -43,7 +43,7 @@ class User extends Authenticatable
     public function getPhotoUrlAttribute(): ?string
     {
         if ($this->foto && Storage::disk('public')->exists($this->foto)) {
-            return route('storage.file', ['path' => $this->foto]);
+            return url('storage-files/' . $this->foto);
         }
         if ($this->avatar) {
             return $this->avatar;
