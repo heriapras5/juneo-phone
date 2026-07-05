@@ -42,7 +42,7 @@ class ProfileController extends Controller
             if ($user->foto && Storage::disk('public')->exists($user->foto)) {
                 Storage::disk('public')->delete($user->foto);
             }
-            $path = $request->file('foto')->store('users/foto', 'public');
+            $path = $request->file('foto')->store('profiles/foto', 'public');
             $user->foto = $path;
         }
 

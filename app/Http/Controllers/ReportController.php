@@ -38,7 +38,6 @@ class ReportController extends Controller
         // Total aggregates untuk baris agregasi
         $totalPengeluaran = (clone $query)->sum('pengeluaran');
         $totalOmzet = (clone $query)->sum('jasa');
-        $totalKeuntungan = (clone $query)->sum('keuntungan');
 
         $kebutuhanPribadi = \App\Models\BiayaHarian::query()
             ->when($from && $to, function ($q) use ($from, $to) {
@@ -63,7 +62,7 @@ class ReportController extends Controller
 
         return view('reports.index', compact(
             'services', 'customers', 'tahun', 'tahunTersedia', 'from', 'to',
-            'totalPengeluaran', 'totalOmzet', 'totalKeuntungan', 'kebutuhanPribadi'
+            'totalPengeluaran', 'totalOmzet', 'kebutuhanPribadi'
         ));
     }
 

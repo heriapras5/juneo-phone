@@ -79,12 +79,11 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
             'No. Service',
             'Tanggal',
             'Pelanggan',
-            'Type',
+            'Type HP',
             'Kerusakan',
             'Pengeluaran',
             'Jasa',
             'Teknisi',
-            'Keterangan',
             'Keuntungan',
         ];
     }
@@ -124,7 +123,6 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
             $row->pengeluaran,
             $row->jasa,
             $teknisiLabel,
-            $row->keterangan ?? '-',
             $row->keuntungan,
         ];
     }
@@ -141,87 +139,116 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
                 $sheet = $event->sheet;
                 $rowCount = $sheet->getHighestRow();
 
-                $sheet->insertNewRowBefore(1, 4);
+                $sheet->insertNewRowBefore(1, 3);
 
                 $sheet->setCellValue('A1', 'LAPORAN SERVICE TAHUN ' . $this->tahun);
-                $sheet->mergeCells('A1:K1');
+                $sheet->mergeCells('A1:J1');
                 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
                 $sheet->getStyle('A1')->getAlignment()
                     ->setHorizontal(Alignment::HORIZONTAL_CENTER)
                     ->setVertical(Alignment::VERTICAL_CENTER);
 
-                $sheet->setCellValue('A2', $this->label . ' ' . $this->tahun . ' — ' . $this->namaToko);
-                $sheet->mergeCells('A2:K2');
+                $subtitle = $this->label . ' ' . $this->tahun . ' — ' . $this->namaToko;
+                if ($this->customerId) {
+                    $customer = \App\Models\Customer::find($this->customerId);
+                    if ($customer) {
+                        $subtitle .= ' — Filter: ' . $customer->nama;
+                    }
+                }
+                $sheet->setCellValue('A2', $subtitle);
+                $sheet->mergeCells('A2:J2');
                 $sheet->getStyle('A2')->getFont()->setSize(12);
                 $sheet->getStyle('A2')->getAlignment()
                     ->setHorizontal(Alignment::HORIZONTAL_CENTER)
                     ->setVertical(Alignment::VERTICAL_CENTER);
 
-                $sheet->setCellValue('A3', '');
-                $sheet->setCellValue('A4', 'RINGKASAN ' . strtoupper($this->label) . ' ' . $this->tahun);
-                $sheet->mergeCells('A4:K4');
-                $sheet->getStyle('A4')->getFont()->setBold(true)->setSize(12);
+                $headerRow = 4;
+                $dataStartRow = 5;
+                $lastDataRow = $rowCount + 3;
 
-                $services = $this->collection();
-                $totalPengeluaran = $services->sum('pengeluaran');
-                $totalJasa = $services->sum('jasa');
-                $biayaHarian = $this->getBiayaHarian();
-
-                $summary = [
-                    ['Omzet', $totalJasa],
-                    ['Pengeluaran', $totalPengeluaran],
-                    ['Kebutuhan Pribadi', $biayaHarian],
-                ];
-
-                $startSummaryRow = 5;
-                foreach ($summary as $i => $s) {
-                    $r = $startSummaryRow + $i;
-                    $sheet->setCellValue('A' . $r, $s[0]);
-                    $sheet->setCellValue('B' . $r, $s[1]);
-                    $sheet->getStyle('A' . $r)->getFont()->setBold(true);
-                    $sheet->getStyle('B' . $r)->getNumberFormat()->setFormatCode('"Rp"#,##0');
-                }
-
-                $labaBersihRow = $startSummaryRow + count($summary);
-                $sheet->setCellValue('A' . $labaBersihRow, 'Keuntungan Bersih');
-                $sheet->setCellValue('B' . $labaBersihRow, $totalJasa - $totalPengeluaran - $biayaHarian);
-                $sheet->getStyle('A' . $labaBersihRow)->getFont()->setBold(true)->setSize(11);
-                $sheet->getStyle('B' . $labaBersihRow)->getFont()->setBold(true)->setSize(11);
-                $sheet->getStyle('B' . $labaBersihRow)->getNumberFormat()->setFormatCode('"Rp"#,##0');
-
-                $lastSummaryRow = $labaBersihRow;
-                $sheet->getStyle('A' . $startSummaryRow . ':B' . $lastSummaryRow)
-                    ->getBorders()->getOutline()->setBorderStyle(Border::BORDER_THIN);
-
-                $headerRow = $lastSummaryRow + 2;
-                $dataStartRow = $headerRow + 1;
-                $lastDataRow = $rowCount + 4;
-
-                $headings = $this->headings();
-                foreach ($headings as $colIndex => $heading) {
-                    $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex + 1);
-                    $cell = $colLetter . $headerRow;
-                    $sheet->setCellValue($cell, $heading);
-                }
-
-                $sheet->getStyle('A' . $headerRow . ':K' . $headerRow)->getFont()->setBold(true);
-                $sheet->getStyle('A' . $headerRow . ':K' . $headerRow)->getFill()
+                $sheet->getStyle('A' . $headerRow . ':J' . $headerRow)->getFont()->setBold(true);
+                $sheet->getStyle('A' . $headerRow . ':J' . $headerRow)->getFill()
                     ->setFillType(Fill::FILL_SOLID)
                     ->getStartColor()->setARGB('FFB8860B');
-                $sheet->getStyle('A' . $headerRow . ':K' . $headerRow)->getFont()->getColor()->setARGB('FFFFFFFF');
+                $sheet->getStyle('A' . $headerRow . ':J' . $headerRow)->getFont()->getColor()->setARGB('FFFFFFFF');
+
+                $sheet->getStyle('G' . $headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+                $sheet->getStyle('H' . $headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+                $sheet->getStyle('J' . $headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
                 if ($lastDataRow >= $dataStartRow) {
-                    $sheet->getStyle('A' . $dataStartRow . ':K' . $lastDataRow)
+                    $sheet->getStyle('A' . $dataStartRow . ':J' . $lastDataRow)
                         ->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
-
-                    $sheet->getStyle('A' . $dataStartRow . ':K' . $lastDataRow)
+                    $sheet->getStyle('A' . $dataStartRow . ':J' . $lastDataRow)
                         ->getBorders()->getLeft()->setBorderStyle(Border::BORDER_THIN);
-                    $sheet->getStyle('A' . $dataStartRow . ':K' . $lastDataRow)
+                    $sheet->getStyle('A' . $dataStartRow . ':J' . $lastDataRow)
                         ->getBorders()->getRight()->setBorderStyle(Border::BORDER_THIN);
 
-                    $sheet->getStyle('G' . $dataStartRow . ':K' . $lastDataRow)
+                    $sheet->getStyle('G' . $dataStartRow . ':H' . $lastDataRow)
                         ->getNumberFormat()->setFormatCode('"Rp"#,##0');
+                    $sheet->getStyle('J' . $dataStartRow . ':J' . $lastDataRow)
+                        ->getNumberFormat()->setFormatCode('"Rp"#,##0');
+
+                    $services = $this->collection();
+                    $totalPengeluaran = $services->sum('pengeluaran');
+                    $totalJasa = $services->sum('jasa');
+                    $biayaHarian = $this->getBiayaHarian();
+
+                    $summaryStart = $lastDataRow + 1;
+
+                    $summaryRows = [
+                        ['Pengeluaran', $totalPengeluaran, false, false],
+                        ['Omzet', $totalJasa, false, false],
+                        ['Kebutuhan Pribadi', $biayaHarian, false, true],
+                        ['Profit', $totalJasa - $totalPengeluaran - $biayaHarian, true, false],
+                    ];
+
+                    foreach ($summaryRows as $i => $item) {
+                        $r = $summaryStart + $i;
+                        $sheet->setCellValue('A' . $r, $item[0]);
+                        $sheet->mergeCells('A' . $r . ':I' . $r);
+
+                        if ($item[3]) {
+                            $sheet->getStyle('A' . $r)->getFont()->setItalic(true)->setSize(9);
+                        } else {
+                            $sheet->getStyle('A' . $r)->getFont()->setSize(10);
+                        }
+
+                        $sheet->setCellValue('J' . $r, $item[1]);
+                        $sheet->getStyle('J' . $r)->getNumberFormat()->setFormatCode('"Rp"#,##0');
+
+                        if ($item[2]) {
+                            $sheet->getStyle('A' . $r)->getFont()->setBold(true)->setSize(11);
+                            $sheet->getStyle('J' . $r)->getFont()->setBold(true)->setSize(11);
+                        }
+
+                        if ($i === 0) {
+                            $sheet->getStyle('A' . $r . ':J' . $r)
+                                ->getBorders()->getTop()->setBorderStyle(Border::BORDER_MEDIUM);
+                        }
+
+                        if ($i === 0) {
+                            $sheet->getStyle('A' . $r . ':J' . $r)
+                                ->getFill()->setFillType(Fill::FILL_SOLID)
+                                ->getStartColor()->setARGB('FFFFF8E1');
+                        }
+                    }
+
+                    $footerRow = $summaryStart + count($summaryRows) + 1;
+                    $sheet->setCellValue('A' . $footerRow, 'Dicetak: ' . now()->format('d/m/Y H:i'));
+                    $sheet->getStyle('A' . $footerRow)->getFont()->setSize(8)->setItalic(true)->getColor()->setARGB('FF999999');
                 }
+
+                $sheet->getColumnDimension('A')->setWidth(4);
+                $sheet->getColumnDimension('B')->setWidth(16);
+                $sheet->getColumnDimension('C')->setWidth(12);
+                $sheet->getColumnDimension('D')->setWidth(18);
+                $sheet->getColumnDimension('E')->setWidth(14);
+                $sheet->getColumnDimension('F')->setWidth(28);
+                $sheet->getColumnDimension('G')->setWidth(14);
+                $sheet->getColumnDimension('H')->setWidth(14);
+                $sheet->getColumnDimension('I')->setWidth(8);
+                $sheet->getColumnDimension('J')->setWidth(16);
             },
         ];
     }

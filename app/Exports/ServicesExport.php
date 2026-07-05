@@ -8,9 +8,10 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithStartRow;
+use Maatwebsite\Excel\Concerns\WithCustomCsvSettings;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class ServicesExport implements FromQuery, WithHeadings, WithMapping, WithStyles, WithStartRow
+class ServicesExport implements FromQuery, WithHeadings, WithMapping, WithStyles, WithStartRow, WithCustomCsvSettings
 {
     private ?string $dateFrom;
     private ?string $dateTo;
@@ -90,6 +91,17 @@ class ServicesExport implements FromQuery, WithHeadings, WithMapping, WithStyles
             $row->estimasi_selesai ? $row->estimasi_selesai->format('d/m/Y') : '-',
             $statusLabels[$row->status] ?? $row->status,
             $row->keterangan ?? '-',
+        ];
+    }
+
+    public function getCsvSettings(): array
+    {
+        return [
+            'delimiter' => ';',
+            'enclosure' => '"',
+            'use_bom' => true,
+            'include_separator_line' => false,
+            'excel_compatibility' => true,
         ];
     }
 

@@ -46,7 +46,7 @@ class LaporanRekapSheet implements FromArray, WithHeadings, WithTitle, WithStyle
                 ->when($this->fromDate && $this->toDate, function ($q) {
                     $q->whereDate('tanggal', '>=', $this->fromDate)
                       ->whereDate('tanggal', '<=', $this->toDate);
-                }, function ($q) {
+                }, function ($q) use ($month) {
                     $q->whereYear('tanggal', $this->tahun)
                       ->whereMonth('tanggal', $month);
                 })
@@ -56,7 +56,7 @@ class LaporanRekapSheet implements FromArray, WithHeadings, WithTitle, WithStyle
                 ->when($this->fromDate && $this->toDate, function ($q) {
                     $q->whereDate('tanggal', '>=', $this->fromDate)
                       ->whereDate('tanggal', '<=', $this->toDate);
-                }, function ($q) {
+                }, function ($q) use ($month) {
                     $q->whereYear('tanggal', $this->tahun)
                       ->whereMonth('tanggal', $month);
                 })
@@ -130,7 +130,14 @@ class LaporanRekapSheet implements FromArray, WithHeadings, WithTitle, WithStyle
 
                 $sheet->insertNewRowBefore(1);
 
-                $sheet->setCellValue('A1', 'REKAP LAPORAN SERVICE TAHUN ' . $this->tahun . ' — ' . $this->namaToko);
+                $title = 'REKAP LAPORAN SERVICE TAHUN ' . $this->tahun . ' — ' . $this->namaToko;
+                if ($this->customerId) {
+                    $customer = \App\Models\Customer::find($this->customerId);
+                    if ($customer) {
+                        $title .= ' — Filter: ' . $customer->nama;
+                    }
+                }
+                $sheet->setCellValue('A1', $title);
                 $sheet->mergeCells('A1:F1');
                 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(15);
                 $sheet->getStyle('A1')->getAlignment()
@@ -164,10 +171,12 @@ class LaporanRekapSheet implements FromArray, WithHeadings, WithTitle, WithStyle
                         ->getBorders()->getTop()->setBorderStyle(Border::BORDER_DOTTED);
                 }
 
-                foreach (range(1, $lastRow) as $r) {
-                    foreach (range('B', 'F') as $col) {
+                foreach (range(3, $lastRow) as $r) {
+                    foreach (['C', 'D', 'E', 'F'] as $col) {
                         if ($r !== $headerRow) {
                             $sheet->getStyle($col . $r)->getNumberFormat()->setFormatCode('"Rp"#,##0');
+                            $sheet->getStyle($col . $r)->getAlignment()
+                                ->setHorizontal(Alignment::HORIZONTAL_RIGHT);
                         }
                     }
                 }

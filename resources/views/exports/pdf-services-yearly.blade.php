@@ -42,7 +42,7 @@
         @php $rekap = $rekapBulan[$month]; @endphp
 
         @if(!$loop->first)
-        <div style="margin-top: 20px;"></div>
+        <div class="page-break"></div>
         @endif
 
         <div class="month-title">{{ $label }} {{ $tahun }}</div>
@@ -125,12 +125,12 @@
 
     <table class="grand-table" style="width:60%; margin-left:auto; margin-right:auto;">
         <tr>
-            <td class="label">Omzet</td>
-            <td class="value">Rp {{ number_format($grandJasa, 0, ',', '.') }}</td>
-        </tr>
-        <tr>
             <td class="label">Pengeluaran</td>
             <td class="value">Rp {{ number_format($grandPengeluaran, 0, ',', '.') }}</td>
+        </tr>
+        <tr>
+            <td class="label">Omzet</td>
+            <td class="value">Rp {{ number_format($grandJasa, 0, ',', '.') }}</td>
         </tr>
         <tr><td colspan="2" style="padding:2px;"></td></tr>
         <tr>
@@ -139,7 +139,7 @@
         </tr>
         <tr><td colspan="2" style="padding:2px;"></td></tr>
         <tr class="total-row">
-            <td class="label">Keuntungan Bersih</td>
+            <td class="label">Profit</td>
             <td class="value">Rp {{ number_format($grandJasa - $grandPengeluaran - $grandBiayaHarian, 0, ',', '.') }}</td>
         </tr>
     </table>

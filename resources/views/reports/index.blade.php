@@ -59,10 +59,6 @@
                     class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm hover:bg-emerald-700 flex items-center gap-1.5 shadow-sm">
                     <i class="fas fa-file-excel"></i> Download Excel
                 </a>
-                <a href="{{ route('reports.export-csv', request()->query()) }}"
-                    class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 flex items-center gap-1.5 shadow-sm">
-                    <i class="fas fa-file-csv"></i> Download CSV
-                </a>
                 <a href="{{ route('reports.export-pdf', request()->query()) }}" target="_blank"
                     @click.prevent="loading = true; $nextTick(() => { window.open('{{ route('reports.export-pdf', request()->query()) }}', '_blank'); setTimeout(() => loading = false, 8000); })"
                     class="px-4 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 flex items-center gap-1.5 shadow-sm"
@@ -80,27 +76,27 @@
             <table class="w-full">
                 <thead>
                     <tr class="bg-gray-50">
-                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap w-10">No</th>
-                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">No. Service</th>
-                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap">Tanggal</th>
-                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Pelanggan</th>
-                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Type HP</th>
-                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Kerusakan</th>
-                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right whitespace-nowrap">Pengeluaran</th>
-                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right whitespace-nowrap">Jasa</th>
-                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap">Teknisi</th>
-                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Keterangan</th>
-                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right whitespace-nowrap">Keuntungan</th>
+                        <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center min-w-[40px]">No</th>
+                        <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">No. Service</th>
+                        <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap">Tanggal</th>
+                        <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Pelanggan</th>
+                        <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left max-w-[200px]">Type HP</th>
+                        <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left max-w-[220px]">Kerusakan</th>
+                        <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right whitespace-nowrap">Pengeluaran</th>
+                        <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right whitespace-nowrap">Jasa</th>
+                        <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center min-w-[60px]">Teknisi</th>
+                        <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left max-w-[160px]">Keterangan</th>
+                        <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right whitespace-nowrap">Keuntungan</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
                     @forelse($services as $service)
                     <tr class="hover:bg-yellow-50/50">
-                        <td class="px-5 py-3 text-sm text-gray-500 text-center whitespace-nowrap">{{ $loop->iteration + ($services->currentPage() - 1) * $services->perPage() }}</td>
-                        <td class="px-5 py-3 text-sm font-medium text-yellow-600 whitespace-nowrap">{{ $service->service_number }}</td>
-                        <td class="px-5 py-3 text-sm text-gray-600 text-center whitespace-nowrap">{{ $service->tanggal->format('d/m/Y') }}</td>
-                        <td class="px-5 py-3 text-sm text-gray-900">{{ $service->customer->nama ?? '-' }}</td>
-                        <td class="px-5 py-3 text-sm text-gray-600 whitespace-nowrap">
+                        <td class="px-4 py-3 text-sm text-gray-500 text-center whitespace-nowrap">{{ $loop->iteration + ($services->currentPage() - 1) * $services->perPage() }}</td>
+                        <td class="px-4 py-3 text-sm font-medium text-yellow-600 whitespace-nowrap">{{ $service->service_number }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-600 text-center whitespace-nowrap">{{ $service->tanggal->format('d/m/Y') }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 whitespace-nowrap max-w-[160px] overflow-hidden text-ellipsis" title="{{ $service->customer->nama ?? '-' }}">{{ $service->customer->nama ?? '-' }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-600 max-w-[200px]" title="
                             @php
                                 $allTypes = collect([$service->type_hp])
                                     ->concat($service->serviceItems->pluck('type_hp'))
@@ -108,10 +104,20 @@
                                     ->values();
                             @endphp
                             @foreach($allTypes as $type)
-                            <div>• {{ $type }}</div>
+• {{ $type }}
+                            @endforeach
+                        ">
+                            @php
+                                $allTypes = collect([$service->type_hp])
+                                    ->concat($service->serviceItems->pluck('type_hp'))
+                                    ->unique()
+                                    ->values();
+                            @endphp
+                            @foreach($allTypes as $type)
+                            <div class="truncate">• {{ $type }}</div>
                             @endforeach
                         </td>
-                        <td class="px-5 py-3 text-sm text-gray-600">
+                        <td class="px-4 py-3 text-sm text-gray-600 max-w-[220px]" title="
                             @php
                                 $krService = $service->kerusakan;
                                 $krDecoded = is_string($krService) ? (json_decode($krService, true) ?? [$krService]) : (array) $krService;
@@ -121,19 +127,31 @@
                                     ->values();
                             @endphp
                             @foreach($allKerusakan as $kr)
-                            <div>• {{ $kr }}</div>
+• {{ $kr }}
+                            @endforeach
+                        ">
+                            @php
+                                $krService = $service->kerusakan;
+                                $krDecoded = is_string($krService) ? (json_decode($krService, true) ?? [$krService]) : (array) $krService;
+                                $allKerusakan = collect($krDecoded)
+                                    ->concat($service->serviceItems->pluck('kerusakan')->flatten())
+                                    ->unique()
+                                    ->values();
+                            @endphp
+                            @foreach($allKerusakan as $kr)
+                            <div class="truncate">• {{ $kr }}</div>
                             @endforeach
                         </td>
-                        <td class="px-5 py-3 text-sm text-gray-900 text-right whitespace-nowrap tabular-nums">Rp {{ number_format($service->pengeluaran, 0, ',', '.') }}</td>
-                        <td class="px-5 py-3 text-sm text-gray-900 text-right whitespace-nowrap tabular-nums">Rp {{ number_format($service->jasa, 0, ',', '.') }}</td>
-                        <td class="px-5 py-3 text-sm text-center whitespace-nowrap">
+                        <td class="px-4 py-3 text-sm text-gray-900 text-right whitespace-nowrap tabular-nums">Rp {{ number_format($service->pengeluaran, 0, ',', '.') }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 text-right whitespace-nowrap tabular-nums">Rp {{ number_format($service->jasa, 0, ',', '.') }}</td>
+                        <td class="px-4 py-3 text-sm text-center whitespace-nowrap">
                             @if($service->teknisi === 'edi') <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700 border border-blue-200">E</span>
                             @elseif($service->teknisi === 'nur') <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200">N</span>
                             @else <span class="text-gray-300">-</span>
                             @endif
                         </td>
-                        <td class="px-5 py-3 text-sm text-gray-600 max-w-[150px] truncate">{{ $service->keterangan ?? '-' }}</td>
-                        <td class="px-5 py-3 text-sm text-right whitespace-nowrap tabular-nums {{ $service->keuntungan >= 0 ? 'text-emerald-600' : 'text-red-600' }}">
+                        <td class="px-4 py-3 text-sm text-gray-600 max-w-[160px] overflow-hidden text-ellipsis whitespace-nowrap" title="{{ $service->keterangan ?? '-' }}">{{ $service->keterangan ?? '-' }}</td>
+                        <td class="px-4 py-3 text-sm text-right whitespace-nowrap tabular-nums {{ $service->keuntungan >= 0 ? 'text-emerald-600' : 'text-red-600' }}">
                             Rp {{ number_format($service->keuntungan, 0, ',', '.') }}
                         </td>
                     </tr>
@@ -162,29 +180,72 @@
     @if($services->total() > 0)
     <div class="bg-white border border-gray-200 rounded-xl shadow-sm">
         <div class="px-5 py-4">
-            <div class="flex items-center gap-2 mb-3">
+            <div class="flex items-center gap-2 mb-4">
                 <span class="h-4 w-1 rounded-full bg-gradient-to-b from-yellow-500 to-amber-500"></span>
                 <h3 class="text-sm font-bold text-gray-800 uppercase tracking-wide">Ringkasan Periode</h3>
             </div>
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="p-4 bg-red-50 rounded-xl border border-red-100">
-                    <p class="text-[10px] text-red-500 uppercase tracking-wider font-medium">Pengeluaran</p>
-                    <p class="text-lg font-bold text-red-600 mt-1">Rp {{ number_format($totalPengeluaran, 0, ',', '.') }}</p>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 items-stretch">
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col h-full">
+                    <div class="p-5 flex-1 flex flex-col gap-1">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shrink-0">
+                                <i class="fas fa-cart-shopping text-white text-xs"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-[11px] text-gray-500 font-medium uppercase tracking-wider">Pengeluaran</p>
+                                <p class="text-[10px] text-gray-400 truncate">Modal sparepart</p>
+                            </div>
+                        </div>
+                        <p class="text-lg font-bold text-red-600 mt-1">Rp {{ number_format($totalPengeluaran, 0, ',', '.') }}</p>
+                    </div>
+                    <div class="h-1 bg-red-500"></div>
                 </div>
-                <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
-                    <p class="text-[10px] text-emerald-500 uppercase tracking-wider font-medium">Omzet</p>
-                    <p class="text-lg font-bold text-emerald-600 mt-1">Rp {{ number_format($totalOmzet, 0, ',', '.') }}</p>
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col h-full">
+                    <div class="p-5 flex-1 flex flex-col gap-1">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shrink-0">
+                                <i class="fas fa-money-bill-wave text-white text-xs"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-[11px] text-gray-500 font-medium uppercase tracking-wider">Omzet</p>
+                                <p class="text-[10px] text-gray-400 truncate">Total tagihan jasa</p>
+                            </div>
+                        </div>
+                        <p class="text-lg font-bold text-gray-900 mt-1">Rp {{ number_format($totalOmzet, 0, ',', '.') }}</p>
+                    </div>
+                    <div class="h-1 bg-emerald-500"></div>
                 </div>
-                <div class="p-4 bg-orange-50 rounded-xl border border-orange-100">
-                    <p class="text-[10px] text-orange-500 uppercase tracking-wider font-medium">Kebutuhan Pribadi</p>
-                    <p class="text-lg font-bold text-orange-600 mt-1">Rp {{ number_format($kebutuhanPribadi, 0, ',', '.') }}</p>
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col h-full">
+                    <div class="p-5 flex-1 flex flex-col gap-1">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shrink-0">
+                                <i class="fas fa-wallet text-white text-xs"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-[11px] text-gray-500 font-medium uppercase tracking-wider">Kebutuhan Pribadi</p>
+                                <p class="text-[10px] text-gray-400 truncate">Bank Jago + Gaji + Lainnya</p>
+                            </div>
+                        </div>
+                        <p class="text-lg font-bold text-orange-600 mt-1">Rp {{ number_format($kebutuhanPribadi, 0, ',', '.') }}</p>
+                    </div>
+                    <div class="h-1 bg-orange-500"></div>
                 </div>
-                <div class="p-4 {{ $profit >= 0 ? 'bg-emerald-50 border-emerald-100' : 'bg-red-50 border-red-100' }} rounded-xl border">
-                    <p class="text-[10px] {{ $profit >= 0 ? 'text-emerald-500' : 'text-red-500' }} uppercase tracking-wider font-medium">Profit</p>
-                    <p class="text-lg font-bold {{ $profit >= 0 ? 'text-emerald-600' : 'text-red-600' }} mt-1">Rp {{ number_format($profit, 0, ',', '.') }}</p>
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col h-full">
+                    <div class="p-5 flex-1 flex flex-col gap-1">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full {{ $profit >= 0 ? 'bg-gradient-to-br from-emerald-500 to-emerald-600' : 'bg-gradient-to-br from-red-500 to-red-600' }} flex items-center justify-center shrink-0">
+                                <i class="fas fa-coins text-white text-xs"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-[11px] text-gray-500 font-medium uppercase tracking-wider">Profit</p>
+                                <p class="text-[10px] text-gray-400 truncate">Omzet - Pengeluaran - Kebutuhan Pribadi</p>
+                            </div>
+                        </div>
+                        <p class="text-lg font-bold {{ $profit >= 0 ? 'text-emerald-600' : 'text-red-600' }} mt-1">Rp {{ number_format($profit, 0, ',', '.') }}</p>
+                    </div>
+                    <div class="h-1 {{ $profit >= 0 ? 'bg-emerald-500' : 'bg-red-500' }}"></div>
                 </div>
             </div>
-            <div class="mt-3 text-[11px] text-gray-400 italic">Omzet - Pengeluaran - Kebutuhan Pribadi = Profit</div>
         </div>
     </div>
     @endif
