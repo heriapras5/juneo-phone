@@ -12,6 +12,9 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SettingController;
 use Illuminate\Support\Facades\Route;
 
+use Illuminate\Support\Facades\Storage;
+
+
 Route::get('/', function () {
     if (auth()->check()) {
         return redirect('/dashboard');
@@ -88,3 +91,13 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('admin', AdminController::class)->except(['show']);
     });
 });
+
+
+
+Route::get('storage/{path}', function (string $path) {
+    $fullPath = storage_path('app/public/' . $path);
+    abort_unless(file_exists($fullPath), 404);
+    return response()->file($fullPath, [
+        'Cache-Control' => 'public, max-age=31536000, immutable',
+    ]);
+})->where('path', '.*');
