@@ -18,8 +18,8 @@
                 <div class="flex items-start gap-4">
                     <div class="relative w-20 h-20 rounded-full overflow-hidden flex items-center justify-center bg-gray-50 flex-shrink-0 ring-4 ring-yellow-500/30 shadow-2xl shadow-yellow-500/30" style="filter: drop-shadow(0 4px 8px rgba(255,215,0,0.25));">
                         <template x-if="!previewUrl">
-                            @if($user->foto)
-                                <img src="{{ asset('storage/' . $user->foto) }}?v={{ time() }}" alt="Foto" class="w-full h-full object-cover">
+                            @if($user->photo_url)
+                                <img src="{{ $user->photo_url }}?v={{ time() }}" alt="Foto" class="w-full h-full object-cover">
                                 <button type="button" @click="showDeleteModal = true"
                                     class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full text-[10px] flex items-center justify-center shadow hover:bg-red-600 transition-colors z-10">
                                     <i class="fas fa-times"></i>

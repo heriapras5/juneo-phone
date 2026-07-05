@@ -35,9 +35,19 @@ class ReportController extends Controller
 
         $services = $query->paginate(10)->withQueryString();
 
-        // Total aggregates untuk baris agregasi
-        $totalPengeluaran = (clone $query)->sum('pengeluaran');
-        $totalOmzet = (clone $query)->sum('jasa');
+        // Total aggregates untuk baris agregasi — rebuild query independen
+        $aggQuery = Service::where('status', '!=', 'batal');
+        if ($from && $to) {
+            $aggQuery->whereDate('tanggal', '>=', $from)
+                     ->whereDate('tanggal', '<=', $to);
+        } else {
+            $aggQuery->whereYear('tanggal', $tahun);
+        }
+        if ($customerId) {
+            $aggQuery->where('customer_id', $customerId);
+        }
+        $totalPengeluaran = $aggQuery->sum('pengeluaran');
+        $totalOmzet = $aggQuery->sum('jasa');
 
         $kebutuhanPribadi = \App\Models\BiayaHarian::query()
             ->when($from && $to, function ($q) use ($from, $to) {

@@ -4,7 +4,7 @@
 @section('page-title', 'Kebutuhan Pribadi')
 
 @section('content')
-<div x-data="{ confirmReset: false }" class="space-y-4">
+<div class="space-y-4">
 
     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5">
         <div class="flex items-center justify-between gap-2 mb-4">
@@ -59,10 +59,10 @@
             <div class="mt-4 flex items-center justify-between">
                 <div class="flex items-center gap-2">
                     <p class="text-xs text-gray-400">Default dapat diubah di menu Pengaturan</p>
-                    <button type="button" @click="confirmReset = true"
-                        class="text-xs text-red-500 hover:text-red-600 underline">
-                        <i class="fas fa-undo-alt mr-1"></i>Reset
-                    </button>
+                    <a href="{{ route('biaya-harian.index') }}"
+                        class="text-xs text-gray-500 hover:text-gray-700 underline">
+                        <i class="fas fa-undo-alt mr-1"></i>Reset ke Hari Ini
+                    </a>
                 </div>
                 <button type="submit" :disabled="loading"
                     class="px-5 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm disabled:opacity-50">
@@ -133,45 +133,6 @@
                     @endforelse
                 </tbody>
             </table>
-        </div>
-    </div>
-    {{-- Hidden form for reset --}}
-    <form id="resetForm" method="POST" action="{{ route('biaya-harian.destroy', $date) }}" class="hidden">
-        @csrf
-        @method('DELETE')
-        <input type="hidden" name="bulan" value="{{ $bulan }}">
-    </form>
-
-    {{-- Modal Konfirmasi Reset --}}
-    <div x-show="confirmReset" x-cloak
-        x-transition:enter="transition-opacity duration-100"
-        x-transition:enter-start="opacity-0"
-        x-transition:enter-end="opacity-100"
-        x-transition:leave="transition-opacity duration-75"
-        x-transition:leave-start="opacity-100"
-        x-transition:leave-end="opacity-0"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-        <div @click.stop class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4 border border-gray-200">
-            <div class="text-center">
-                <div class="flex items-center justify-end mb-2">
-                    <button @click="confirmReset = false" title="Tutup" class="text-gray-400 hover:text-gray-600 -mr-2"><i class="fas fa-times"></i></button>
-                </div>
-                <div class="mx-auto w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center mb-4">
-                    <i class="fas fa-undo-alt text-orange-500 text-xl"></i>
-                </div>
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">Konfirmasi Reset</h3>
-                <p class="text-sm text-gray-600 mb-6">Reset semua Kebutuhan Pribadi untuk tanggal ini ke default?</p>
-                <div class="flex gap-3 justify-center">
-                    <button @click="confirmReset = false"
-                        class="px-5 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl">
-                        Batal
-                    </button>
-                    <button @click="document.getElementById('resetForm').submit()"
-                        class="px-5 py-2 text-sm font-medium text-white bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-400 hover:to-red-400 rounded-xl shadow-lg shadow-orange-500/25">
-                        Ya, Reset
-                    </button>
-                </div>
-            </div>
         </div>
     </div>
 </div>

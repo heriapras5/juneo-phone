@@ -327,8 +327,8 @@
                         <button @click="userMenuOpen = !userMenuOpen"
                             class="flex items-center gap-2 text-sm text-gray-700 hover:text-yellow-600">
                             <div class="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-yellow-500 to-amber-600 flex items-center justify-center text-white text-sm font-bold shadow-md">
-                                @if(auth()->user()->foto)
-                                    <img src="{{ asset('storage/' . auth()->user()->foto) }}?v={{ time() }}" alt="Foto" class="w-full h-full object-cover">
+                                @if(auth()->user()->photo_url)
+                                    <img src="{{ auth()->user()->photo_url }}?v={{ time() }}" alt="Foto" class="w-full h-full object-cover">
                                 @else
                                     {{ substr(auth()->user()->name, 0, 1) }}
                                 @endif
@@ -347,8 +347,8 @@
                             class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-xl py-1 z-50">
                             <div class="px-4 py-2.5 border-b border-gray-100 flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-yellow-100 to-amber-100 flex-shrink-0">
-                                    @if(auth()->user()->foto)
-                                        <img src="{{ asset('storage/' . auth()->user()->foto) }}?v={{ time() }}" alt="Foto" class="w-full h-full object-cover">
+                                    @if(auth()->user()->photo_url)
+                                        <img src="{{ auth()->user()->photo_url }}?v={{ time() }}" alt="Foto" class="w-full h-full object-cover">
                                     @else
                                         <div class="w-full h-full flex items-center justify-center text-sm font-bold text-yellow-600">
                                             {{ substr(auth()->user()->name, 0, 1) }}
