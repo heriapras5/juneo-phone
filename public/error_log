@@ -1,0 +1,287 @@
+[04-Jul-2026 23:06:37 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:06:37 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:06:38 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:06:38 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:06:38 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:06:38 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:06:39 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:06:39 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:06:45 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:06:45 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:06:45 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:06:45 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:06:45 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:06:45 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:06:45 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:06:45 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:06:46 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:06:46 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:07:01 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:07:01 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:07:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:07:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:08:01 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:08:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:08:01 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:08:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:09:01 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:09:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:09:01 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:09:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:10:01 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:10:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:10:01 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:10:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:11:01 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:11:01 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:11:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:11:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:11:27 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:11:27 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:11:28 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:11:28 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:11:44 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:11:44 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:12:01 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:12:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:12:01 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:12:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:13:01 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:13:01 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:13:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:13:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:14:01 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:14:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:14:01 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:14:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:15:01 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:15:01 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:15:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:15:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:16:01 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:16:01 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:16:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:16:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:16:20 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:16:20 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:16:21 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:16:21 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:16:22 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:16:22 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:16:22 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:16:22 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:16:22 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:16:22 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:16:23 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:16:23 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:16:23 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:16:23 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:17:01 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:17:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:17:01 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:17:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:18:01 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:18:01 Asia/Jakarta] PHP Warning:  require_once(/home/jun46083/public_html/public/bootstrap/app.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:18:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:18:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/bootstrap/app.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 18
+[04-Jul-2026 23:19:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/public/vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:19:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/public/vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:19:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:19:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/public/vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:19:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/public/vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:19:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:20:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/public/vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:20:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/public/vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:20:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:20:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/public/vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:20:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/public/vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:20:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:21:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/public/vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:21:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/public/vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:21:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:21:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/public/vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:21:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/public/vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:21:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:22:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/public/vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:22:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/public/vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:22:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:22:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/public/vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:22:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/public/vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:22:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:23:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/public/vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:23:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/public/vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:23:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:23:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/public/vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:23:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/public/vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:23:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:24:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/public/vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:24:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/public/vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:24:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:24:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/public/vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:24:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/public/vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/public/index.php on line 14
+[04-Jul-2026 23:24:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/public/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/public/index.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/public/index.php on line 14

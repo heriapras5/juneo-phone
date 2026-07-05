@@ -1,0 +1,96 @@
+[04-Jul-2026 23:00:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:00:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:00:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:00:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:00:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/../vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/index.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:00:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/../vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/index.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:01:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:01:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:01:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/../vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/index.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:01:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:01:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:01:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/../vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/index.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:02:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:02:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:02:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/../vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/index.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:02:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:02:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:02:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/../vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/index.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:02:03 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:02:03 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:02:03 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/../vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/index.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:03:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:03:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:03:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/../vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/index.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:03:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:03:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:03:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/../vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/index.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:03:32 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:03:32 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:03:32 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/../vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/index.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:04:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:04:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:04:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/../vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/index.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:04:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:04:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:04:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/../vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/index.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:05:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:05:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:05:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/../vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/index.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:05:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:05:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:05:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/../vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/index.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:06:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:06:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:06:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/../vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/index.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:06:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:06:01 Asia/Jakarta] PHP Warning:  require(/home/jun46083/public_html/../vendor/autoload.php): Failed to open stream: No such file or directory in /home/jun46083/public_html/index.php on line 14
+[04-Jul-2026 23:06:01 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/jun46083/public_html/../vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home/jun46083/public_html/index.php:14
+Stack trace:
+#0 {main}
+  thrown in /home/jun46083/public_html/index.php on line 14
