@@ -18,7 +18,7 @@
     .subtotal-row td { font-weight: bold; border-top: 1px solid #B8860B; background: #fff8e1; padding-top: 4px; color: #000; }
     .grand-title { font-size: 12px; font-weight: bold; margin-top: 16px; margin-bottom: 5px; color: #000; border-bottom: 2px solid #000; padding-bottom: 2px; }
     .footer { text-align: center; margin-top: 14px; font-size: 8px; color: #000; border-top: 1px solid #ddd; padding-top: 6px; }
-    .page-break { page-break-before: always; }
+
     .text-right { text-align: right; }
     .text-center { text-align: center; }
     .text-bold { font-weight: bold; }
@@ -44,10 +44,6 @@
         @php $label = $bulanMap[$ym] ?? $ym; @endphp
         @php $rekap = $rekapBulan[$ym]; @endphp
 
-        @if(!$loop->first)
-        <div class="page-break"></div>
-        @endif
-
         <div class="month-title">{{ $label }}</div>
 
         <table>
@@ -72,7 +68,7 @@
                     <td class="text-center">{{ $loop->iteration }}</td>
                     <td>{{ $service->service_number }}</td>
                     <td class="text-center">{{ $service->tanggal->format('d/m/Y') }}</td>
-                    <td>{{ $service->customer->nama ?? '-' }}</td>
+                    <td>{{ $service->customer->nama ?? '' }}</td>
                     @php $pdfTypes = \App\Helpers\ServiceHelper::getAllTypesArray($service); @endphp
                     <td>
                         @foreach($pdfTypes as $type)
@@ -87,7 +83,7 @@
                     </td>
                     <td class="text-right">Rp {{ number_format($service->pengeluaran, 0, ',', '.') }}</td>
                     <td class="text-right">Rp {{ number_format($service->jasa, 0, ',', '.') }}</td>
-                    <td class="text-center">{{ match($service->teknisi) { 'edi' => 'E', 'nur' => 'N', default => '-' } }}</td>
+                    <td class="text-center">{{ match($service->teknisi) { 'edi' => 'E', 'nur' => 'N', default => '' } }}</td>
                     <td style="font-size:6px; max-width:80px; word-wrap:break-word;">{{ $service->keterangan ?? '' }}</td>
                     <td class="text-right text-bold">Rp {{ number_format($service->keuntungan, 0, ',', '.') }}</td>
                 </tr>

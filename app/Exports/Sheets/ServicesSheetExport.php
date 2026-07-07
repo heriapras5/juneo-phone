@@ -11,6 +11,7 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class ServicesSheetExport implements FromCollection, WithHeadings, WithMapping, WithTitle, WithColumnWidths, WithColumnFormatting, WithStyles
@@ -120,6 +121,10 @@ class ServicesSheetExport implements FromCollection, WithHeadings, WithMapping, 
     {
         return [
             1 => ['font' => ['bold' => true]],
+            'I:I' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]],
+            'J:J' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]],
+            'K:K' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]],
+            'L:L' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]],
         ];
     }
 }

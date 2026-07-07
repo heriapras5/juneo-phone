@@ -297,7 +297,7 @@
                         <th class="px-3 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left">Type HP</th>
                         <th class="px-3 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left">Selesai</th>
                         <th class="px-3 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Teknisi</th>
-                        <th class="px-3 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Total</th>
+                        <th class="px-3 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right">Total</th>
                         <th class="px-3 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Aksi</th>
                     </tr>
                 </thead>

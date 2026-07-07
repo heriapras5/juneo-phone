@@ -11,6 +11,7 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class BiayaHarianSheetExport implements FromCollection, WithHeadings, WithMapping, WithTitle, WithColumnWidths, WithColumnFormatting, WithStyles
@@ -63,6 +64,7 @@ class BiayaHarianSheetExport implements FromCollection, WithHeadings, WithMappin
     {
         return [
             1 => ['font' => ['bold' => true]],
+            'D:D' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]],
         ];
     }
 }

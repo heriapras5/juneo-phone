@@ -110,7 +110,7 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
             $this->no,
             $row->service_number,
             $row->tanggal->format('d/m/Y'),
-            $row->customer->nama ?? '-',
+            $row->customer->nama ?? '',
             $allTypesText,
             $kerusakanText,
             $row->pengeluaran,
@@ -186,6 +186,7 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
                     $sheet->getStyle('K' . $dataStartRow . ':K' . $lastDataRow)
                         ->getNumberFormat()->setFormatCode('"Rp"#,##0');
 
+                    $sheet->getStyle('G' . $dataStartRow . ':H' . $lastDataRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
                     $sheet->getStyle('K' . $dataStartRow . ':K' . $lastDataRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
                     $services = $this->collection();

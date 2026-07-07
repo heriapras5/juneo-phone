@@ -10,6 +10,7 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Concerns\WithCustomCsvSettings;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class ServicesExport implements FromQuery, WithHeadings, WithMapping, WithStyles, WithStartRow, WithCustomCsvSettings
@@ -71,7 +72,7 @@ class ServicesExport implements FromQuery, WithHeadings, WithMapping, WithStyles
             $this->no,
             $row->service_number,
             $row->tanggal->format('d/m/Y'),
-            $row->customer->nama ?? '-',
+            $row->customer->nama ?? '',
             $allTypesText,
             $kerusakanText,
             $row->pengeluaran,
@@ -79,7 +80,7 @@ class ServicesExport implements FromQuery, WithHeadings, WithMapping, WithStyles
             $teknisiLabel,
             $row->keterangan ?? '',
             $row->keuntungan,
-            $row->estimasi_selesai ? $row->estimasi_selesai->format('d/m/Y') : '-',
+            $row->estimasi_selesai ? $row->estimasi_selesai->format('d/m/Y') : '',
             $statusLabels[$row->status] ?? $row->status,
         ];
     }
@@ -104,6 +105,9 @@ class ServicesExport implements FromQuery, WithHeadings, WithMapping, WithStyles
     {
         return [
             1 => ['font' => ['bold' => true]],
+            'G:G' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT], 'numberFormat' => ['formatCode' => '"Rp"#,##0']],
+            'H:H' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT], 'numberFormat' => ['formatCode' => '"Rp"#,##0']],
+            'K:K' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT], 'numberFormat' => ['formatCode' => '"Rp"#,##0']],
         ];
     }
 }

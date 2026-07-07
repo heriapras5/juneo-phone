@@ -39,12 +39,12 @@ $namaTeknisi = match($service->teknisi) {
         <tr>
             <td style="font-weight: bold; color: #000; padding: 2px 3px; vertical-align: top;">Pelanggan</td>
             <td style="padding: 2px 3px; vertical-align: top;">:</td>
-            <td style="padding: 2px 3px; vertical-align: top;">{{ $service->customer->nama ?? '-' }}</td>
+            <td style="padding: 2px 3px; vertical-align: top;">{{ $service->customer->nama ?? '' }}</td>
         </tr>
         <tr>
             <td style="font-weight: bold; color: #000; padding: 2px 3px; vertical-align: top;">No. HP</td>
             <td style="padding: 2px 3px; vertical-align: top;">:</td>
-            <td style="padding: 2px 3px; vertical-align: top;">{{ $service->customer->no_hp ?? '-' }}</td>
+            <td style="padding: 2px 3px; vertical-align: top;">{{ $service->customer->no_hp ?? '' }}</td>
         </tr>
         @if($service->customer?->alamat)
         <tr>

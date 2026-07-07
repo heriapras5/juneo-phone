@@ -80,11 +80,11 @@
                         <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Pelanggan</th>
                         <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left max-w-[200px]">Type HP</th>
                         <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left max-w-[220px]">Kerusakan</th>
-                        <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Pengeluaran</th>
-                        <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Jasa</th>
+                        <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right whitespace-nowrap">Pengeluaran</th>
+                        <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right whitespace-nowrap">Jasa</th>
                         <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center min-w-[60px]">Teknisi</th>
                         <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left max-w-[160px]">Keterangan</th>
-                        <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Keuntungan</th>
+                        <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right whitespace-nowrap">Keuntungan</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -140,8 +140,8 @@
                             <div class="truncate">• {{ $kr }}</div>
                             @endforeach
                         </td>
-                        <td class="px-4 py-3 text-sm text-gray-900 whitespace-nowrap tabular-nums">Rp {{ number_format($service->pengeluaran, 0, ',', '.') }}</td>
-                        <td class="px-4 py-3 text-sm text-gray-900 whitespace-nowrap tabular-nums">Rp {{ number_format($service->jasa, 0, ',', '.') }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 whitespace-nowrap tabular-nums text-right">Rp {{ number_format($service->pengeluaran, 0, ',', '.') }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 whitespace-nowrap tabular-nums text-right">Rp {{ number_format($service->jasa, 0, ',', '.') }}</td>
                         <td class="px-4 py-3 text-sm text-center whitespace-nowrap">
                             @if($service->teknisi === 'edi') <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700 border border-blue-200">E</span>
                             @elseif($service->teknisi === 'nur') <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200">N</span>
@@ -149,7 +149,7 @@
                             @endif
                         </td>
                         <td class="px-4 py-3 text-sm text-gray-600 max-w-[160px] overflow-hidden text-ellipsis whitespace-nowrap" title="{{ $service->keterangan ?? '' }}">{{ $service->keterangan ?? '' }}</td>
-                        <td class="px-4 py-3 text-sm whitespace-nowrap tabular-nums {{ $service->keuntungan >= 0 ? 'text-emerald-600' : 'text-red-600' }}">
+                        <td class="px-4 py-3 text-sm whitespace-nowrap tabular-nums text-right {{ $service->keuntungan >= 0 ? 'text-emerald-600' : 'text-red-600' }}">
                             Rp {{ number_format($service->keuntungan, 0, ',', '.') }}
                         </td>
                     </tr>

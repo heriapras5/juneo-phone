@@ -11,6 +11,7 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class GajiKaryawanSheetExport implements FromCollection, WithHeadings, WithMapping, WithTitle, WithColumnWidths, WithColumnFormatting, WithStyles
@@ -59,6 +60,7 @@ class GajiKaryawanSheetExport implements FromCollection, WithHeadings, WithMappi
     {
         return [
             1 => ['font' => ['bold' => true]],
+            'C:C' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]],
         ];
     }
 }
