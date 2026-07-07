@@ -118,7 +118,7 @@ $hasCustomRange = request()->has('from') && request()->has('to');
             <h2 class="text-sm font-bold text-gray-800 uppercase tracking-wide">Ringkasan Keuangan</h2>
             <span class="text-[11px] text-gray-400 italic hidden sm:inline">— Pengeluaran, Omzet, Kebutuhan Pribadi &amp; Profit</span>
         </div>
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 items-stretch" id="rowKpi">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 items-stretch" id="rowKpi">
             @include('dashboard._partials.kpi-cards', [
                 'periodLabels' => $periodLabels,
                 'period' => $period,

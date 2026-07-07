@@ -4,25 +4,24 @@
     <meta charset="UTF-8">
     <title>Laporan Service {{ $tahun }} - {{ $namaToko }}</title>
     <style>
-        @page { margin: 15mm; }
-        body { font-family: sans-serif; font-size: 8px; }
-    .header { text-align: center; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 2px solid #B8860B; }
-    .header h1 { margin: 0; font-size: 24px; letter-spacing: 1px; }
-    .header .subtitle { margin: 4px 0 0; font-size: 14px; font-weight: bold; color: #333; }
-    .header .info { margin: 2px 0 0; font-size: 8px; color: #555; }
-    .month-title { font-size: 12px; font-weight: bold; margin-top: 16px; margin-bottom: 6px; color: #B8860B; border-bottom: 1px solid #B8860B; padding-bottom: 3px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 6px; }
-    th { background: #B8860B; color: white; padding: 5px 6px; text-align: left; font-size: 7px; }
-    td { padding: 3px 6px; border-bottom: 1px solid #ddd; font-size: 7px; }
+        @page { margin: 12mm; }
+        body { font-family: sans-serif; font-size: 8px; color: #000; }
+    .header { text-align: center; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 2px solid #B8860B; }
+    .header h1 { margin: 0; font-size: 22px; letter-spacing: 1px; color: #000; }
+    .header .subtitle { margin: 4px 0 0; font-size: 13px; font-weight: bold; color: #000; }
+    .header .info { margin: 2px 0 0; font-size: 8px; color: #000; }
+    .month-title { font-size: 12px; font-weight: bold; margin-top: 14px; margin-bottom: 5px; color: #000; border-bottom: 1px solid #B8860B; padding-bottom: 2px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 4px; }
+    th { background: #B8860B; color: #fff; padding: 4px 4px; text-align: left; font-size: 7px; }
+    td { padding: 2px 4px; border-bottom: 1px solid #ddd; font-size: 7px; color: #000; }
     tr:nth-child(even) { background: #f9fafb; }
-    .subtotal-row td { font-weight: bold; border-top: 1px solid #B8860B; background: #fff8e1; padding-top: 4px; }
-    .grand-title { font-size: 12px; font-weight: bold; margin-top: 18px; margin-bottom: 6px; color: #333; border-bottom: 2px solid #333; padding-bottom: 3px; }
-    .footer { text-align: center; margin-top: 16px; font-size: 8px; color: #888; border-top: 1px solid #ddd; padding-top: 8px; }
+    .subtotal-row td { font-weight: bold; border-top: 1px solid #B8860B; background: #fff8e1; padding-top: 4px; color: #000; }
+    .grand-title { font-size: 12px; font-weight: bold; margin-top: 16px; margin-bottom: 5px; color: #000; border-bottom: 2px solid #000; padding-bottom: 2px; }
+    .footer { text-align: center; margin-top: 14px; font-size: 8px; color: #000; border-top: 1px solid #ddd; padding-top: 6px; }
     .page-break { page-break-before: always; }
     .text-right { text-align: right; }
     .text-center { text-align: center; }
-    .text-green { color: #059669; font-weight: bold; }
-    .text-red { color: #DC2626; font-weight: bold; }
+    .text-bold { font-weight: bold; }
     </style>
 </head>
 <body>
@@ -55,16 +54,16 @@
             <thead>
                 <tr>
                     <th style="width:3%;">No</th>
-                    <th style="width:9%;">No. Service</th>
-                    <th style="width:8%;">Tanggal</th>
-                    <th style="width:11%;">Pelanggan</th>
-                    <th style="width:10%;">Type HP</th>
-                    <th style="width:18%;">Kerusakan</th>
-                    <th style="width:9%;">Pengeluaran</th>
-                    <th style="width:9%;">Jasa</th>
-                    <th style="width:5%;">Teknisi</th>
-                    <th style="width:9%;">Keterangan</th>
-                    <th style="width:9%;">Keuntungan</th>
+                    <th style="width:8%;">No. Service</th>
+                    <th style="width:7%;">Tanggal</th>
+                    <th style="width:10%;">Pelanggan</th>
+                    <th style="width:9%;">Type HP</th>
+                    <th style="width:15%;">Kerusakan</th>
+                    <th style="width:8%;">Pengeluaran</th>
+                    <th style="width:8%;">Jasa</th>
+                    <th style="width:4%;">Teknisi</th>
+                    <th style="width:8%;">Keterangan</th>
+                    <th style="width:8%;">Keuntungan</th>
                 </tr>
             </thead>
             <tbody>
@@ -89,8 +88,8 @@
                     <td class="text-right">Rp {{ number_format($service->pengeluaran, 0, ',', '.') }}</td>
                     <td class="text-right">Rp {{ number_format($service->jasa, 0, ',', '.') }}</td>
                     <td class="text-center">{{ match($service->teknisi) { 'edi' => 'E', 'nur' => 'N', default => '-' } }}</td>
-                    <td style="font-size:6px; color:#666; max-width:80px; word-wrap:break-word;">{{ $service->keterangan ?? '' }}</td>
-                    <td class="text-right {{ $service->keuntungan >= 0 ? 'text-green' : 'text-red' }}">Rp {{ number_format($service->keuntungan, 0, ',', '.') }}</td>
+                    <td style="font-size:6px; max-width:80px; word-wrap:break-word;">{{ $service->keterangan ?? '' }}</td>
+                    <td class="text-right text-bold">Rp {{ number_format($service->keuntungan, 0, ',', '.') }}</td>
                 </tr>
                 @endforeach
             </tbody>
@@ -117,7 +116,7 @@
                 </tr>
                 <tr style="border-top:2px solid #333; background:#fff8e1;">
                     <td colspan="6" class="text-right" style="font-size:9px; font-weight:bold;">Profit</td>
-                    <td class="text-right {{ $subProfit >= 0 ? 'text-green' : 'text-red' }}" style="font-size:9px; font-weight:bold;">
+                    <td class="text-right text-bold" style="font-size:9px; font-weight:bold;">
                         Rp {{ number_format($subProfit, 0, ',', '.') }}
                     </td>
                     <td colspan="4"></td>
@@ -127,7 +126,7 @@
     @endforeach
 
     @if(empty($bulanList))
-        <p style="text-align:center; margin-top:40px; color:#999;">
+        <p style="text-align:center; margin-top:40px; color:#000;">
             @if(!empty($from) && !empty($to))
                 Tidak ada data service untuk periode {{ \Carbon\Carbon::parse($from)->format('d/m/Y') }} — {{ \Carbon\Carbon::parse($to)->format('d/m/Y') }}.
             @else
@@ -162,7 +161,7 @@
                 <td class="text-right">Rp {{ number_format($r['totalJasa'], 0, ',', '.') }}</td>
                 <td class="text-right">Rp {{ number_format($r['totalPengeluaran'], 0, ',', '.') }}</td>
                 <td class="text-right">Rp {{ number_format($r['biayaHarian'], 0, ',', '.') }}</td>
-                <td class="text-right {{ $p >= 0 ? 'text-green' : 'text-red' }}">Rp {{ number_format($p, 0, ',', '.') }}</td>
+                <td class="text-right text-bold">Rp {{ number_format($p, 0, ',', '.') }}</td>
             </tr>
             @endforeach
         </tbody>
@@ -173,7 +172,7 @@
                 <td class="text-right">Rp {{ number_format($grandJasa, 0, ',', '.') }}</td>
                 <td class="text-right">Rp {{ number_format($grandPengeluaran, 0, ',', '.') }}</td>
                 <td class="text-right">Rp {{ number_format($grandBiayaHarian, 0, ',', '.') }}</td>
-                <td class="text-right {{ $grandProfit >= 0 ? 'text-green' : 'text-red' }}">Rp {{ number_format($grandProfit, 0, ',', '.') }}</td>
+                <td class="text-right text-bold">Rp {{ number_format($grandProfit, 0, ',', '.') }}</td>
             </tr>
         </tfoot>
     </table>

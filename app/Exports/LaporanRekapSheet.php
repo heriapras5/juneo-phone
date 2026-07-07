@@ -196,16 +196,6 @@ class LaporanRekapSheet implements FromArray, WithHeadings, WithTitle, WithStyle
                     }
                 }
 
-                // Conditional coloring for Keuntungan Bersih (column F)
-                // Hijau jika >= 0, merah jika < 0
-                for ($r = 4; $r <= $totalRowIndex; $r++) {
-                    $cellValue = $sheet->getCell('F' . $r)->getCalculatedValue();
-                    if (is_numeric($cellValue)) {
-                        $color = $cellValue >= 0 ? 'FF10B981' : 'FFEF4444';
-                        $sheet->getStyle('F' . $r)->getFont()->getColor()->setARGB($color);
-                    }
-                }
-
                 $sheet->getColumnDimension('A')->setWidth(22);
                 $sheet->getColumnDimension('B')->setWidth(16);
                 $sheet->getColumnDimension('C')->setWidth(18);
@@ -220,7 +210,7 @@ class LaporanRekapSheet implements FromArray, WithHeadings, WithTitle, WithStyle
                 // Footer
                 $footerRow = $totalRowIndex + 2;
                 $sheet->setCellValue('A' . $footerRow, 'Dicetak: ' . now()->format('d/m/Y H:i'));
-                $sheet->getStyle('A' . $footerRow)->getFont()->setSize(8)->setItalic(true)->getColor()->setARGB('FF999999');
+                $sheet->getStyle('A' . $footerRow)->getFont()->setSize(8)->setItalic(true)->getColor()->setARGB('FF000000');
             },
         ];
     }

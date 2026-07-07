@@ -43,30 +43,30 @@ window._pageData = {
         </div>
 
         <div class="overflow-x-auto">
-            <table class="w-full">
+            <table class="w-full min-w-[800px]">
                 <thead>
                     <tr class="bg-gray-50">
-                        <th class="px-3 sm:px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">No</th>
-                        <th class="px-3 sm:px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left">Nama</th>
-                        <th class="px-3 sm:px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left">No. HP</th>
-                        <th class="px-3 sm:px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left">Alamat</th>
-                        <th class="px-3 sm:px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Total Service</th>
-                        <th class="px-3 sm:px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Aksi</th>
+                        <th class="px-3 sm:px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap">No</th>
+                        <th class="px-3 sm:px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Nama</th>
+                        <th class="px-3 sm:px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">No. HP</th>
+                        <th class="px-3 sm:px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Alamat</th>
+                        <th class="px-3 sm:px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap">Total Service</th>
+                        <th class="px-3 sm:px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
                     @forelse($customers as $customer)
                     <tr class="hover:bg-yellow-50/50">
-                        <td class="px-3 sm:px-5 py-4 text-sm text-gray-500">{{ $loop->iteration + ($customers->currentPage() - 1) * $customers->perPage() }}</td>
-                        <td class="px-3 sm:px-5 py-4">
+                        <td class="px-3 sm:px-5 py-3 text-sm text-gray-500 text-center whitespace-nowrap">{{ $loop->iteration + ($customers->currentPage() - 1) * $customers->perPage() }}</td>
+                        <td class="px-3 sm:px-5 py-3 whitespace-nowrap">
                             <a href="{{ route('customers.show', $customer) }}" class="text-sm font-medium text-yellow-600 hover:text-yellow-700">
                                 {{ $customer->nama }}
                             </a>
                         </td>
-                        <td class="px-3 sm:px-5 py-4 text-sm text-gray-600">{{ $customer->no_hp ?? '-' }}</td>
-                        <td class="px-3 sm:px-5 py-4 text-sm text-gray-600 max-w-xs truncate">{{ $customer->alamat ?? '-' }}</td>
-                        <td class="px-3 sm:px-5 py-4 text-sm text-gray-600 text-center">{{ $customer->services_count }}</td>
-                        <td class="px-3 sm:px-5 py-4 text-right">
+                        <td class="px-3 sm:px-5 py-3 text-sm text-gray-600 whitespace-nowrap">{{ $customer->no_hp ?? '-' }}</td>
+                        <td class="px-3 sm:px-5 py-3 text-sm text-gray-600 whitespace-nowrap">{{ $customer->alamat ?? '-' }}</td>
+                        <td class="px-3 sm:px-5 py-3 text-sm text-gray-600 text-center whitespace-nowrap">{{ $customer->services_count }}</td>
+                        <td class="px-3 sm:px-5 py-3 text-right whitespace-nowrap">
                             <div class="flex items-center justify-end gap-1">
                                 <a href="{{ route('customers.show', $customer) }}" title="Lihat Detail"
                                     class="p-2 text-gray-400 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg ">

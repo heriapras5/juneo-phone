@@ -186,14 +186,6 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
                     $sheet->getStyle('K' . $dataStartRow . ':K' . $lastDataRow)
                         ->getNumberFormat()->setFormatCode('"Rp"#,##0');
 
-                    // Conditional warna Keuntungan (kolom K) — hijau/merah per baris
-                    for ($r = $dataStartRow; $r <= $lastDataRow; $r++) {
-                        $cellValue = $sheet->getCell('K' . $r)->getCalculatedValue();
-                        if (is_numeric($cellValue)) {
-                            $color = $cellValue >= 0 ? 'FF10B981' : 'FFEF4444';
-                            $sheet->getStyle('K' . $r)->getFont()->getColor()->setARGB($color);
-                        }
-                    }
                     $sheet->getStyle('K' . $dataStartRow . ':K' . $lastDataRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
                     $services = $this->collection();
@@ -243,7 +235,7 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
 
                     $footerRow = $summaryStart + count($summaryRows) + 1;
                     $sheet->setCellValue('A' . $footerRow, 'Dicetak: ' . now()->format('d/m/Y H:i'));
-                    $sheet->getStyle('A' . $footerRow)->getFont()->setSize(8)->setItalic(true)->getColor()->setARGB('FF999999');
+                    $sheet->getStyle('A' . $footerRow)->getFont()->setSize(8)->setItalic(true)->getColor()->setARGB('FF000000');
                 }
 
                 $sheet->getColumnDimension('A')->setWidth(5);

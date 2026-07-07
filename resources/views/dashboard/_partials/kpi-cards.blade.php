@@ -129,7 +129,7 @@ $profitPositive = $periodTotals->profit >= 0;
                 <p class="text-xl sm:text-2xl font-bold mt-1 {{ $profitPositive ? 'text-emerald-600' : 'text-red-600' }}">
                     Rp {{ number_format($periodTotals->profit, 0, ',', '.') }}
                 </p>
-                <p class="text-xs text-gray-400 mt-1">Omzet - Pengeluaran - Kebutuhan Pribadi</p>
+                <p class="text-xs text-gray-400 mt-1 hidden sm:block">Omzet - Pengeluaran - Kebutuhan Pribadi</p>
                 @if($changeProfit !== null)
                 <div class="flex items-center gap-1 mt-1">
                     <i class="fas fa-{{ $changeProfit >= 0 ? 'arrow-up' : 'arrow-down' }} text-{{ $changeProfit >= 0 ? 'emerald' : 'red' }}-500 text-xs"></i>
