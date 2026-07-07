@@ -89,7 +89,7 @@ class ServicesSheetExport implements FromCollection, WithHeadings, WithMapping, 
 
     public function title(): string
     {
-        return 'Services';
+        return 'Service';
     }
 
     public function columnWidths(): array

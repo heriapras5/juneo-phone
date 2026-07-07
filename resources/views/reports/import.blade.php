@@ -55,14 +55,18 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
-                    <tr><td class="px-3 py-2 text-gray-700">No</td><td class="px-3 py-2 text-gray-500">Penomoran (diabaikan saat import)</td><td class="px-3 py-2 text-gray-400">Opsional</td></tr>
-                    <tr><td class="px-3 py-2 text-gray-700">Tanggal</td><td class="px-3 py-2 text-gray-500">Format YYYY-MM-DD</td><td class="px-3 py-2 text-emerald-600">Ya</td></tr>
-                    <tr><td class="px-3 py-2 text-gray-700">Pelanggan</td><td class="px-3 py-2 text-gray-500">Nama pelanggan</td><td class="px-3 py-2 text-emerald-600">Ya</td></tr>
-                    <tr><td class="px-3 py-2 text-gray-700">Type</td><td class="px-3 py-2 text-gray-500">Tipe HP</td><td class="px-3 py-2 text-emerald-600">Ya</td></tr>
-                    <tr><td class="px-3 py-2 text-gray-700">Kerusakan</td><td class="px-3 py-2 text-gray-500">Deskripsi kerusakan</td><td class="px-3 py-2 text-emerald-600">Ya</td></tr>
-                    <tr><td class="px-3 py-2 text-gray-700">Pengeluaran (Modal)</td><td class="px-3 py-2 text-gray-500">Modal/biaya</td><td class="px-3 py-2 text-gray-400">Opsional</td></tr>
-                    <tr><td class="px-3 py-2 text-gray-700">Jasa (Total Keseluruhan)</td><td class="px-3 py-2 text-gray-500">Total tagihan ke pelanggan</td><td class="px-3 py-2 text-gray-400">Opsional</td></tr>
-                    <tr><td class="px-3 py-2 text-gray-700">Teknisi</td><td class="px-3 py-2 text-gray-500">Kosongkan (Adit), "edi" (Edi), atau "nur" (Nur)</td><td class="px-3 py-2 text-gray-400">Opsional</td></tr>
+                    <tr><td class="px-3 py-2 text-gray-700">No</td><td class="px-3 py-2 text-gray-500">Diabaikan saat import</td><td class="px-3 py-2 text-gray-400">Opsional</td></tr>
+                    <tr><td class="px-3 py-2 font-medium text-gray-800">Tanggal</td><td class="px-3 py-2 text-gray-500">Format YYYY-MM-DD</td><td class="px-3 py-2 text-emerald-600 font-medium">Ya</td></tr>
+                    <tr><td class="px-3 py-2 font-medium text-gray-800">Pelanggan</td><td class="px-3 py-2 text-gray-500">Nama pelanggan</td><td class="px-3 py-2 text-emerald-600 font-medium">Ya</td></tr>
+                    <tr><td class="px-3 py-2 text-gray-700">No. HP</td><td class="px-3 py-2 text-gray-500">Nomor HP pelanggan</td><td class="px-3 py-2 text-gray-400">Opsional</td></tr>
+                    <tr><td class="px-3 py-2 text-gray-700">Type HP</td><td class="px-3 py-2 text-gray-500">Tipe HP</td><td class="px-3 py-2 text-gray-400">Opsional</td></tr>
+                    <tr><td class="px-3 py-2 text-gray-700">Kerusakan</td><td class="px-3 py-2 text-gray-500">Deskripsi kerusakan</td><td class="px-3 py-2 text-gray-400">Opsional</td></tr>
+                    <tr><td class="px-3 py-2 text-gray-700">Pengeluaran</td><td class="px-3 py-2 text-gray-500">Modal/biaya</td><td class="px-3 py-2 text-gray-400">Opsional</td></tr>
+                    <tr><td class="px-3 py-2 text-gray-700">Jasa</td><td class="px-3 py-2 text-gray-500">Total tagihan ke pelanggan</td><td class="px-3 py-2 text-gray-400">Opsional</td></tr>
+                    <tr><td class="px-3 py-2 text-gray-700">Teknisi</td><td class="px-3 py-2 text-gray-500">Kosongkan (Adit), "edi", atau "nur"</td><td class="px-3 py-2 text-gray-400">Opsional</td></tr>
+                    <tr><td class="px-3 py-2 text-gray-700">Status</td><td class="px-3 py-2 text-gray-500">menunggu / dikerjakan / selesai / diambil / batal</td><td class="px-3 py-2 text-gray-400">Opsional</td></tr>
+                    <tr><td class="px-3 py-2 text-gray-700">Estimasi Selesai</td><td class="px-3 py-2 text-gray-500">Format YYYY-MM-DD</td><td class="px-3 py-2 text-gray-400">Opsional</td></tr>
+                    <tr><td class="px-3 py-2 text-gray-700">Tanggal Selesai</td><td class="px-3 py-2 text-gray-500">Format YYYY-MM-DD</td><td class="px-3 py-2 text-gray-400">Opsional</td></tr>
                     <tr><td class="px-3 py-2 text-gray-700">Keterangan</td><td class="px-3 py-2 text-gray-500">Catatan tambahan</td><td class="px-3 py-2 text-gray-400">Opsional</td></tr>
                 </tbody>
             </table>
