@@ -176,6 +176,14 @@
                     <span class="sidebar-text">Laporan</span>
                 </a>
 
+                <a href="{{ route('reports.import') }}"
+                    class="flex items-center gap-3 pl-4 pr-3 py-2.5 text-sm {{ request()->routeIs('reports.import*') ? 'bg-gradient-to-r from-yellow-500/15 to-amber-500/5 border-r-2 border-yellow-500 text-yellow-400' : 'text-gray-400 hover:bg-white/5 hover:text-yellow-400' }}">
+                    <span class="w-8 h-8 flex items-center justify-center rounded-lg {{ request()->routeIs('reports.import*') ? 'bg-yellow-500/20' : '' }}">
+                        <i class="fas fa-upload w-5 text-center {{ request()->routeIs('reports.import*') ? 'text-yellow-400' : '' }}"></i>
+                    </span>
+                    <span class="sidebar-text">Import Data</span>
+                </a>
+
                 {{-- Section: ADMIN --}}
                 @if(in_array(auth()->user()->role, ['admin', 'superadmin']))
                 <div class="sidebar-text text-[10px] font-semibold text-gray-600 uppercase tracking-[2px] px-4 pt-4 pb-1">MASTER DATA</div>
@@ -194,19 +202,6 @@
                         <i class="fas fa-cog w-5 text-center {{ request()->routeIs('settings') ? 'text-yellow-400' : '' }}"></i>
                     </span>
                     <span class="sidebar-text">Pengaturan</span>
-                </a>
-                @endif
-
-                {{-- Section: LAINNYA --}}
-                @if(false)
-                <div class="sidebar-text text-[10px] font-semibold text-gray-600 uppercase tracking-[2px] px-4 pt-4 pb-1">LAINNYA</div>
-
-                <a href="{{ route('reports.import') }}"
-                    class="flex items-center gap-3 pl-4 pr-3 py-2.5 text-sm {{ request()->routeIs('reports.import*') ? 'bg-gradient-to-r from-yellow-500/15 to-amber-500/5 border-r-2 border-yellow-500 text-yellow-400' : 'text-gray-400 hover:bg-white/5 hover:text-yellow-400' }}">
-                    <span class="w-8 h-8 flex items-center justify-center rounded-lg {{ request()->routeIs('reports.import*') ? 'bg-yellow-500/20' : '' }}">
-                        <i class="fas fa-upload w-5 text-center {{ request()->routeIs('reports.import*') ? 'text-yellow-400' : '' }}"></i>
-                    </span>
-                    <span class="sidebar-text">Import Data</span>
                 </a>
 
                 <a href="{{ route('data.index') }}"
@@ -277,6 +272,10 @@
                     class="flex items-center gap-3 pl-4 pr-3 py-2.5 text-sm {{ request()->routeIs('reports.*') && !request()->routeIs('reports.import*') ? 'bg-gradient-to-r from-yellow-500/15 to-amber-500/5 border-r-2 border-yellow-500 text-yellow-400' : 'text-gray-400 hover:bg-white/5 hover:text-yellow-400' }}">
                     <span class="w-8 h-8 flex items-center justify-center rounded-lg {{ request()->routeIs('reports.*') && !request()->routeIs('reports.import*') ? 'bg-yellow-500/20' : '' }}"><i class="fas fa-file-alt w-5 text-center"></i></span> Laporan
                 </a>
+                <a href="{{ route('reports.import') }}" @click="sidebarMobileOpen = false"
+                    class="flex items-center gap-3 pl-4 pr-3 py-2.5 text-sm {{ request()->routeIs('reports.import*') ? 'bg-gradient-to-r from-yellow-500/15 to-amber-500/5 border-r-2 border-yellow-500 text-yellow-400' : 'text-gray-400 hover:bg-white/5 hover:text-yellow-400' }}">
+                    <span class="w-8 h-8 flex items-center justify-center rounded-lg {{ request()->routeIs('reports.import*') ? 'bg-yellow-500/20' : '' }}"><i class="fas fa-upload w-5 text-center"></i></span> Import Data
+                </a>
                 @if(in_array(auth()->user()->role, ['admin', 'superadmin']))
                 <div class="text-[10px] font-semibold text-gray-600 uppercase tracking-[2px] px-4 pt-4 pb-1">MASTER DATA</div>
                 @if(auth()->user()->role === 'superadmin')
@@ -288,15 +287,6 @@
                 <a href="{{ route('settings') }}" @click="sidebarMobileOpen = false"
                     class="flex items-center gap-3 pl-4 pr-3 py-2.5 text-sm {{ request()->routeIs('settings') ? 'bg-gradient-to-r from-yellow-500/15 to-amber-500/5 border-r-2 border-yellow-500 text-yellow-400' : 'text-gray-400 hover:bg-white/5 hover:text-yellow-400' }}">
                     <span class="w-8 h-8 flex items-center justify-center rounded-lg {{ request()->routeIs('settings') ? 'bg-yellow-500/20' : '' }}"><i class="fas fa-cog w-5 text-center"></i></span> Pengaturan
-                </a>
-                @endif
-
-                @if(false)
-                <div class="text-[10px] font-semibold text-gray-600 uppercase tracking-[2px] px-4 pt-4 pb-1">LAINNYA</div>
-
-                <a href="{{ route('reports.import') }}" @click="sidebarMobileOpen = false"
-                    class="flex items-center gap-3 pl-4 pr-3 py-2.5 text-sm {{ request()->routeIs('reports.import*') ? 'bg-gradient-to-r from-yellow-500/15 to-amber-500/5 border-r-2 border-yellow-500 text-yellow-400' : 'text-gray-400 hover:bg-white/5 hover:text-yellow-400' }}">
-                    <span class="w-8 h-8 flex items-center justify-center rounded-lg {{ request()->routeIs('reports.import*') ? 'bg-yellow-500/20' : '' }}"><i class="fas fa-upload w-5 text-center"></i></span> Import Data
                 </a>
                 <a href="{{ route('data.index') }}" @click="sidebarMobileOpen = false"
                     class="flex items-center gap-3 pl-4 pr-3 py-2.5 text-sm {{ request()->routeIs('data.*') ? 'bg-gradient-to-r from-yellow-500/15 to-amber-500/5 border-r-2 border-yellow-500 text-yellow-400' : 'text-gray-400 hover:bg-white/5 hover:text-yellow-400' }}">
