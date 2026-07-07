@@ -34,7 +34,7 @@ $profitPositive = $periodTotals->profit >= 0;
             </svg>
         </div>
     </div>
-    <div class="h-1 bg-red-500"></div>
+    <div class="h-1.5 bg-red-500 rounded-b-xl"></div>
 </div>
 
 {{-- Omzet --}}
@@ -69,7 +69,7 @@ $profitPositive = $periodTotals->profit >= 0;
             </svg>
         </div>
     </div>
-    <div class="h-1 bg-emerald-500"></div>
+    <div class="h-1.5 bg-emerald-500 rounded-b-xl"></div>
 </div>
 
 {{-- Kebutuhan Pribadi --}}
@@ -80,7 +80,7 @@ $profitPositive = $periodTotals->profit >= 0;
                 <p class="text-xs text-gray-500 uppercase tracking-wider font-medium">Kebutuhan Pribadi {{ $periodLabels[$period] }}</p>
                 <p class="text-[10px] text-gray-400 italic mt-1 hidden sm:block">Bank Jago + Gaji Edi + Gaji Nur + Lainnya — total biaya kebutuhan harian</p>
                 <p class="text-base sm:text-xl lg:text-2xl font-bold mt-1 kpi-value text-orange-600" data-value="{{ $periodTotals->kebutuhan_pribadi }}">Rp {{ number_format($periodTotals->kebutuhan_pribadi, 0, ',', '.') }}</p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 mt-1 text-xs">
+                <div class="grid grid-cols-2 gap-x-2 sm:gap-x-4 mt-1 text-xs kpi-breakdown">
                     <div class="flex items-center gap-1">
                         <span class="text-gray-400">Bank Jago:</span>
                         <span class="font-medium text-blue-600">Rp {{ number_format($periodTotals->bank_jago, 0, ',', '.') }}</span>
@@ -121,7 +121,7 @@ $profitPositive = $periodTotals->profit >= 0;
             </svg>
         </div>
     </div>
-    <div class="h-1 bg-orange-500"></div>
+    <div class="h-1.5 bg-orange-500 rounded-b-xl"></div>
 </div>
 
 {{-- Profit --}}
@@ -158,5 +158,5 @@ $profitPositive = $periodTotals->profit >= 0;
             </svg>
         </div>
     </div>
-    <div class="h-1 {{ $profitPositive ? 'bg-emerald-500' : 'bg-red-500' }}"></div>
+    <div class="h-1.5 rounded-b-xl {{ $profitPositive ? 'bg-emerald-500' : 'bg-red-500' }}"></div>
 </div>

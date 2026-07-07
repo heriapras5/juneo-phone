@@ -30,40 +30,42 @@ $hasCustomRange = request()->has('from') && request()->has('to');
 <div class="space-y-6" id="dashboard-app">
 
     {{-- ============ Period Filter Bar (AJAX) ============ --}}
-    <div x-data="{ df: '{{ $fromDate->format('Y-m-d') }}', dt: '{{ $toDate->format('Y-m-d') }}' }" id="dashFilterBar" class="anm-wrap bg-white border border-gray-200 rounded-xl shadow-sm px-3 sm:px-4 py-2 sm:py-3 flex flex-wrap items-center gap-1.5 sm:gap-2">
-        <span class="text-[11px] text-gray-500 font-medium mr-0.5 sm:mr-1 flex items-center gap-1 sm:gap-1.5">
+    <div x-data="{ df: '{{ $fromDate->format('Y-m-d') }}', dt: '{{ $toDate->format('Y-m-d') }}' }" id="dashFilterBar" class="anm-wrap bg-white border border-gray-200 rounded-xl shadow-sm px-3 sm:px-4 py-3 sm:py-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:flex-wrap sm:gap-1 lg:gap-2 border-l-4 border-yellow-500/30">
+        <span class="text-[11px] text-gray-500 font-medium flex items-center gap-1 sm:gap-1.5">
             <i class="fas fa-filter text-yellow-500"></i>
-            <span class="hidden sm:inline">Filter waktu:</span>
+            <span>Filter waktu:</span>
         </span>
+        <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-0">
         @foreach(['daily', 'weekly', 'monthly', 'yearly'] as $p)
         <button data-period="{{ $p }}"
-            class="period-btn px-2 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors {{ $period === $p && !$hasCustomRange ? 'bg-gradient-to-r from-yellow-500 to-amber-500 text-white shadow-sm' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 shadow-sm' }}">
-            <i class="fas {{ $periodIcons[$p] }} hidden sm:inline mr-1 sm:mr-1.5"></i>{{ $periodLabels[$p] }}
+            class="period-btn w-full sm:w-auto px-2 lg:px-3.5 py-1.5 lg:py-2 text-xs lg:text-sm font-medium rounded-lg transition-colors {{ $period === $p && !$hasCustomRange ? 'bg-gradient-to-r from-yellow-500 to-amber-500 text-white shadow-sm' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 shadow-sm' }}">
+            <i class="fas {{ $periodIcons[$p] }} hidden lg:inline mr-1 sm:mr-1.5"></i>{{ $periodLabels[$p] }}
         </button>
         @endforeach
+        </div>
 
-        <span class="hidden sm:inline text-gray-200">|</span>
+        <span class="hidden lg:inline text-gray-200">|</span>
 
-        <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
-            <span class="text-[11px] text-gray-500 font-medium hidden sm:inline">Dari</span>
+        <div class="flex items-center gap-2 flex-nowrap">
+            <span class="text-[11px] text-gray-500 font-medium whitespace-nowrap">Dari</span>
             <input type="date" id="filterFrom" x-model="df"
-                class="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none w-[130px] sm:w-auto">
-            <span class="text-[11px] text-gray-500 font-medium hidden sm:inline">Sampai</span>
+                class="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none w-28 lg:w-auto flex-shrink-0">
+            <span class="text-[11px] text-gray-500 font-medium whitespace-nowrap">Sampai</span>
             <input type="date" id="filterTo" x-model="dt"
-                class="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none w-[130px] sm:w-auto">
+                class="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none w-28 lg:w-auto flex-shrink-0">
             <button id="applyDateBtn"
-                class="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white rounded-lg shadow-sm flex items-center gap-1 sm:gap-2">
+                class="flex-shrink-0 px-3 sm:px-2 lg:px-4 py-1.5 sm:py-1.5 lg:py-2 text-xs sm:text-xs lg:text-sm font-medium bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white rounded-lg shadow-sm flex items-center justify-center gap-1 sm:gap-2">
                 <i class="fas fa-filter"></i> <span class="hidden sm:inline">Filter</span>
             </button>
-            <button id="resetDateBtn"
-                class="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg shadow-sm flex items-center gap-1 sm:gap-2">
+            <button id="resetDateBtn" @if(!$hasCustomRange) style="display:none" @endif
+                class="flex-shrink-0 px-3 sm:px-2 lg:px-4 py-1.5 sm:py-1.5 lg:py-2 text-xs sm:text-xs lg:text-sm font-medium bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg shadow-sm flex items-center justify-center gap-1 sm:gap-2">
                 <i class="fas fa-undo"></i> <span class="hidden sm:inline">Reset</span>
             </button>
         </div>
     </div>
 
     {{-- ============ Period Info Bar ============ --}}
-    <div class="anm-wrap bg-white border border-gray-200 rounded-xl shadow-sm px-3 sm:px-5 py-3 sm:py-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+    <div class="anm-wrap bg-white border border-gray-200 rounded-xl shadow-sm px-3 sm:px-5 py-3 sm:py-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 border-l-4 border-yellow-500/30">
         <div class="flex items-center gap-2 sm:gap-3 text-sm text-gray-700">
             <span class="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-yellow-50 text-yellow-500 flex-shrink-0">
                 <i class="fas fa-calendar-alt text-sm sm:text-base"></i>
@@ -92,12 +94,12 @@ $hasCustomRange = request()->has('from') && request()->has('to');
     {{-- ============ Notif Kebutuhan Pribadi ============ --}}
     <div id="biayaNotifWrap" class="anm-wrap">
         @if(!$biayaCount)
-        <div class="bg-orange-50 border border-orange-200 text-orange-700 px-4 py-3 rounded-xl flex flex-wrap items-center gap-2 sm:gap-3 shadow-sm">
-            <i class="fas fa-clock text-orange-500 text-lg"></i>
-            <div class="flex-1">
-                Kebutuhan Pribadi hari ini <strong>belum tercatat</strong>
+        <div class="bg-orange-50 border border-orange-200 text-orange-700 px-4 py-3 rounded-xl flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 shadow-sm">
+            <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                <i class="fas fa-clock text-orange-500 text-lg flex-shrink-0"></i>
+                <span class="text-sm">Kebutuhan Pribadi hari ini <strong>belum tercatat</strong></span>
             </div>
-            <a href="{{ route('biaya-harian.index') }}" class="px-4 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium">
+            <a href="{{ route('biaya-harian.index') }}" class="w-full sm:w-auto px-4 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium text-center flex-shrink-0">
                 Catat Sekarang
             </a>
         </div>
@@ -122,14 +124,13 @@ $hasCustomRange = request()->has('from') && request()->has('to');
     </svg>
 
     {{-- ============ BAGIAN A: Ringkasan Keuangan ============ --}}
-    {{-- 4 KPI utama: Pengeluaran | Omzet | Kebutuhan Pribadi | Profit --}}
         <section class="space-y-3 anm-wrap" id="kpiSection">
         <div class="flex items-center gap-2">
             <span class="h-5 w-1.5 rounded-full bg-gradient-to-b from-yellow-500 to-amber-500"></span>
             <h2 class="text-sm font-bold text-gray-800 uppercase tracking-wide">Ringkasan Keuangan</h2>
-            <span class="text-[11px] text-gray-400 italic hidden sm:inline">— Pengeluaran, Omzet, Kebutuhan Pribadi &amp; Profit</span>
+            <span class="text-[10px] sm:text-[11px] text-gray-400 italic hidden sm:inline">— Pengeluaran, Omzet, Kebutuhan Pribadi &amp; Profit</span>
         </div>
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 items-stretch" id="rowKpi">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-stretch" id="rowKpi">
             @include('dashboard._partials.kpi-cards', [
                 'periodLabels' => $periodLabels,
                 'period' => $period,
@@ -151,34 +152,38 @@ $hasCustomRange = request()->has('from') && request()->has('to');
             <span class="h-5 w-1.5 rounded-full bg-gradient-to-b from-yellow-500 to-amber-500"></span>
             <h2 class="text-sm font-bold text-gray-800 uppercase tracking-wide">Grafik &amp; Status</h2>
         </div>
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 bg-white border border-gray-200 rounded-xl shadow-sm p-5 pb-1 transition-all duration-200 ease-in-out hover:-translate-y-1 hover:shadow-lg flex flex-col">
-                <h3 class="text-sm font-semibold text-gray-700 mb-1 flex items-center gap-2">
-                    <i class="fas fa-chart-bar text-yellow-500"></i>
-                    Grafik <span id="chartPeriodLabel">{{ $periodLabels[$period] }}</span>
-                </h3>
-                <p class="text-[10px] text-gray-400 italic mb-3">Perbandingan Omzet, Pengeluaran &amp; Profit per periode</p>
-                <div class="relative flex-1 min-h-[180px] sm:min-h-[260px]">
-                    <canvas id="revenueChart" class="absolute inset-0 w-full h-full"></canvas>
+        <div class="flex flex-col gap-6 lg:grid lg:grid-cols-3 lg:gap-6">
+            <div class="lg:col-span-2 bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col">
+                <div class="p-5 pb-1 flex-1 flex flex-col">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-1 flex items-center gap-2">
+                        <i class="fas fa-chart-bar text-yellow-500"></i>
+                        Grafik <span id="chartPeriodLabel">{{ $periodLabels[$period] }}</span>
+                    </h3>
+                    <p class="text-[10px] text-gray-400 italic mb-3">Perbandingan Omzet, Pengeluaran &amp; Profit per periode</p>
+                    <div class="relative flex-1 min-h-[180px] sm:min-h-[260px]">
+                        <canvas id="revenueChart" class="absolute inset-0 w-full h-full"></canvas>
+                    </div>
+                    <div class="flex flex-nowrap items-center justify-center gap-x-3 sm:gap-x-4 pt-3 pb-1 text-xs text-gray-500 border-t border-gray-100 mt-3">
+                        <span class="flex items-center gap-1.5 whitespace-nowrap"><span class="inline-block w-3 h-3 rounded-sm" style="background:rgba(16,185,129,0.7)"></span> Omzet</span>
+                        <span class="flex items-center gap-1.5 whitespace-nowrap"><span class="inline-block w-3 h-3 rounded-sm" style="background:rgba(239,68,68,0.5)"></span> Pengeluaran</span>
+                        <span class="flex items-center gap-1.5 whitespace-nowrap"><span class="inline-block w-3 h-3 rounded-sm" style="background:rgba(99,102,241,0.6)"></span> Profit</span>
+                    </div>
                 </div>
-                <div class="flex flex-nowrap items-center justify-center gap-x-3 pt-3 pb-0.5 text-xs text-gray-500 overflow-x-auto">
-                    <span class="flex items-center gap-1.5 whitespace-nowrap"><span class="inline-block w-3 h-3 rounded-sm" style="background:rgba(16,185,129,0.7)"></span> Omzet</span>
-                    <span class="flex items-center gap-1.5 whitespace-nowrap"><span class="inline-block w-3 h-3 rounded-sm" style="background:rgba(239,68,68,0.5)"></span> Pengeluaran</span>
-                    <span class="flex items-center gap-1.5 whitespace-nowrap"><span class="inline-block w-3 h-3 rounded-sm" style="background:rgba(99,102,241,0.6)"></span> Profit</span>
-                </div>
+                <div class="h-1 rounded-b-xl bg-yellow-500"></div>
             </div>
-            <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5 transition-all duration-200 ease-in-out hover:-translate-y-1 hover:shadow-lg">
-                <h3 class="text-sm font-semibold text-gray-700 mb-1 flex items-center gap-2">
-                    <i class="fas fa-chart-donut text-yellow-500"></i>
-                    Status Service
-                </h3>
-                <p class="text-[10px] text-gray-400 italic mb-3">Persentase status pengerjaan service saat ini</p>
-                <div>
-                    <div class="relative h-48 sm:h-64">
+            <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col">
+                <div class="p-5 flex-1 flex flex-col">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-1 flex items-center gap-2">
+                        <i class="fas fa-chart-donut text-yellow-500"></i>
+                        Status Service
+                    </h3>
+                    <p class="text-[10px] text-gray-400 italic mb-3">Persentase status pengerjaan service saat ini</p>
+                    <div class="relative flex-1 min-h-[180px] sm:min-h-[260px] flex items-center justify-center">
                         <canvas id="statusChart" style="max-height:100%;max-width:100%;"></canvas>
                     </div>
-                    <div id="statusLegend" class="flex flex-nowrap items-center justify-center gap-x-3 overflow-x-auto mt-3 px-1"></div>
+                    <div id="statusLegend" class="grid grid-cols-2 gap-x-4 gap-y-2 pt-3 border-t border-gray-100 mt-3 text-xs text-gray-500"></div>
                 </div>
+                <div class="h-1 rounded-b-xl bg-yellow-500"></div>
             </div>
         </div>
     </section>
@@ -190,7 +195,7 @@ $hasCustomRange = request()->has('from') && request()->has('to');
                 <span class="h-5 w-1.5 rounded-full bg-gradient-to-b from-yellow-500 to-amber-500"></span>
                 <h2 class="text-sm font-bold text-gray-800 uppercase tracking-wide">Service Terbaru</h2>
             </div>
-            <a href="{{ route('services.index') }}" class="text-xs text-yellow-600 hover:text-yellow-700 font-medium">Lihat Semua →</a>
+            <a href="{{ route('services.index') }}" class="text-[11px] sm:text-xs text-yellow-600 hover:text-yellow-700 font-medium whitespace-nowrap">Lihat Semua &rarr;</a>
         </div>
         <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
             <p class="px-4 sm:px-5 pt-3 text-[10px] text-gray-400 italic">10 service terakhir yang dicatat</p>
@@ -198,7 +203,7 @@ $hasCustomRange = request()->has('from') && request()->has('to');
                 @forelse($recentServices as $service)
                 <div class="anm-row px-3 sm:px-5 py-2.5 sm:py-3 flex items-center justify-between hover:bg-gray-50/50">
                     <div class="flex items-center gap-2 sm:gap-3 min-w-0">
-                        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-yellow-50 to-amber-100 flex items-center justify-center flex-shrink-0 hidden xs:flex">
+                        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-yellow-50 to-amber-100 items-center justify-center flex-shrink-0 hidden sm:flex">
                             <i class="fas fa-mobile-alt text-yellow-600 text-[10px] sm:text-xs"></i>
                         </div>
                         <div class="min-w-0">
@@ -207,19 +212,19 @@ $hasCustomRange = request()->has('from') && request()->has('to');
                             <p class="text-xs text-gray-500 truncate">{{ $service->type_hp }} — {{ is_array($kr) ? implode(', ', $kr) : $service->kerusakan }}</p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2 flex-shrink-0">
+                    <div class="flex items-center gap-2 flex-shrink-0 ml-2">
                         @php
                         $cls = match($service->status) { 'menunggu' => 'bg-yellow-100 text-yellow-700', 'dikerjakan' => 'bg-blue-100 text-blue-700', 'selesai' => 'bg-emerald-100 text-emerald-700', 'diambil' => 'bg-gray-100 text-gray-600', 'batal' => 'bg-red-100 text-red-700', default => 'bg-gray-100 text-gray-600' };
                         $label = match($service->status) { 'menunggu' => 'Menunggu', 'dikerjakan' => 'Dikerjakan', 'selesai' => 'Selesai', 'diambil' => 'Diambil', 'batal' => 'Batal', default => $service->status };
                         @endphp
-                        <span class="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-medium min-w-0 sm:min-w-[75px] leading-none {{ $cls }}">{{ $label }}</span>
-                        <span class="text-xs text-gray-400 w-auto sm:w-10 text-right">{{ $service->tanggal->format('d/m') }}</span>
+                        <span class="inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full text-xs font-medium leading-none {{ $cls }}"><span class="w-1.5 h-1.5 rounded-full inline-block flex-shrink-0 opacity-75" style="background:currentColor"></span>{{ $label }}</span>
+                        <span class="text-xs text-gray-400 w-10 sm:w-12 text-right tabular-nums">{{ $service->tanggal->format('d/m') }}</span>
                     </div>
                 </div>
                 @empty
-                <div class="px-5 py-8 text-center text-gray-400">
-                    <i class="fas fa-inbox text-2xl mb-1 block"></i>
-                    Belum ada service
+                <div class="px-5 py-10 text-center text-gray-400">
+                    <i class="fas fa-inbox text-3xl mb-2 block"></i>
+                    <p class="text-sm">Belum ada service</p>
                 </div>
                 @endforelse
             </div>
@@ -258,9 +263,9 @@ function updateTabActive(period, hasCustom) {
     document.querySelectorAll('.period-btn').forEach(function(btn) {
         var p = btn.dataset.period;
         if (p === period && !hasCustom) {
-            btn.className = 'period-btn px-3.5 py-2 text-sm font-medium rounded-lg transition-colors bg-gradient-to-r from-yellow-500 to-amber-500 text-white shadow-sm';
+            btn.className = 'period-btn w-full sm:w-auto px-2 lg:px-3.5 py-1.5 lg:py-2 text-xs lg:text-sm font-medium rounded-lg transition-colors bg-gradient-to-r from-yellow-500 to-amber-500 text-white shadow-sm';
         } else {
-            btn.className = 'period-btn px-3.5 py-2 text-sm font-medium rounded-lg transition-colors bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 shadow-sm';
+            btn.className = 'period-btn w-full sm:w-auto px-2 lg:px-3.5 py-1.5 lg:py-2 text-xs lg:text-sm font-medium rounded-lg transition-colors bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 shadow-sm';
         }
     });
 }
@@ -295,9 +300,9 @@ function renderStatusLegend(labels, data, colors) {
     if (!wrap) return;
     var html = '';
     for (var i = 0; i < labels.length; i++) {
-        html += '<div class="flex items-center gap-1.5 text-xs text-gray-500 whitespace-nowrap">'
-            + '<span class="inline-block w-3 h-3 rounded-sm" style="background:' + colors[i] + '"></span>'
-            + labels[i]
+        html += '<div class="flex items-center gap-2 text-xs text-gray-500">'
+            + '<span class="inline-block w-2.5 h-2.5 rounded-sm flex-shrink-0" style="background:' + colors[i] + '"></span>'
+            + '<span class="truncate">' + labels[i] + '</span>'
             + '</div>';
     }
     wrap.innerHTML = html;
@@ -306,7 +311,7 @@ function renderStatusLegend(labels, data, colors) {
 function updateRecentServices(services) {
     var wrap = document.getElementById('recentServicesList');
     if (!wrap || !services || services.length === 0) {
-        if (wrap) wrap.innerHTML = '<div class="px-5 py-8 text-center text-gray-400"><i class="fas fa-inbox text-2xl mb-1 block"></i>Belum ada service</div>';
+        if (wrap) wrap.innerHTML = '<div class="px-5 py-10 text-center text-gray-400"><i class="fas fa-inbox text-3xl mb-2 block"></i><p class="text-sm">Belum ada service</p></div>';
         return;
     }
     var statusMap = {
@@ -322,15 +327,15 @@ function updateRecentServices(services) {
         var kerusakan = Array.isArray(s.kerusakan) ? s.kerusakan.join(', ') : (s.kerusakan || '-');
                     html += '<div class="anm-row px-3 sm:px-5 py-2.5 sm:py-3 flex items-center justify-between hover:bg-gray-50/50">'
             + '<div class="flex items-center gap-2 sm:gap-3 min-w-0">'
-            +   '<div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-yellow-50 to-amber-100 flex items-center justify-center flex-shrink-0 hidden xs:flex"><i class="fas fa-mobile-alt text-yellow-600 text-[10px] sm:text-xs"></i></div>'
+            +   '<div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-yellow-50 to-amber-100 items-center justify-center flex-shrink-0 hidden sm:flex"><i class="fas fa-mobile-alt text-yellow-600 text-[10px] sm:text-xs"></i></div>'
             +   '<div class="min-w-0">'
             +     '<p class="text-sm font-medium text-gray-900 truncate">' + s.customer_name + '</p>'
             +     '<p class="text-xs text-gray-500 truncate">' + s.type_hp + ' — ' + kerusakan + '</p>'
             +   '</div>'
             + '</div>'
-            + '<div class="flex items-center gap-2 flex-shrink-0">'
-            +   '<span class="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-medium min-w-0 sm:min-w-[75px] leading-none ' + st.cls + '">' + st.label + '</span>'
-            +   '<span class="text-xs text-gray-400 w-auto sm:w-10 text-right">' + s.tanggal + '</span>'
+            + '<div class="flex items-center gap-2 flex-shrink-0 ml-2">'
+            +   '<span class="inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full text-xs font-medium leading-none ' + st.cls + '"><span class="w-1.5 h-1.5 rounded-full inline-block flex-shrink-0 opacity-75" style="background:currentColor"></span>' + st.label + '</span>'
+            +   '<span class="text-xs text-gray-400 w-10 sm:w-12 text-right tabular-nums">' + s.tanggal + '</span>'
             + '</div></div>';
     });
     wrap.innerHTML = html;
@@ -385,7 +390,7 @@ function kpiCardHTML(cfg) {
     +       '</svg>'
     +     '</div>'
     +   '</div>'
-    +   '<div class="h-1 ' + cfg.barCls + '"></div>'
+    +   '<div class="h-1.5 rounded-b-xl ' + cfg.barCls + '"></div>'
     + '</div>';
 }
 
@@ -420,7 +425,7 @@ function buildKpiCardsHTML(d, periodLabel) {
             value: d.kebutuhan_pribadi, valueCls: 'text-orange-600',
             icon: 'fa-wallet', iconBg: 'from-orange-50 to-amber-100', iconColor: 'orange-600',
             change: d.changeKebutuhan, upIsGood: false,
-            extra: '<div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 mt-1 text-xs">'
+            extra: '<div class="grid grid-cols-2 gap-x-2 sm:gap-x-4 mt-1 text-xs kpi-breakdown">'
                 + '<div class="flex items-center gap-1"><span class="text-gray-400">Bank Jago:</span><span class="font-medium text-blue-600">' + fmtRp(d.bank_jago) + '</span></div>'
                 + '<div class="flex items-center gap-1"><span class="text-gray-400">Gaji Edi:</span><span class="font-medium text-purple-600">' + fmtRp(d.gaji_edi) + '</span></div>'
                 + '<div class="flex items-center gap-1"><span class="text-gray-400">Gaji Nur:</span><span class="font-medium text-purple-600">' + fmtRp(d.gaji_nur) + '</span></div>'
@@ -478,6 +483,10 @@ function updateCards(d) {
     // Input date values — Alpine x-model akan sikronkan ke DOM
     dateFilterApi.set(d.fromDateInput, d.toDateInput);
 
+    // Tombol Reset hanya muncul bila sedang mencari tanggal tertentu (custom range)
+    var rb = document.getElementById('resetDateBtn');
+    if (rb) rb.style.display = d.hasCustomRange ? '' : 'none';
+
     // Notif Kebutuhan Pribadi, empty state, KPI, chart
     updateKpiOnly(d, periodLabel);
 }
@@ -513,10 +522,12 @@ function updateKpiOnly(d, periodLabel) {
     // Notif Kebutuhan Pribadi
     var bw = document.getElementById('biayaNotifWrap');
     if (!d.biayaCount) {
-        bw.innerHTML = '<div class="bg-orange-50 border border-orange-200 text-orange-700 px-4 py-3 rounded-xl flex items-center gap-3 shadow-sm">'
-            + '<i class="fas fa-clock text-orange-500 text-lg"></i>'
-            + '<div class="flex-1">Kebutuhan Pribadi hari ini <strong>belum tercatat</strong></div>'
-            + '<a href="{{ route('biaya-harian.index') }}" class="px-4 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium">Catat Sekarang</a>'
+        bw.innerHTML = '<div class="bg-orange-50 border border-orange-200 text-orange-700 px-4 py-3 rounded-xl flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 shadow-sm">'
+            + '<div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">'
+            + '<i class="fas fa-clock text-orange-500 text-lg flex-shrink-0"></i>'
+            + '<span class="text-sm">Kebutuhan Pribadi hari ini <strong>belum tercatat</strong></span>'
+            + '</div>'
+            + '<a href="{{ route('biaya-harian.index') }}" class="w-full sm:w-auto px-4 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium text-center flex-shrink-0">Catat Sekarang</a>'
             + '</div>';
     } else {
         bw.innerHTML = '';

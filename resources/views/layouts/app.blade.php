@@ -20,7 +20,7 @@
     <style>
         .sidebar-desktop nav a {
             position: relative;
-            transition: background-color 0.2s ease, color 0.2s ease;
+            transition: background-color 0.12s ease, color 0.12s ease;
         }
         .sidebar-desktop nav a::before {
             content: '';
@@ -32,7 +32,7 @@
             height: 0;
             background: linear-gradient(to bottom, #F59E0B, #D97706);
             border-radius: 0 3px 3px 0;
-            transition: height 0.2s ease;
+            transition: height 0.12s ease;
             opacity: 0;
         }
         .sidebar-desktop nav a:not(.sidebar-no-hover):hover::before {
@@ -69,20 +69,19 @@
             x-transition:leave="transition-opacity duration-75"
             x-transition:leave-start="opacity-100"
             x-transition:leave-end="opacity-0"
-            class="fixed inset-0 z-30 bg-black/60 lg:hidden"
+            class="fixed inset-0 z-30 bg-black/60 md:hidden"
             @click="sidebarMobileOpen = false">
         </div>
 
         {{-- SIDEBAR DESKTOP --}}
-        <aside class="sidebar-desktop hidden lg:flex flex-col fixed inset-y-0 left-0 z-40 bg-gradient-to-b from-gray-900 via-gray-950 to-black text-white border-r border-gray-800/50 w-64 overflow-hidden"
-            :class="{ 'w-64': sidebarOpen, 'w-20': !sidebarOpen, 'sidebar-collapsed': !sidebarOpen }">
+        <aside class="sidebar-desktop hidden md:flex flex-col fixed inset-y-0 left-0 z-40 bg-gradient-to-b from-gray-900 via-gray-950 to-black text-white border-r border-gray-800/50 w-20 overflow-hidden"
+            :class="{ 'sidebar-collapsed': !sidebarOpen }">
 
             {{-- Logo Area --}}
             <a href="{{ route('dashboard') }}"
-                :class="sidebarOpen ? 'flex-row items-center gap-3 px-3 pt-5 pb-5' : 'flex-col items-center px-3 pt-4 pb-4'"
                 class="flex-shrink-0 flex justify-center flex-row items-center gap-3 px-3 pt-5 pb-5">
                 @php $logoSetting = \App\Models\Setting::getValue('logo'); @endphp
-                <div :class="{ 'w-16 h-16': sidebarOpen, 'w-10 h-10': !sidebarOpen }" class="flex-shrink-0 overflow-hidden rounded-full ring-4 ring-yellow-500/30 shadow-2xl shadow-yellow-500/30 w-16 h-16" style="filter: drop-shadow(0 4px 8px rgba(255,215,0,0.25));">
+                <div :class="{ 'w-16 h-16': sidebarOpen, 'w-10 h-10': !sidebarOpen }" class="flex-shrink-0 overflow-hidden rounded-full ring-4 ring-yellow-500/30 shadow-2xl shadow-yellow-500/30 w-16 h-16 transition-all duration-150 ease-in-out" style="filter: drop-shadow(0 4px 8px rgba(255,215,0,0.25));">
                     @if($logoSetting)
                         <img src="{{ asset('storage/' . $logoSetting) }}" alt="Logo" width="64" height="64" class="w-full h-full object-cover">
                     @else
@@ -230,7 +229,7 @@
             x-transition:leave="transition-opacity duration-75"
             x-transition:leave-start="opacity-100"
             x-transition:leave-end="opacity-0"
-            class="lg:hidden fixed inset-y-0 left-0 z-40 w-64 bg-gradient-to-b from-gray-900 via-gray-950 to-black text-white flex flex-col border-r border-gray-800/50">
+            class="md:hidden fixed inset-y-0 left-0 z-40 w-64 bg-gradient-to-b from-gray-900 via-gray-950 to-black text-white flex flex-col border-r border-gray-800/50">
 
             <div class="flex-shrink-0 flex items-center justify-between h-16 px-4 border-b border-gray-800">
                 @php $logoSetting = \App\Models\Setting::getValue('logo'); @endphp
@@ -309,13 +308,12 @@
         </aside>
 
         {{-- Main Content Area --}}
-        <div class="main-content-wrap flex-1 flex flex-col overflow-hidden"
-            :class="{ 'lg:ml-64': sidebarOpen, 'lg:ml-20': !sidebarOpen }">
+        <div class="main-content-wrap flex-1 flex flex-col overflow-hidden">
 
             {{-- Header --}}
             <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-6 sticky top-0 z-20">
                 <div class="flex items-center gap-3">
-                    <button @click="window.innerWidth < 1024 ? sidebarMobileOpen = !sidebarMobileOpen : sidebarOpen = !sidebarOpen"
+                    <button @click="window.innerWidth < 768 ? sidebarMobileOpen = !sidebarMobileOpen : sidebarOpen = !sidebarOpen"
                         class="text-gray-500 hover:text-yellow-600">
                         <i class="fas fa-bars text-xl"></i>
                     </button>

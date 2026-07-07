@@ -13,16 +13,25 @@
 
 [x-cloak] { display: none !important; }
 
+/* ── KPI breakdown alternating rows ── */
+.kpi-breakdown > div:nth-child(even) { background: rgba(249,250,251,0.5); border-radius: 4px; }
+
 /* ── Sidebar ── */
 .sidebar-text {
-    transition: opacity 0.25s ease-in-out;
+    transition: opacity 0.12s ease-in-out;
 }
 .sidebar-collapsed .sidebar-text {
     opacity: 0;
-    width: 0;
-    min-width: 0;
-    flex: 0 0 0;
-    overflow: hidden;
+}
+.sidebar-collapsed nav a {
+    justify-content: center;
+    padding-left: 0;
+}
+.sidebar-collapsed > a {
+    gap: 0;
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
 }
 
 /* ── Scrollbar ── */
@@ -33,3 +42,40 @@
 
 /* Sidebar — lebih tipis */
 nav::-webkit-scrollbar { width: 6px; height: 6px; }
+
+/* ── Sidebar width & content margin — CSS murni agar tidak ada pergerakan saat mount ── */
+.sidebar-desktop { transition: width 0.12s ease-in-out; }
+.main-content-wrap { transition: margin-left 0.12s ease-in-out; }
+
+@media (min-width: 768px) {
+    .sidebar-desktop { width: 5rem; }
+    .sidebar-desktop ~ .main-content-wrap { margin-left: 5rem; }
+}
+
+@media (min-width: 1024px) {
+    .sidebar-desktop:not(.sidebar-collapsed) { width: 16rem; }
+    .sidebar-desktop:not(.sidebar-collapsed) ~ .main-content-wrap { margin-left: 16rem; }
+}
+
+/* ── Tablet (md): paksa sidebar jadi mode ikon (collapsed) walau sidebarOpen=true ── */
+@media (min-width: 768px) and (max-width: 1023.98px) {
+    .sidebar-desktop .sidebar-text {
+        opacity: 0;
+    }
+    .sidebar-desktop nav a {
+        justify-content: center;
+        padding-left: 0;
+    }
+    .sidebar-desktop > a {
+        gap: 0;
+        justify-content: center;
+        padding-left: 0;
+        padding-right: 0;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+    .sidebar-desktop > a > div:first-child {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+}
