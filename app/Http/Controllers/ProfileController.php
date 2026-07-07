@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -34,14 +33,8 @@ class ProfileController extends Controller
         $user->email = $request->email;
 
         if ($request->boolean('remove_foto')) {
-            if ($user->foto && Storage::disk('public')->exists($user->foto)) {
-                Storage::disk('public')->delete($user->foto);
-            }
             $user->foto = null;
         } elseif ($request->hasFile('foto')) {
-            if ($user->foto && Storage::disk('public')->exists($user->foto)) {
-                Storage::disk('public')->delete($user->foto);
-            }
             $path = $request->file('foto')->store('profiles/foto', 'public');
             $user->foto = $path;
         }

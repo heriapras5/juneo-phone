@@ -14,6 +14,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Color;
 
 class LaporanRekapSheet implements FromArray, WithHeadings, WithTitle, WithStyles, WithEvents
 {
@@ -24,6 +25,7 @@ class LaporanRekapSheet implements FromArray, WithHeadings, WithTitle, WithStyle
     protected $fromDate;
     protected $toDate;
     protected $data;
+    protected $profitColumnIndex = 0;
 
     public function __construct(array $bulan, int $tahun, ?string $namaToko = null, ?int $customerId = null, ?string $fromDate = null, ?string $toDate = null)
     {
@@ -31,8 +33,8 @@ class LaporanRekapSheet implements FromArray, WithHeadings, WithTitle, WithStyle
         $this->tahun = $tahun;
         $this->namaToko = $namaToko ?? 'Juneo Phone';
         $this->customerId = $customerId;
-        $this->fromDate = $fromDate;
-        $this->toDate = $toDate;
+        $this->fromDate = $fromDate ? \Carbon\Carbon::parse($fromDate) : null;
+        $this->toDate = $toDate ? \Carbon\Carbon::parse($toDate) : null;
         $this->loadData();
     }
 
@@ -43,9 +45,10 @@ class LaporanRekapSheet implements FromArray, WithHeadings, WithTitle, WithStyle
 
         foreach ($this->bulan as $month => $label) {
             $services = Service::where('status', '!=', 'batal')
-                ->when($this->fromDate && $this->toDate, function ($q) {
+                ->when($this->fromDate && $this->toDate, function ($q) use ($month) {
                     $q->whereDate('tanggal', '>=', $this->fromDate)
-                      ->whereDate('tanggal', '<=', $this->toDate);
+                      ->whereDate('tanggal', '<=', $this->toDate)
+                      ->whereMonth('tanggal', $month);
                 }, function ($q) use ($month) {
                     $q->whereYear('tanggal', $this->tahun)
                       ->whereMonth('tanggal', $month);
@@ -53,9 +56,10 @@ class LaporanRekapSheet implements FromArray, WithHeadings, WithTitle, WithStyle
                 ->when($this->customerId, fn($q, $v) => $q->where('customer_id', $v));
 
             $biayaHarian = BiayaHarian::query()
-                ->when($this->fromDate && $this->toDate, function ($q) {
+                ->when($this->fromDate && $this->toDate, function ($q) use ($month) {
                     $q->whereDate('tanggal', '>=', $this->fromDate)
-                      ->whereDate('tanggal', '<=', $this->toDate);
+                      ->whereDate('tanggal', '<=', $this->toDate)
+                      ->whereMonth('tanggal', $month);
                 }, function ($q) use ($month) {
                     $q->whereYear('tanggal', $this->tahun)
                       ->whereMonth('tanggal', $month);
@@ -65,13 +69,15 @@ class LaporanRekapSheet implements FromArray, WithHeadings, WithTitle, WithStyle
             $totalJasa = (clone $services)->sum('jasa');
             $totalPengeluaran = (clone $services)->sum('pengeluaran');
 
+            $profit = $totalJasa - $totalPengeluaran - $biayaHarian;
+
             $this->data[] = [
                 $label,
                 (clone $services)->count(),
                 $totalJasa,
                 $totalPengeluaran,
                 $biayaHarian,
-                $totalJasa - $totalPengeluaran - $biayaHarian,
+                $profit,
             ];
         }
 
@@ -79,6 +85,7 @@ class LaporanRekapSheet implements FromArray, WithHeadings, WithTitle, WithStyle
         $totalJasa = array_sum(array_column($this->data, 2));
         $totalPengeluaran = array_sum(array_column($this->data, 3));
         $totalBiayaHarian = array_sum(array_column($this->data, 4));
+        $totalProfit = $totalJasa - $totalPengeluaran - $totalBiayaHarian;
 
         $this->data[] = ['', '', '', '', '', ''];
         $this->data[] = [
@@ -87,7 +94,7 @@ class LaporanRekapSheet implements FromArray, WithHeadings, WithTitle, WithStyle
             $totalJasa,
             $totalPengeluaran,
             $totalBiayaHarian,
-            $totalJasa - $totalPengeluaran - $totalBiayaHarian,
+            $totalProfit,
         ];
     }
 
@@ -129,8 +136,12 @@ class LaporanRekapSheet implements FromArray, WithHeadings, WithTitle, WithStyle
                 $rowCount = $sheet->getHighestRow();
 
                 $sheet->insertNewRowBefore(1);
+                $sheet->insertNewRowBefore(1);
 
-                $title = 'REKAP LAPORAN SERVICE TAHUN ' . $this->tahun . ' — ' . $this->namaToko;
+                $title = $this->fromDate && $this->toDate
+                    ? 'REKAP LAPORAN SERVICE (' . $this->fromDate->format('d/m/Y') . ' — ' . $this->toDate->format('d/m/Y') . ')'
+                    : 'REKAP LAPORAN SERVICE TAHUN ' . $this->tahun;
+                $title .= ' — ' . $this->namaToko;
                 if ($this->customerId) {
                     $customer = \App\Models\Customer::find($this->customerId);
                     if ($customer) {
@@ -144,13 +155,14 @@ class LaporanRekapSheet implements FromArray, WithHeadings, WithTitle, WithStyle
                     ->setHorizontal(Alignment::HORIZONTAL_CENTER)
                     ->setVertical(Alignment::VERTICAL_CENTER);
 
-                $headerRow = 2;
+                $headerRow = 3;
                 $lastRow = $rowCount + 1;
 
                 $sheet->getStyle('A' . $headerRow . ':F' . $headerRow)->getFill()
                     ->setFillType(Fill::FILL_SOLID)
-                    ->getStartColor()->setARGB('FF2563EB');
+                    ->getStartColor()->setARGB('FFB8860B');
                 $sheet->getStyle('A' . $headerRow . ':F' . $headerRow)->getFont()->getColor()->setARGB('FFFFFFFF');
+                $sheet->getStyle('A' . $headerRow . ':F' . $headerRow)->getFont()->setBold(true);
                 $sheet->getStyle('A' . $headerRow . ':F' . $headerRow)->getAlignment()
                     ->setHorizontal(Alignment::HORIZONTAL_CENTER)
                     ->setVertical(Alignment::VERTICAL_CENTER);
@@ -158,20 +170,23 @@ class LaporanRekapSheet implements FromArray, WithHeadings, WithTitle, WithStyle
                 $totalRowIndex = $lastRow;
                 $separatorRow = $totalRowIndex - 1;
 
+                // Styling total row
                 $sheet->getStyle('A' . $totalRowIndex . ':F' . $totalRowIndex)->getFont()->setBold(true)->setSize(11);
                 $sheet->getStyle('A' . $totalRowIndex . ':F' . $totalRowIndex)->getFill()
                     ->setFillType(Fill::FILL_SOLID)
                     ->getStartColor()->setARGB('FFFEF3C7');
-
                 $sheet->getStyle('A' . $totalRowIndex . ':F' . $totalRowIndex)
                     ->getBorders()->getTop()->setBorderStyle(Border::BORDER_MEDIUM);
+                $sheet->getStyle('A' . $totalRowIndex . ':F' . $totalRowIndex)
+                    ->getBorders()->getBottom()->setBorderStyle(Border::BORDER_MEDIUM);
 
                 if ($separatorRow > $headerRow) {
                     $sheet->getStyle('A' . $separatorRow . ':F' . $separatorRow)
                         ->getBorders()->getTop()->setBorderStyle(Border::BORDER_DOTTED);
                 }
 
-                foreach (range(3, $lastRow) as $r) {
+                // Format Rp untuk kolom C, D, E, F
+                foreach (range(4, $lastRow) as $r) {
                     foreach (['C', 'D', 'E', 'F'] as $col) {
                         if ($r !== $headerRow) {
                             $sheet->getStyle($col . $r)->getNumberFormat()->setFormatCode('"Rp"#,##0');
@@ -181,15 +196,31 @@ class LaporanRekapSheet implements FromArray, WithHeadings, WithTitle, WithStyle
                     }
                 }
 
-                $sheet->getColumnDimension('A')->setWidth(18);
-                $sheet->getColumnDimension('B')->setWidth(14);
-                $sheet->getColumnDimension('C')->setWidth(16);
-                $sheet->getColumnDimension('D')->setWidth(18);
-                $sheet->getColumnDimension('E')->setWidth(16);
-                $sheet->getColumnDimension('F')->setWidth(18);
+                // Conditional coloring for Keuntungan Bersih (column F)
+                // Hijau jika >= 0, merah jika < 0
+                for ($r = 4; $r <= $totalRowIndex; $r++) {
+                    $cellValue = $sheet->getCell('F' . $r)->getCalculatedValue();
+                    if (is_numeric($cellValue)) {
+                        $color = $cellValue >= 0 ? 'FF10B981' : 'FFEF4444';
+                        $sheet->getStyle('F' . $r)->getFont()->getColor()->setARGB($color);
+                    }
+                }
 
+                $sheet->getColumnDimension('A')->setWidth(22);
+                $sheet->getColumnDimension('B')->setWidth(16);
+                $sheet->getColumnDimension('C')->setWidth(18);
+                $sheet->getColumnDimension('D')->setWidth(20);
+                $sheet->getColumnDimension('E')->setWidth(20);
+                $sheet->getColumnDimension('F')->setWidth(22);
+
+                // Border all data cells
                 $sheet->getStyle('A' . $headerRow . ':F' . $lastRow)
                     ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+
+                // Footer
+                $footerRow = $totalRowIndex + 2;
+                $sheet->setCellValue('A' . $footerRow, 'Dicetak: ' . now()->format('d/m/Y H:i'));
+                $sheet->getStyle('A' . $footerRow)->getFont()->setSize(8)->setItalic(true)->getColor()->setARGB('FF999999');
             },
         ];
     }

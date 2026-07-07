@@ -47,10 +47,10 @@ class ServicesExport implements FromQuery, WithHeadings, WithMapping, WithStyles
             'Pengeluaran',
             'Jasa',
             'Teknisi',
+            'Keterangan',
             'Keuntungan',
             'Estimasi Selesai',
             'Status',
-            'Keterangan',
         ];
     }
 
@@ -87,10 +87,10 @@ class ServicesExport implements FromQuery, WithHeadings, WithMapping, WithStyles
             $row->pengeluaran,
             $row->jasa,
             $teknisiLabel,
+            $row->keterangan ?? '',
             $row->keuntungan,
             $row->estimasi_selesai ? $row->estimasi_selesai->format('d/m/Y') : '-',
             $statusLabels[$row->status] ?? $row->status,
-            $row->keterangan ?? '-',
         ];
     }
 

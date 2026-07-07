@@ -4,12 +4,12 @@ $profitPositive = $periodTotals->profit >= 0;
 
 {{-- Pengeluaran (Modal Sparepart) --}}
 <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden group flex flex-col h-full transition-all duration-200 ease-in-out hover:-translate-y-1 hover:shadow-lg">
-    <div class="p-5 flex-1 flex flex-col">
+    <div class="p-4 sm:p-5 flex-1 flex flex-col">
         <div class="flex items-start justify-between">
             <div class="flex-1 min-w-0">
                 <p class="text-xs text-gray-500 uppercase tracking-wider font-medium">Pengeluaran {{ $periodLabels[$period] }}</p>
-                <p class="text-[10px] text-gray-400 italic mt-1">Modal sparepart — total biaya beli komponen service</p>
-                <p class="text-2xl font-bold mt-1 text-red-500">Rp {{ number_format($periodTotals->pengeluaran, 0, ',', '.') }}</p>
+                <p class="text-[10px] text-gray-400 italic mt-1 hidden sm:block">Modal sparepart — total biaya beli komponen service</p>
+                <p class="text-xl sm:text-2xl font-bold mt-1 text-red-500">Rp {{ number_format($periodTotals->pengeluaran, 0, ',', '.') }}</p>
                 @if($changePengeluaran !== null)
                 <div class="flex items-center gap-1 mt-1">
                     <i class="fas fa-{{ $changePengeluaran >= 0 ? 'arrow-up' : 'arrow-down' }} text-{{ $changePengeluaran >= 0 ? 'red' : 'emerald' }}-500 text-xs"></i>
@@ -39,12 +39,12 @@ $profitPositive = $periodTotals->profit >= 0;
 
 {{-- Omzet --}}
 <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden group flex flex-col h-full transition-all duration-200 ease-in-out hover:-translate-y-1 hover:shadow-lg">
-    <div class="p-5 flex-1 flex flex-col">
+    <div class="p-4 sm:p-5 flex-1 flex flex-col">
         <div class="flex items-start justify-between">
             <div class="flex-1 min-w-0">
                 <p class="text-xs text-gray-500 uppercase tracking-wider font-medium">Omzet {{ $periodLabels[$period] }}</p>
-                <p class="text-[10px] text-gray-400 italic mt-1">Total tagihan jasa service ke pelanggan — belum dipotong biaya apapun</p>
-                <p class="text-2xl font-bold mt-1 text-gray-900">Rp {{ number_format($periodTotals->omzet, 0, ',', '.') }}</p>
+                <p class="text-[10px] text-gray-400 italic mt-1 hidden sm:block">Total tagihan jasa service ke pelanggan — belum dipotong biaya apapun</p>
+                <p class="text-xl sm:text-2xl font-bold mt-1 text-gray-900">Rp {{ number_format($periodTotals->omzet, 0, ',', '.') }}</p>
                 @if($changeOmzet !== null)
                 <div class="flex items-center gap-1 mt-1">
                     <i class="fas fa-{{ $changeOmzet >= 0 ? 'arrow-up' : 'arrow-down' }} text-{{ $changeOmzet >= 0 ? 'emerald' : 'red' }}-500 text-xs"></i>
@@ -74,13 +74,13 @@ $profitPositive = $periodTotals->profit >= 0;
 
 {{-- Kebutuhan Pribadi --}}
 <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden group flex flex-col h-full transition-all duration-200 ease-in-out hover:-translate-y-1 hover:shadow-lg">
-    <div class="p-5 flex-1 flex flex-col">
+    <div class="p-4 sm:p-5 flex-1 flex flex-col">
         <div class="flex items-start justify-between">
             <div class="flex-1 min-w-0">
                 <p class="text-xs text-gray-500 uppercase tracking-wider font-medium">Kebutuhan Pribadi {{ $periodLabels[$period] }}</p>
-                <p class="text-[10px] text-gray-400 italic mt-1">Bank Jago + Gaji Edi + Gaji Nur + Lainnya — total biaya kebutuhan harian</p>
-                <p class="text-2xl font-bold mt-1 text-orange-600">Rp {{ number_format($periodTotals->kebutuhan_pribadi, 0, ',', '.') }}</p>
-                <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs">
+                <p class="text-[10px] text-gray-400 italic mt-1 hidden sm:block">Bank Jago + Gaji Edi + Gaji Nur + Lainnya — total biaya kebutuhan harian</p>
+                <p class="text-xl sm:text-2xl font-bold mt-1 text-orange-600">Rp {{ number_format($periodTotals->kebutuhan_pribadi, 0, ',', '.') }}</p>
+                <div class="hidden sm:flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs">
                     <span class="text-gray-400">Bank Jago:</span>
                     <span class="font-medium text-blue-600">Rp {{ number_format($periodTotals->bank_jago, 0, ',', '.') }}</span>
                     <span class="text-gray-300">|</span>
@@ -121,12 +121,12 @@ $profitPositive = $periodTotals->profit >= 0;
 
 {{-- Profit --}}
 <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden group flex flex-col h-full transition-all duration-200 ease-in-out hover:-translate-y-1 hover:shadow-lg">
-    <div class="p-5 flex-1 flex flex-col">
+    <div class="p-4 sm:p-5 flex-1 flex flex-col">
         <div class="flex items-start justify-between">
             <div class="flex-1 min-w-0">
                 <p class="text-xs text-gray-500 uppercase tracking-wider font-medium">Profit {{ $periodLabels[$period] }}</p>
-                <p class="text-[10px] text-gray-400 italic mt-1">Sisa keuntungan setelah dikurangi seluruh Kebutuhan Pribadi</p>
-                <p class="text-2xl font-bold mt-1 {{ $profitPositive ? 'text-emerald-600' : 'text-red-600' }}">
+                <p class="text-[10px] text-gray-400 italic mt-1 hidden sm:block">Sisa keuntungan setelah dikurangi seluruh Kebutuhan Pribadi</p>
+                <p class="text-xl sm:text-2xl font-bold mt-1 {{ $profitPositive ? 'text-emerald-600' : 'text-red-600' }}">
                     Rp {{ number_format($periodTotals->profit, 0, ',', '.') }}
                 </p>
                 <p class="text-xs text-gray-400 mt-1">Omzet - Pengeluaran - Kebutuhan Pribadi</p>

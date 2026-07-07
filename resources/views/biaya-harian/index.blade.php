@@ -12,7 +12,14 @@
                 <div class="w-1 h-6 bg-orange-500 rounded-full"></div>
                 <span class="text-sm font-semibold text-gray-700">Kebutuhan Pribadi</span>
             </div>
-            <div>
+            <div class="flex items-center gap-2">
+                @if($date !== now()->toDateString())
+                <a href="{{ route('biaya-harian.index') }}"
+                    class="px-3 py-1.5 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white rounded-lg text-xs font-medium flex items-center gap-1.5 shadow-sm transition-all">
+                    <i class="fas fa-undo-alt"></i>
+                    Reset ke Hari Ini
+                </a>
+                @endif
                 <input type="date" id="datePicker" value="{{ $date }}"
                     onchange="window.location.href='?date=' + this.value"
                     class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
@@ -59,10 +66,6 @@
             <div class="mt-4 flex items-center justify-between">
                 <div class="flex items-center gap-2">
                     <p class="text-xs text-gray-400">Default dapat diubah di menu Pengaturan</p>
-                    <a href="{{ route('biaya-harian.index') }}"
-                        class="text-xs text-gray-500 hover:text-gray-700 underline">
-                        <i class="fas fa-undo-alt mr-1"></i>Reset ke Hari Ini
-                    </a>
                 </div>
                 <button type="submit" :disabled="loading"
                     class="px-5 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm disabled:opacity-50">

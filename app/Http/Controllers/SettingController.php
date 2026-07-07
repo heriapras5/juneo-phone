@@ -6,7 +6,6 @@ use App\Models\DamageCategory;
 use App\Models\Setting;
 use App\Models\TypeHpOption;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class SettingController extends Controller
 {
@@ -61,11 +60,6 @@ class SettingController extends Controller
         }
 
         if ($request->hasFile('logo')) {
-            $oldLogo = Setting::getValue('logo');
-            if ($oldLogo && Storage::disk('public')->exists($oldLogo)) {
-                Storage::disk('public')->delete($oldLogo);
-            }
-
             $path = $request->file('logo')->store('logo', 'public');
             Setting::updateOrCreate(
                 ['key' => 'logo'],

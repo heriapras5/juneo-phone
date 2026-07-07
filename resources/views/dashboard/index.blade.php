@@ -19,50 +19,51 @@ $hasCustomRange = request()->has('from') && request()->has('to');
 <div class="space-y-6" id="dashboard-app">
 
     {{-- ============ Period Filter Bar (AJAX) ============ --}}
-    <div x-data="{ df: '{{ $fromDate->format('Y-m-d') }}', dt: '{{ $toDate->format('Y-m-d') }}' }" id="dashFilterBar" class="bg-white border border-gray-200 rounded-xl shadow-sm px-4 py-3 flex flex-wrap items-center gap-2">
-        <span class="text-[11px] text-gray-500 font-medium mr-1 flex items-center gap-1.5">
-            <i class="fas fa-filter text-yellow-500"></i> Filter waktu:
+    <div x-data="{ df: '{{ $fromDate->format('Y-m-d') }}', dt: '{{ $toDate->format('Y-m-d') }}' }" id="dashFilterBar" class="bg-white border border-gray-200 rounded-xl shadow-sm px-3 sm:px-4 py-2 sm:py-3 flex flex-wrap items-center gap-1.5 sm:gap-2">
+        <span class="text-[11px] text-gray-500 font-medium mr-0.5 sm:mr-1 flex items-center gap-1 sm:gap-1.5">
+            <i class="fas fa-filter text-yellow-500"></i>
+            <span class="hidden sm:inline">Filter waktu:</span>
         </span>
         @foreach(['daily', 'weekly', 'monthly', 'yearly'] as $p)
         <button data-period="{{ $p }}"
-            class="period-btn px-3.5 py-2 text-sm font-medium rounded-lg transition-colors {{ $period === $p && !$hasCustomRange ? 'bg-gradient-to-r from-yellow-500 to-amber-500 text-white shadow-sm' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 shadow-sm' }}">
-            <i class="fas {{ $periodIcons[$p] }} mr-1.5"></i>{{ $periodLabels[$p] }}
+            class="period-btn px-2 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors {{ $period === $p && !$hasCustomRange ? 'bg-gradient-to-r from-yellow-500 to-amber-500 text-white shadow-sm' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 shadow-sm' }}">
+            <i class="fas {{ $periodIcons[$p] }} hidden sm:inline mr-1 sm:mr-1.5"></i>{{ $periodLabels[$p] }}
         </button>
         @endforeach
 
         <span class="hidden sm:inline text-gray-200">|</span>
 
-        <div class="flex flex-wrap items-center gap-2">
-            <span class="text-[11px] text-gray-500 font-medium">Dari</span>
+        <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <span class="text-[11px] text-gray-500 font-medium hidden sm:inline">Dari</span>
             <input type="date" id="filterFrom" x-model="df"
-                class="px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
-            <span class="text-[11px] text-gray-500 font-medium">Sampai</span>
+                class="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none w-[130px] sm:w-auto">
+            <span class="text-[11px] text-gray-500 font-medium hidden sm:inline">Sampai</span>
             <input type="date" id="filterTo" x-model="dt"
-                class="px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
+                class="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none w-[130px] sm:w-auto">
             <button id="applyDateBtn"
-                class="px-4 py-2 text-sm font-medium bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white rounded-lg shadow-sm flex items-center gap-2">
-                <i class="fas fa-check"></i> Terapkan
+                class="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white rounded-lg shadow-sm flex items-center gap-1 sm:gap-2">
+                <i class="fas fa-filter"></i> <span class="hidden sm:inline">Filter</span>
             </button>
             <button id="resetDateBtn"
-                class="px-4 py-2 text-sm font-medium bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg shadow-sm flex items-center gap-2">
-                <i class="fas fa-undo"></i> Reset
+                class="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg shadow-sm flex items-center gap-1 sm:gap-2">
+                <i class="fas fa-undo"></i> <span class="hidden sm:inline">Reset</span>
             </button>
         </div>
     </div>
 
     {{-- ============ Period Info Bar ============ --}}
-    <div class="bg-white border border-gray-200 rounded-xl shadow-sm px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-3">
-        <div class="flex items-center gap-3 text-sm text-gray-700">
-            <span class="flex items-center justify-center w-9 h-9 rounded-lg bg-yellow-50 text-yellow-500">
-                <i class="fas fa-calendar-alt"></i>
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm px-3 sm:px-5 py-3 sm:py-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+        <div class="flex items-center gap-2 sm:gap-3 text-sm text-gray-700">
+            <span class="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-yellow-50 text-yellow-500 flex-shrink-0">
+                <i class="fas fa-calendar-alt text-sm sm:text-base"></i>
             </span>
-            <div class="leading-tight">
-                <span class="font-semibold" id="infoFromDate">{{ $fromDate->format('d M Y') }}</span>
-                <span class="text-gray-300 mx-1">—</span>
-                <span class="font-semibold" id="infoToDate">{{ $toDate->format('d M Y') }}</span>
-                <div class="text-[11px] text-gray-400 mt-0.5" id="infoPeriodLabel">{{ $hasCustomRange ? 'Rentang Kustom' : $periodLabels[$period] }}</div>
+            <div class="leading-tight min-w-0">
+                <span class="text-xs sm:text-sm font-semibold" id="infoFromDate">{{ $fromDate->format('d M Y') }}</span>
+                <span class="text-gray-300 mx-0.5 sm:mx-1">—</span>
+                <span class="text-xs sm:text-sm font-semibold" id="infoToDate">{{ $toDate->format('d M Y') }}</span>
+                <div class="text-[10px] sm:text-[11px] text-gray-400 mt-0.5" id="infoPeriodLabel">{{ $hasCustomRange ? 'Rentang Kustom' : $periodLabels[$period] }}</div>
             </div>
-            <span class="hidden sm:inline text-[10px] text-gray-400 italic ml-1 max-w-[200px] leading-tight">Gunakan filter di atas untuk mengubah rentang waktu tampilan data</span>
+            <span class="hidden lg:inline text-[10px] text-gray-400 italic ml-1 max-w-[200px] leading-tight">Gunakan filter di atas untuk mengubah rentang waktu tampilan data</span>
         </div>
         <div class="flex flex-wrap items-center gap-2">
             <span id="infoBadge"
@@ -156,8 +157,11 @@ $hasCustomRange = request()->has('from') && request()->has('to');
                     Status Service
                 </h3>
                 <p class="text-[10px] text-gray-400 italic mb-3">Persentase status pengerjaan service saat ini</p>
-                <div class="relative" style="height: 260px;">
-                    <canvas id="statusChart" style="max-height:100%;max-width:100%;"></canvas>
+                <div>
+                    <div class="relative" style="height: 260px;">
+                        <canvas id="statusChart" style="max-height:100%;max-width:100%;"></canvas>
+                    </div>
+                    <div id="statusLegend" class="flex flex-nowrap items-center justify-center gap-x-3 overflow-x-auto mt-3 px-1"></div>
                 </div>
             </div>
         </div>
@@ -173,13 +177,13 @@ $hasCustomRange = request()->has('from') && request()->has('to');
             <a href="{{ route('services.index') }}" class="text-xs text-yellow-600 hover:text-yellow-700 font-medium">Lihat Semua →</a>
         </div>
         <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-            <p class="px-5 pt-3 text-[10px] text-gray-400 italic">10 service terakhir yang dicatat</p>
+            <p class="px-4 sm:px-5 pt-3 text-[10px] text-gray-400 italic">10 service terakhir yang dicatat</p>
             <div class="divide-y divide-gray-100" id="recentServicesList">
                 @forelse($recentServices as $service)
-                <div class="px-5 py-3 flex items-center justify-between hover:bg-gray-50/50">
-                    <div class="flex items-center gap-3 min-w-0">
-                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-yellow-50 to-amber-100 flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-mobile-alt text-yellow-600 text-xs"></i>
+                <div class="px-3 sm:px-5 py-2.5 sm:py-3 flex items-center justify-between hover:bg-gray-50/50">
+                    <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+                        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-yellow-50 to-amber-100 flex items-center justify-center flex-shrink-0 hidden xs:flex">
+                            <i class="fas fa-mobile-alt text-yellow-600 text-[10px] sm:text-xs"></i>
                         </div>
                         <div class="min-w-0">
                             <p class="text-sm font-medium text-gray-900 truncate">{{ $service->customer?->nama ?? '-' }}</p>
@@ -266,6 +270,20 @@ function updateStatusChart(newCounts) {
     statusChartInstance.data.labels = labels;
     statusChartInstance.data.datasets[0].data = data;
     statusChartInstance.update('none');
+    renderStatusLegend(labels, data, colors);
+}
+
+function renderStatusLegend(labels, data, colors) {
+    var wrap = document.getElementById('statusLegend');
+    if (!wrap) return;
+    var html = '';
+    for (var i = 0; i < labels.length; i++) {
+        html += '<div class="flex items-center gap-1.5 text-xs text-gray-500 whitespace-nowrap">'
+            + '<span class="inline-block w-3 h-3 rounded-sm" style="background:' + colors[i] + '"></span>'
+            + labels[i]
+            + '</div>';
+    }
+    wrap.innerHTML = html;
 }
 
 function updateRecentServices(services) {
@@ -533,9 +551,10 @@ document.addEventListener('DOMContentLoaded', function() {
             options: {
                 responsive: true, maintainAspectRatio: false,
                 cutout: '70%',
-                plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 10, font: { size: 11 } } } }
+                plugins: { legend: { display: false } }
             }
         });
+        renderStatusLegend(scLabels, scData, scColors);
     }
 
     // Tab clicks

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Setting extends Model
 {
@@ -12,6 +13,18 @@ class Setting extends Model
     ];
 
     protected static $cache = [];
+
+    protected static function booted()
+    {
+        static::saved(function ($setting) {
+            if ($setting->key === 'logo' && $setting->wasChanged('value')) {
+                $original = $setting->getOriginal('value');
+                if ($original && Storage::disk('public')->exists($original)) {
+                    Storage::disk('public')->delete($original);
+                }
+            }
+        });
+    }
 
     public static function getValue($key, $default = null)
     {

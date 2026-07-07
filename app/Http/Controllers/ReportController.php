@@ -85,7 +85,6 @@ class ReportController extends Controller
         $slug       = str_replace(' ', '-', $namaToko);
 
         if ($from && $to) {
-            // Kalkulasi bulan-bulan tercakup dalam rentang tanggal
             $namaBulan = [
                 1 => 'Januari', 2 => 'Februari', 3 => 'Maret',
                 4 => 'April', 5 => 'Mei', 6 => 'Juni',
@@ -94,17 +93,20 @@ class ReportController extends Controller
             ];
             $start = \Carbon\Carbon::parse($from)->startOfMonth();
             $end   = \Carbon\Carbon::parse($to)->startOfMonth();
-            $bulanMap = [];
+            $bulanData = [];
             $current = $start->copy();
             while ($current->lte($end)) {
-                $bulanMap[(int) $current->format('m')] = $namaBulan[(int) $current->format('m')];
+                $bulanData[] = [
+                    'month' => (int) $current->format('m'),
+                    'year' => (int) $current->format('Y'),
+                    'label' => $namaBulan[(int) $current->format('m')] . ' ' . $current->format('Y'),
+                ];
                 $current->addMonth();
             }
-            $tahun = (int) $start->format('Y');
-            // Untuk rentang lintas tahun, ambil tahun pertama — sheet akan filter per bulan
             $dateLabel = $from . '-' . $to;
+
             return Excel::download(
-                new LaporanExport($tahun, $bulanMap, $namaToko, $customerId, $from, $to),
+                new LaporanExport($bulanData, $namaToko, $customerId, $from, $to),
                 'Laporan-Service-' . $dateLabel . '-' . $slug . '.xlsx'
             );
         }
@@ -168,55 +170,38 @@ class ReportController extends Controller
             10 => 'Oktober', 11 => 'November', 12 => 'Desember',
         ];
 
-        if ($from && $to) {
-            $bulanList = [];
-            foreach ($services as $service) {
-                $key = $service->tanggal->format('Y-m');
-                $bulanList[$key][] = $service;
+        // Group services by month (using Y-m key for proper ordering and cross-year support)
+        $bulanMap = [];
+        $bulanList = [];
+        foreach ($services as $service) {
+            $ym = $service->tanggal->format('Y-m');
+            $monthNum = (int) $service->tanggal->format('m');
+            $yearNum = (int) $service->tanggal->format('Y');
+            if (!isset($bulanList[$ym])) {
+                $bulanList[$ym] = [];
+                $bulanMap[$ym] = $namaBulan[$monthNum] . ' ' . $yearNum;
             }
-            $rekapBulan = [];
-            foreach ($bulanList as $ym => $data) {
-                [$year, $month] = explode('-', $ym);
-                $biayaHarian = BiayaHarian::whereYear('tanggal', $year)
-                    ->whereMonth('tanggal', $month)
-                    ->sum('jumlah');
-
-                $rekapBulan[$ym] = [
-                    'totalPengeluaran' => collect($data)->sum('pengeluaran'),
-                    'totalJasa' => collect($data)->sum('jasa'),
-                    'totalKeuntungan' => collect($data)->sum('keuntungan'),
-                    'biayaHarian' => $biayaHarian,
-                ];
-            }
-
-            $grandPengeluaran = array_sum(array_column($rekapBulan, 'totalPengeluaran'));
-            $grandJasa = array_sum(array_column($rekapBulan, 'totalJasa'));
-            $grandBiayaHarian = array_sum(array_column($rekapBulan, 'biayaHarian'));
-        } else {
-            $bulanList = [];
-            foreach ($services as $service) {
-                $month = (int) $service->tanggal->format('m');
-                $bulanList[$month][] = $service;
-            }
-
-            $rekapBulan = [];
-            foreach ($bulanList as $month => $data) {
-                $biayaHarian = BiayaHarian::whereYear('tanggal', $tahun)
-                    ->whereMonth('tanggal', $month)
-                    ->sum('jumlah');
-
-                $rekapBulan[$month] = [
-                    'totalPengeluaran' => collect($data)->sum('pengeluaran'),
-                    'totalJasa' => collect($data)->sum('jasa'),
-                    'totalKeuntungan' => collect($data)->sum('keuntungan'),
-                    'biayaHarian' => $biayaHarian,
-                ];
-            }
-
-            $grandPengeluaran = array_sum(array_column($rekapBulan, 'totalPengeluaran'));
-            $grandJasa = array_sum(array_column($rekapBulan, 'totalJasa'));
-            $grandBiayaHarian = array_sum(array_column($rekapBulan, 'biayaHarian'));
+            $bulanList[$ym][] = $service;
         }
+
+        $rekapBulan = [];
+        foreach ($bulanList as $ym => $data) {
+            [$year, $month] = explode('-', $ym);
+            $biayaHarian = BiayaHarian::whereYear('tanggal', $year)
+                ->whereMonth('tanggal', $month)
+                ->sum('jumlah');
+
+            $rekapBulan[$ym] = [
+                'totalPengeluaran' => collect($data)->sum('pengeluaran'),
+                'totalJasa' => collect($data)->sum('jasa'),
+                'totalKeuntungan' => collect($data)->sum('keuntungan'),
+                'biayaHarian' => $biayaHarian,
+            ];
+        }
+
+        $grandPengeluaran = array_sum(array_column($rekapBulan, 'totalPengeluaran'));
+        $grandJasa = array_sum(array_column($rekapBulan, 'totalJasa'));
+        $grandBiayaHarian = array_sum(array_column($rekapBulan, 'biayaHarian'));
 
         $customerName = null;
         if ($customerId) {
@@ -227,10 +212,10 @@ class ReportController extends Controller
         $dateLabel = $from && $to ? $from . '-' . $to : 'Tahun-' . $tahun;
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('exports.pdf-services-yearly', compact(
-            'bulanList', 'rekapBulan', 'namaBulan',
+            'bulanList', 'rekapBulan', 'bulanMap',
             'grandPengeluaran', 'grandJasa',
             'grandBiayaHarian',
-            'tahun', 'namaToko', 'customerName'
+            'tahun', 'namaToko', 'customerName', 'from', 'to'
         ));
         $pdf->setPaper('A4', 'landscape');
         return $pdf->stream('Laporan-Service-' . $dateLabel . '-' . $slug . '.pdf');

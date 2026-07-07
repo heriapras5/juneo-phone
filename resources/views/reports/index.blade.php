@@ -150,7 +150,7 @@
                             @else <span class="text-gray-300">-</span>
                             @endif
                         </td>
-                        <td class="px-4 py-3 text-sm text-gray-600 max-w-[160px] overflow-hidden text-ellipsis whitespace-nowrap" title="{{ $service->keterangan ?? '-' }}">{{ $service->keterangan ?? '-' }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-600 max-w-[160px] overflow-hidden text-ellipsis whitespace-nowrap" title="{{ $service->keterangan ?? '' }}">{{ $service->keterangan ?? '' }}</td>
                         <td class="px-4 py-3 text-sm whitespace-nowrap tabular-nums {{ $service->keuntungan >= 0 ? 'text-emerald-600' : 'text-red-600' }}">
                             Rp {{ number_format($service->keuntungan, 0, ',', '.') }}
                         </td>
@@ -184,64 +184,64 @@
                 <span class="h-4 w-1 rounded-full bg-gradient-to-b from-yellow-500 to-amber-500"></span>
                 <h3 class="text-sm font-bold text-gray-800 uppercase tracking-wide">Ringkasan Periode</h3>
             </div>
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 items-stretch">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 items-stretch">
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col h-full">
-                    <div class="p-5 flex-1 flex flex-col gap-1">
-                        <div class="flex items-center gap-2">
-                            <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-red-50 to-rose-100 flex items-center justify-center shadow-md flex-shrink-0">
-                                <i class="fas fa-cart-shopping text-red-600 text-lg"></i>
+                    <div class="p-3 sm:p-5 flex-1 flex flex-col gap-1">
+                        <div class="flex items-center gap-1 sm:gap-2">
+                            <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-red-50 to-rose-100 flex items-center justify-center shadow-md flex-shrink-0">
+                                <i class="fas fa-cart-shopping text-red-600 text-sm sm:text-lg"></i>
                             </div>
                             <div class="min-w-0">
                                 <p class="text-[11px] text-gray-500 font-medium uppercase tracking-wider">Pengeluaran</p>
                                 <p class="text-[10px] text-gray-400 truncate">Modal sparepart</p>
                             </div>
                         </div>
-                        <p class="text-lg font-bold text-red-600 mt-1">Rp {{ number_format($totalPengeluaran, 0, ',', '.') }}</p>
+                        <p class="text-sm sm:text-lg font-bold text-red-600 mt-1">Rp {{ number_format($totalPengeluaran, 0, ',', '.') }}</p>
                     </div>
                     <div class="h-1 bg-red-500"></div>
                 </div>
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col h-full">
-                    <div class="p-5 flex-1 flex flex-col gap-1">
-                        <div class="flex items-center gap-2">
-                            <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-50 to-green-100 flex items-center justify-center shadow-md flex-shrink-0">
-                                <i class="fas fa-money-bill-wave text-emerald-600 text-lg"></i>
+                    <div class="p-3 sm:p-5 flex-1 flex flex-col gap-1">
+                        <div class="flex items-center gap-1 sm:gap-2">
+                            <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-emerald-50 to-green-100 flex items-center justify-center shadow-md flex-shrink-0">
+                                <i class="fas fa-money-bill-wave text-emerald-600 text-sm sm:text-lg"></i>
                             </div>
                             <div class="min-w-0">
                                 <p class="text-[11px] text-gray-500 font-medium uppercase tracking-wider">Omzet</p>
                                 <p class="text-[10px] text-gray-400 truncate">Total tagihan jasa</p>
                             </div>
                         </div>
-                        <p class="text-lg font-bold text-gray-900 mt-1">Rp {{ number_format($totalOmzet, 0, ',', '.') }}</p>
+                        <p class="text-sm sm:text-lg font-bold text-gray-900 mt-1">Rp {{ number_format($totalOmzet, 0, ',', '.') }}</p>
                     </div>
                     <div class="h-1 bg-emerald-500"></div>
                 </div>
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col h-full">
-                    <div class="p-5 flex-1 flex flex-col gap-1">
-                        <div class="flex items-center gap-2">
-                            <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-orange-50 to-amber-100 flex items-center justify-center shadow-md flex-shrink-0">
-                                <i class="fas fa-wallet text-orange-600 text-lg"></i>
+                    <div class="p-3 sm:p-5 flex-1 flex flex-col gap-1">
+                        <div class="flex items-center gap-1 sm:gap-2">
+                            <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-orange-50 to-amber-100 flex items-center justify-center shadow-md flex-shrink-0">
+                                <i class="fas fa-wallet text-orange-600 text-sm sm:text-lg"></i>
                             </div>
                             <div class="min-w-0">
                                 <p class="text-[11px] text-gray-500 font-medium uppercase tracking-wider">Kebutuhan Pribadi</p>
                                 <p class="text-[10px] text-gray-400 truncate">Bank Jago + Gaji + Lainnya</p>
                             </div>
                         </div>
-                        <p class="text-lg font-bold text-orange-600 mt-1">Rp {{ number_format($kebutuhanPribadi, 0, ',', '.') }}</p>
+                        <p class="text-sm sm:text-lg font-bold text-orange-600 mt-1">Rp {{ number_format($kebutuhanPribadi, 0, ',', '.') }}</p>
                     </div>
                     <div class="h-1 bg-orange-500"></div>
                 </div>
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col h-full">
-                    <div class="p-5 flex-1 flex flex-col gap-1">
-                        <div class="flex items-center gap-2">
-                            <div class="w-11 h-11 rounded-xl {{ $profit >= 0 ? 'bg-gradient-to-br from-emerald-50 to-green-100' : 'bg-gradient-to-br from-red-50 to-rose-100' }} flex items-center justify-center shadow-md flex-shrink-0">
-                                <i class="fas fa-coins {{ $profit >= 0 ? 'text-emerald-600' : 'text-red-600' }} text-lg"></i>
+                    <div class="p-3 sm:p-5 flex-1 flex flex-col gap-1">
+                        <div class="flex items-center gap-1 sm:gap-2">
+                            <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl {{ $profit >= 0 ? 'bg-gradient-to-br from-emerald-50 to-green-100' : 'bg-gradient-to-br from-red-50 to-rose-100' }} flex items-center justify-center shadow-md flex-shrink-0">
+                                <i class="fas fa-coins {{ $profit >= 0 ? 'text-emerald-600' : 'text-red-600' }} text-sm sm:text-lg"></i>
                             </div>
                             <div class="min-w-0">
                                 <p class="text-[11px] text-gray-500 font-medium uppercase tracking-wider">Profit</p>
                                 <p class="text-[10px] text-gray-400 truncate">Omzet - Pengeluaran - Kebutuhan Pribadi</p>
                             </div>
                         </div>
-                        <p class="text-lg font-bold {{ $profit >= 0 ? 'text-emerald-600' : 'text-red-600' }} mt-1">Rp {{ number_format($profit, 0, ',', '.') }}</p>
+                        <p class="text-sm sm:text-lg font-bold {{ $profit >= 0 ? 'text-emerald-600' : 'text-red-600' }} mt-1">Rp {{ number_format($profit, 0, ',', '.') }}</p>
                     </div>
                     <div class="h-1 {{ $profit >= 0 ? 'bg-emerald-500' : 'bg-red-500' }}"></div>
                 </div>

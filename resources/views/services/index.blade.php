@@ -192,7 +192,7 @@ window._pageData = {
                         <td class="px-5 py-3 text-sm text-right whitespace-nowrap tabular-nums {{ $service->keuntungan >= 0 ? 'text-emerald-600' : 'text-red-600' }} font-semibold">
                             Rp {{ number_format($service->keuntungan, 0, ',', '.') }}
                         </td>
-                        <td class="px-5 py-3 text-sm text-gray-600 max-w-[180px] truncate whitespace-nowrap">{{ $service->keterangan ?? '-' }}</td>
+                        <td class="px-5 py-3 text-sm text-gray-600 max-w-[180px] truncate whitespace-nowrap">{{ $service->keterangan ?? '' }}</td>
                         <td class="px-5 py-3 text-sm text-center whitespace-nowrap">
                             @if($service->estimasi_selesai)
                                 @php

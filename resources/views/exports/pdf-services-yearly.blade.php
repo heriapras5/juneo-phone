@@ -12,10 +12,10 @@
     .header .info { margin: 2px 0 0; font-size: 8px; color: #555; }
     .month-title { font-size: 12px; font-weight: bold; margin-top: 16px; margin-bottom: 6px; color: #B8860B; border-bottom: 1px solid #B8860B; padding-bottom: 3px; }
     table { width: 100%; border-collapse: collapse; margin-top: 6px; }
-    th { background: #B8860B; color: white; padding: 5px 8px; text-align: left; font-size: 8px; }
-    td { padding: 4px 8px; border-bottom: 1px solid #ddd; font-size: 8px; }
+    th { background: #B8860B; color: white; padding: 5px 6px; text-align: left; font-size: 7px; }
+    td { padding: 3px 6px; border-bottom: 1px solid #ddd; font-size: 7px; }
     tr:nth-child(even) { background: #f9fafb; }
-    .subtotal-row td { font-weight: bold; border-top: 2px solid #B8860B; background: #fff8e1; padding-top: 6px; }
+    .subtotal-row td { font-weight: bold; border-top: 2px solid #B8860B; background: #fff8e1; padding-top: 5px; }
     .grand-title { font-size: 12px; font-weight: bold; margin-top: 18px; margin-bottom: 6px; color: #333; border-bottom: 2px solid #333; padding-bottom: 3px; }
     .grand-table td { padding: 4px 10px; font-size: 10px; }
     .grand-table .label { font-weight: bold; }
@@ -25,41 +25,50 @@
     .page-break { page-break-before: always; }
     .text-right { text-align: right; }
     .text-center { text-align: center; }
+    .text-green { color: #059669; font-weight: bold; }
+    .text-red { color: #DC2626; font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>{{ $namaToko }}</h1>
-        <p class="subtitle">LAPORAN SERVICE TAHUN {{ $tahun }}</p>
+        <p class="subtitle">
+            @if(!empty($from) && !empty($to))
+                LAPORAN SERVICE ({{ \Carbon\Carbon::parse($from)->format('d/m/Y') }} — {{ \Carbon\Carbon::parse($to)->format('d/m/Y') }})
+            @else
+                LAPORAN SERVICE TAHUN {{ $tahun }}
+            @endif
+        </p>
         @php $alamatToko = App\Models\Setting::getValue('alamat', ''); $telpToko = App\Models\Setting::getValue('nota_telepon', ''); @endphp
         @if($alamatToko || $telpToko)
         <p class="info">{{ $alamatToko }}@if($alamatToko && $telpToko) — @endif{{ $telpToko ? 'No WA: '.$telpToko : '' }}</p>
         @endif
     </div>
 
-    @foreach($bulanList as $month => $data)
-        @php $label = $namaBulan[$month] ?? $month; @endphp
-        @php $rekap = $rekapBulan[$month]; @endphp
+    @foreach($bulanList as $ym => $data)
+        @php $label = $bulanMap[$ym] ?? $ym; @endphp
+        @php $rekap = $rekapBulan[$ym]; @endphp
 
         @if(!$loop->first)
         <div class="page-break"></div>
         @endif
 
-        <div class="month-title">{{ $label }} {{ $tahun }}</div>
+        <div class="month-title">{{ $label }}</div>
 
         <table>
             <thead>
                 <tr>
                     <th style="width:3%;">No</th>
-                    <th style="width:10%;">No. Service</th>
+                    <th style="width:9%;">No. Service</th>
                     <th style="width:8%;">Tanggal</th>
-                    <th style="width:12%;">Pelanggan</th>
+                    <th style="width:11%;">Pelanggan</th>
                     <th style="width:10%;">Type HP</th>
-                    <th style="width:20%;">Kerusakan</th>
-                    <th style="width:10%;">Pengeluaran</th>
-                    <th style="width:10%;">Jasa</th>
-                    <th style="width:7%;">Teknisi</th>
-                    <th style="width:10%;">Keuntungan</th>
+                    <th style="width:18%;">Kerusakan</th>
+                    <th style="width:9%;">Pengeluaran</th>
+                    <th style="width:9%;">Jasa</th>
+                    <th style="width:5%;">Teknisi</th>
+                    <th style="width:9%;">Keterangan</th>
+                    <th style="width:9%;">Keuntungan</th>
                 </tr>
             </thead>
             <tbody>
@@ -94,34 +103,42 @@
                     <td class="text-right">Rp {{ number_format($service->pengeluaran, 0, ',', '.') }}</td>
                     <td class="text-right">Rp {{ number_format($service->jasa, 0, ',', '.') }}</td>
                     <td class="text-center">{{ match($service->teknisi) { 'edi' => 'E', 'nur' => 'N', default => '-' } }}</td>
-                    <td class="text-right">Rp {{ number_format($service->keuntungan, 0, ',', '.') }}</td>
+                    <td style="font-size:6px; color:#666; max-width:80px; word-wrap:break-word;">{{ $service->keterangan ?? '' }}</td>
+                    <td class="text-right {{ $service->keuntungan >= 0 ? 'text-green' : 'text-red' }}">Rp {{ number_format($service->keuntungan, 0, ',', '.') }}</td>
                 </tr>
                 @endforeach
             </tbody>
             <tfoot>
                 <tr class="subtotal-row">
-                    <td colspan="6" class="text-right">Subtotal {{ $label }}</td>
-                    <td class="text-right">Rp {{ number_format($rekap['totalPengeluaran'], 0, ',', '.') }}</td>
+                    <td colspan="7" class="text-right">Subtotal {{ $label }}</td>
                     <td class="text-right">Rp {{ number_format($rekap['totalJasa'], 0, ',', '.') }}</td>
+                    <td></td>
                     <td></td>
                     <td class="text-right">Rp {{ number_format($rekap['totalJasa'] - $rekap['totalPengeluaran'] - $rekap['biayaHarian'], 0, ',', '.') }}</td>
                 </tr>
                 <tr>
-                    <td colspan="6" class="text-right" style="font-size:7px; color:#888;">Kebutuhan Pribadi</td>
+                    <td colspan="7" class="text-right" style="font-size:6px; color:#888;">Kebutuhan Pribadi: Rp {{ number_format($rekap['biayaHarian'], 0, ',', '.') }} | Pengeluaran: Rp {{ number_format($rekap['totalPengeluaran'], 0, ',', '.') }}</td>
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td class="text-right" style="font-size:7px; color:#888;">Rp {{ number_format($rekap['biayaHarian'], 0, ',', '.') }}</td>
+                    <td class="text-right" style="font-size:6px; color:#888;">Biaya: Rp {{ number_format($rekap['biayaHarian'], 0, ',', '.') }}</td>
                 </tr>
             </tfoot>
         </table>
     @endforeach
 
     @if(empty($bulanList))
-        <p style="text-align:center; margin-top:40px; color:#999;">Tidak ada data service untuk tahun {{ $tahun }}.</p>
+        <p style="text-align:center; margin-top:40px; color:#999;">
+            @if(!empty($from) && !empty($to))
+                Tidak ada data service untuk periode {{ \Carbon\Carbon::parse($from)->format('d/m/Y') }} — {{ \Carbon\Carbon::parse($to)->format('d/m/Y') }}.
+            @else
+                Tidak ada data service untuk tahun {{ $tahun }}.
+            @endif
+        </p>
     @endif
 
-    <div class="grand-title">REKAP TAHUNAN {{ $tahun }}</div>
+    @php $grandProfit = $grandJasa - $grandPengeluaran - $grandBiayaHarian; @endphp
+    <div class="grand-title">REKAP {{ !empty($from) && !empty($to) ? 'PERIODE' : 'TAHUNAN ' . $tahun }}</div>
 
     <table class="grand-table" style="width:60%; margin-left:auto; margin-right:auto;">
         <tr>
@@ -140,7 +157,7 @@
         <tr><td colspan="2" style="padding:2px;"></td></tr>
         <tr class="total-row">
             <td class="label">Profit</td>
-            <td class="value">Rp {{ number_format($grandJasa - $grandPengeluaran - $grandBiayaHarian, 0, ',', '.') }}</td>
+            <td class="value {{ $grandProfit >= 0 ? 'text-green' : 'text-red' }}">Rp {{ number_format($grandProfit, 0, ',', '.') }}</td>
         </tr>
     </table>
 

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasPhotoAutoCleanup;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -9,7 +10,8 @@ use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasPhotoAutoCleanup;
+    protected $photoField = 'foto';
 
     const ROLE_ADMIN = 'admin';
     const ROLE_SUPERADMIN = 'superadmin';

@@ -91,7 +91,7 @@
                             <i class="fas fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
                             <input type="email" name="email" value="{{ old('email') }}" required autofocus
                                 class="w-full pl-9 pr-3.5 py-2 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 placeholder-gray-400 outline-none  text-sm @error('email') border-red-400 ring-red-500/30 @enderror"
-                                placeholder="admin@juneo.com">
+                                placeholder="">
                         </div>
                         @error('email') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
@@ -102,7 +102,7 @@
                             <i class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
                             <input type="password" name="password" required
                                 class="w-full pl-9 pr-3.5 py-2 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 placeholder-gray-400 outline-none  text-sm"
-                                placeholder="Masukkan password">
+                                placeholder="">
                         </div>
                     </div>
 

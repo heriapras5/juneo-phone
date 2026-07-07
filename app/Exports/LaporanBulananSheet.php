@@ -45,7 +45,8 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
             ->where('status', '!=', 'batal')
             ->when($this->fromDate && $this->toDate, function ($q) {
                 $q->whereDate('tanggal', '>=', $this->fromDate)
-                  ->whereDate('tanggal', '<=', $this->toDate);
+                  ->whereDate('tanggal', '<=', $this->toDate)
+                  ->whereMonth('tanggal', $this->month);
             }, function ($q) {
                 $q->whereYear('tanggal', $this->tahun)
                   ->whereMonth('tanggal', $this->month);
@@ -63,7 +64,8 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
         $this->cachedBiayaHarian = BiayaHarian::query()
             ->when($this->fromDate && $this->toDate, function ($q) {
                 $q->whereDate('tanggal', '>=', $this->fromDate)
-                  ->whereDate('tanggal', '<=', $this->toDate);
+                  ->whereDate('tanggal', '<=', $this->toDate)
+                  ->whereMonth('tanggal', $this->month);
             }, function ($q) {
                 $q->whereYear('tanggal', $this->tahun)
                   ->whereMonth('tanggal', $this->month);
@@ -84,6 +86,7 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
             'Pengeluaran',
             'Jasa',
             'Teknisi',
+            'Keterangan',
             'Keuntungan',
         ];
     }
@@ -123,6 +126,7 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
             $row->pengeluaran,
             $row->jasa,
             $teknisiLabel,
+            $row->keterangan ?? '',
             $row->keuntungan,
         ];
     }
@@ -141,8 +145,11 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
 
                 $sheet->insertNewRowBefore(1, 3);
 
-                $sheet->setCellValue('A1', 'LAPORAN SERVICE TAHUN ' . $this->tahun);
-                $sheet->mergeCells('A1:J1');
+                $colCount = 'K';
+                $range = 'A1:' . $colCount . '1';
+
+                $sheet->setCellValue('A1', 'LAPORAN SERVICE' . ($this->fromDate && $this->toDate ? ' (' . $this->fromDate->format('d/m/Y') . ' — ' . $this->toDate->format('d/m/Y') . ')' : ' TAHUN ' . $this->tahun));
+                $sheet->mergeCells($range);
                 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
                 $sheet->getStyle('A1')->getAlignment()
                     ->setHorizontal(Alignment::HORIZONTAL_CENTER)
@@ -156,7 +163,7 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
                     }
                 }
                 $sheet->setCellValue('A2', $subtitle);
-                $sheet->mergeCells('A2:J2');
+                $sheet->mergeCells('A2:' . $colCount . '2');
                 $sheet->getStyle('A2')->getFont()->setSize(12);
                 $sheet->getStyle('A2')->getAlignment()
                     ->setHorizontal(Alignment::HORIZONTAL_CENTER)
@@ -166,28 +173,32 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
                 $dataStartRow = 5;
                 $lastDataRow = $rowCount + 3;
 
-                $sheet->getStyle('A' . $headerRow . ':J' . $headerRow)->getFont()->setBold(true);
-                $sheet->getStyle('A' . $headerRow . ':J' . $headerRow)->getFill()
+                $sheet->getStyle('A' . $headerRow . ':' . $colCount . $headerRow)->getFont()->setBold(true);
+                $sheet->getStyle('A' . $headerRow . ':' . $colCount . $headerRow)->getFill()
                     ->setFillType(Fill::FILL_SOLID)
                     ->getStartColor()->setARGB('FFB8860B');
-                $sheet->getStyle('A' . $headerRow . ':J' . $headerRow)->getFont()->getColor()->setARGB('FFFFFFFF');
+                $sheet->getStyle('A' . $headerRow . ':' . $colCount . $headerRow)->getFont()->getColor()->setARGB('FFFFFFFF');
 
-                $sheet->getStyle('G' . $headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-                $sheet->getStyle('H' . $headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-                $sheet->getStyle('J' . $headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+                foreach (['G', 'H', 'K'] as $c) {
+                    $sheet->getStyle($c . $headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+                }
 
                 if ($lastDataRow >= $dataStartRow) {
-                    $sheet->getStyle('A' . $dataStartRow . ':J' . $lastDataRow)
+                    $sheet->getStyle('A' . $dataStartRow . ':' . $colCount . $lastDataRow)
                         ->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
-                    $sheet->getStyle('A' . $dataStartRow . ':J' . $lastDataRow)
+                    $sheet->getStyle('A' . $dataStartRow . ':' . $colCount . $lastDataRow)
                         ->getBorders()->getLeft()->setBorderStyle(Border::BORDER_THIN);
-                    $sheet->getStyle('A' . $dataStartRow . ':J' . $lastDataRow)
+                    $sheet->getStyle('A' . $dataStartRow . ':' . $colCount . $lastDataRow)
                         ->getBorders()->getRight()->setBorderStyle(Border::BORDER_THIN);
 
                     $sheet->getStyle('G' . $dataStartRow . ':H' . $lastDataRow)
                         ->getNumberFormat()->setFormatCode('"Rp"#,##0');
-                    $sheet->getStyle('J' . $dataStartRow . ':J' . $lastDataRow)
+                    $sheet->getStyle('K' . $dataStartRow . ':K' . $lastDataRow)
                         ->getNumberFormat()->setFormatCode('"Rp"#,##0');
+
+                    // Conditional warna Keuntungan (kolom K)
+                    $profitRange = 'K' . $dataStartRow . ':K' . $lastDataRow;
+                    $sheet->getStyle($profitRange)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
                     $services = $this->collection();
                     $totalPengeluaran = $services->sum('pengeluaran');
@@ -206,7 +217,7 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
                     foreach ($summaryRows as $i => $item) {
                         $r = $summaryStart + $i;
                         $sheet->setCellValue('A' . $r, $item[0]);
-                        $sheet->mergeCells('A' . $r . ':I' . $r);
+                        $sheet->mergeCells('A' . $r . ':J' . $r);
 
                         if ($item[3]) {
                             $sheet->getStyle('A' . $r)->getFont()->setItalic(true)->setSize(9);
@@ -214,21 +225,21 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
                             $sheet->getStyle('A' . $r)->getFont()->setSize(10);
                         }
 
-                        $sheet->setCellValue('J' . $r, $item[1]);
-                        $sheet->getStyle('J' . $r)->getNumberFormat()->setFormatCode('"Rp"#,##0');
+                        $sheet->setCellValue('K' . $r, $item[1]);
+                        $sheet->getStyle('K' . $r)->getNumberFormat()->setFormatCode('"Rp"#,##0');
 
                         if ($item[2]) {
                             $sheet->getStyle('A' . $r)->getFont()->setBold(true)->setSize(11);
-                            $sheet->getStyle('J' . $r)->getFont()->setBold(true)->setSize(11);
+                            $sheet->getStyle('K' . $r)->getFont()->setBold(true)->setSize(11);
                         }
 
                         if ($i === 0) {
-                            $sheet->getStyle('A' . $r . ':J' . $r)
+                            $sheet->getStyle('A' . $r . ':' . $colCount . $r)
                                 ->getBorders()->getTop()->setBorderStyle(Border::BORDER_MEDIUM);
                         }
 
                         if ($i === 0) {
-                            $sheet->getStyle('A' . $r . ':J' . $r)
+                            $sheet->getStyle('A' . $r . ':' . $colCount . $r)
                                 ->getFill()->setFillType(Fill::FILL_SOLID)
                                 ->getStartColor()->setARGB('FFFFF8E1');
                         }
@@ -240,15 +251,16 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
                 }
 
                 $sheet->getColumnDimension('A')->setWidth(4);
-                $sheet->getColumnDimension('B')->setWidth(16);
+                $sheet->getColumnDimension('B')->setWidth(18);
                 $sheet->getColumnDimension('C')->setWidth(12);
-                $sheet->getColumnDimension('D')->setWidth(18);
-                $sheet->getColumnDimension('E')->setWidth(14);
-                $sheet->getColumnDimension('F')->setWidth(28);
+                $sheet->getColumnDimension('D')->setWidth(20);
+                $sheet->getColumnDimension('E')->setWidth(16);
+                $sheet->getColumnDimension('F')->setWidth(30);
                 $sheet->getColumnDimension('G')->setWidth(14);
                 $sheet->getColumnDimension('H')->setWidth(14);
                 $sheet->getColumnDimension('I')->setWidth(8);
-                $sheet->getColumnDimension('J')->setWidth(16);
+                $sheet->getColumnDimension('J')->setWidth(20);
+                $sheet->getColumnDimension('K')->setWidth(16);
             },
         ];
     }
