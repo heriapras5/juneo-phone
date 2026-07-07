@@ -16,6 +16,8 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class ServicesSheetExport implements FromCollection, WithHeadings, WithMapping, WithTitle, WithColumnWidths, WithColumnFormatting, WithStyles
 {
+    private int $rowNumber = 0;
+
     public function collection()
     {
         return Service::with('customer', 'serviceItems')
@@ -27,6 +29,7 @@ class ServicesSheetExport implements FromCollection, WithHeadings, WithMapping, 
     public function headings(): array
     {
         return [
+            'No',
             'No. Service',
             'Tanggal',
             'Pelanggan',
@@ -47,6 +50,8 @@ class ServicesSheetExport implements FromCollection, WithHeadings, WithMapping, 
 
     public function map($service): array
     {
+        $this->rowNumber++;
+
         $allTypes = collect([$service->type_hp])
             ->concat($service->serviceItems->pluck('type_hp'))
             ->unique()->values();
@@ -63,6 +68,7 @@ class ServicesSheetExport implements FromCollection, WithHeadings, WithMapping, 
         $kerusakanText = '• ' . $allKerusakan->implode(' | • ');
 
         return [
+            $this->rowNumber,
             $service->service_number ?? '',
             $service->tanggal ? Carbon::parse($service->tanggal)->format('d/m/Y') : '',
             $service->customer?->nama ?? '',
@@ -89,31 +95,32 @@ class ServicesSheetExport implements FromCollection, WithHeadings, WithMapping, 
     public function columnWidths(): array
     {
         return [
-            'A' => 18,
-            'B' => 14,
-            'C' => 25,
-            'D' => 18,
-            'E' => 20,
-            'F' => 30,
-            'G' => 16,
+            'A' => 6,
+            'B' => 18,
+            'C' => 14,
+            'D' => 25,
+            'E' => 18,
+            'F' => 20,
+            'G' => 30,
             'H' => 16,
-            'I' => 15,
+            'I' => 16,
             'J' => 15,
             'K' => 15,
-            'L' => 18,
-            'M' => 10,
-            'N' => 14,
-            'O' => 30,
+            'L' => 15,
+            'M' => 18,
+            'N' => 10,
+            'O' => 14,
+            'P' => 30,
         ];
     }
 
     public function columnFormats(): array
     {
         return [
-            'I' => '"Rp"#,##0',
             'J' => '"Rp"#,##0',
             'K' => '"Rp"#,##0',
             'L' => '"Rp"#,##0',
+            'M' => '"Rp"#,##0',
         ];
     }
 
@@ -121,10 +128,10 @@ class ServicesSheetExport implements FromCollection, WithHeadings, WithMapping, 
     {
         return [
             1 => ['font' => ['bold' => true]],
-            'I:I' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]],
             'J:J' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]],
             'K:K' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]],
             'L:L' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]],
+            'M:M' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]],
         ];
     }
 }

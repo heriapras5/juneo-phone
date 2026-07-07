@@ -16,6 +16,8 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class GajiKaryawanSheetExport implements FromCollection, WithHeadings, WithMapping, WithTitle, WithColumnWidths, WithColumnFormatting, WithStyles
 {
+    private int $rowNumber = 0;
+
     public function collection()
     {
         return GajiKaryawan::orderBy('tanggal')->get();
@@ -23,12 +25,15 @@ class GajiKaryawanSheetExport implements FromCollection, WithHeadings, WithMappi
 
     public function headings(): array
     {
-        return ['Tanggal', 'Karyawan', 'Jumlah'];
+        return ['No', 'Tanggal', 'Karyawan', 'Jumlah'];
     }
 
     public function map($item): array
     {
+        $this->rowNumber++;
+
         return [
+            $this->rowNumber,
             $item->tanggal ? Carbon::parse($item->tanggal)->format('d/m/Y') : '',
             $item->nama ?? $item->karyawan ?? '',
             $item->jumlah ?: 0,
@@ -43,16 +48,17 @@ class GajiKaryawanSheetExport implements FromCollection, WithHeadings, WithMappi
     public function columnWidths(): array
     {
         return [
-            'A' => 18,
-            'B' => 25,
-            'C' => 15,
+            'A' => 6,
+            'B' => 18,
+            'C' => 25,
+            'D' => 15,
         ];
     }
 
     public function columnFormats(): array
     {
         return [
-            'C' => '"Rp"#,##0',
+            'D' => '"Rp"#,##0',
         ];
     }
 
@@ -60,7 +66,7 @@ class GajiKaryawanSheetExport implements FromCollection, WithHeadings, WithMappi
     {
         return [
             1 => ['font' => ['bold' => true]],
-            'C:C' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]],
+            'D:D' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]],
         ];
     }
 }

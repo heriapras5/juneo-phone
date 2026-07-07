@@ -16,6 +16,8 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class BiayaHarianSheetExport implements FromCollection, WithHeadings, WithMapping, WithTitle, WithColumnWidths, WithColumnFormatting, WithStyles
 {
+    private int $rowNumber = 0;
+
     public function collection()
     {
         return BiayaHarian::orderBy('tanggal')->get();
@@ -23,12 +25,15 @@ class BiayaHarianSheetExport implements FromCollection, WithHeadings, WithMappin
 
     public function headings(): array
     {
-        return ['Tanggal', 'Kategori', 'Nama', 'Jumlah', 'Keterangan'];
+        return ['No', 'Tanggal', 'Kategori', 'Nama', 'Jumlah', 'Keterangan'];
     }
 
     public function map($item): array
     {
+        $this->rowNumber++;
+
         return [
+            $this->rowNumber,
             $item->tanggal ? Carbon::parse($item->tanggal)->format('d/m/Y') : '',
             $item->kategori ?? '',
             $item->nama ?? '',
@@ -45,18 +50,19 @@ class BiayaHarianSheetExport implements FromCollection, WithHeadings, WithMappin
     public function columnWidths(): array
     {
         return [
-            'A' => 18,
-            'B' => 20,
-            'C' => 30,
-            'D' => 15,
-            'E' => 40,
+            'A' => 6,
+            'B' => 18,
+            'C' => 20,
+            'D' => 30,
+            'E' => 15,
+            'F' => 40,
         ];
     }
 
     public function columnFormats(): array
     {
         return [
-            'D' => '"Rp"#,##0',
+            'E' => '"Rp"#,##0',
         ];
     }
 
@@ -64,7 +70,7 @@ class BiayaHarianSheetExport implements FromCollection, WithHeadings, WithMappin
     {
         return [
             1 => ['font' => ['bold' => true]],
-            'D:D' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]],
+            'E:E' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]],
         ];
     }
 }
