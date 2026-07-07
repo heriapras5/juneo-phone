@@ -3,7 +3,18 @@
 @section('title', 'Dashboard')
 @section('page-title', 'Dashboard')
 
-{{-- No extra styles needed --}}
+@push('styles')
+<style>
+.anm-wrap { opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease-out, transform 0.5s ease-out; }
+.anm-wrap.anm-show { opacity: 1; transform: translateY(0); }
+.anm-card { opacity: 0; transform: translateY(16px); transition: opacity 0.4s ease-out, transform 0.4s ease-out; }
+.anm-card.anm-show { opacity: 1; transform: translateY(0); }
+@keyframes pulse-soft { 0%,100%{opacity:1} 50%{opacity:0.55} }
+.anm-pulse { animation: pulse-soft 2s ease-in-out infinite; }
+.anm-row { opacity: 0; transform: translateX(-8px); transition: opacity 0.3s ease-out, transform 0.3s ease-out; }
+.anm-row.anm-show { opacity: 1; transform: translateX(0); }
+</style>
+@endpush
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
@@ -19,7 +30,7 @@ $hasCustomRange = request()->has('from') && request()->has('to');
 <div class="space-y-6" id="dashboard-app">
 
     {{-- ============ Period Filter Bar (AJAX) ============ --}}
-    <div x-data="{ df: '{{ $fromDate->format('Y-m-d') }}', dt: '{{ $toDate->format('Y-m-d') }}' }" id="dashFilterBar" class="bg-white border border-gray-200 rounded-xl shadow-sm px-3 sm:px-4 py-2 sm:py-3 flex flex-wrap items-center gap-1.5 sm:gap-2">
+    <div x-data="{ df: '{{ $fromDate->format('Y-m-d') }}', dt: '{{ $toDate->format('Y-m-d') }}' }" id="dashFilterBar" class="anm-wrap bg-white border border-gray-200 rounded-xl shadow-sm px-3 sm:px-4 py-2 sm:py-3 flex flex-wrap items-center gap-1.5 sm:gap-2">
         <span class="text-[11px] text-gray-500 font-medium mr-0.5 sm:mr-1 flex items-center gap-1 sm:gap-1.5">
             <i class="fas fa-filter text-yellow-500"></i>
             <span class="hidden sm:inline">Filter waktu:</span>
@@ -52,7 +63,7 @@ $hasCustomRange = request()->has('from') && request()->has('to');
     </div>
 
     {{-- ============ Period Info Bar ============ --}}
-    <div class="bg-white border border-gray-200 rounded-xl shadow-sm px-3 sm:px-5 py-3 sm:py-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+    <div class="anm-wrap bg-white border border-gray-200 rounded-xl shadow-sm px-3 sm:px-5 py-3 sm:py-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
         <div class="flex items-center gap-2 sm:gap-3 text-sm text-gray-700">
             <span class="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-yellow-50 text-yellow-500 flex-shrink-0">
                 <i class="fas fa-calendar-alt text-sm sm:text-base"></i>
@@ -79,7 +90,7 @@ $hasCustomRange = request()->has('from') && request()->has('to');
     </div>
 
     {{-- ============ Notif Kebutuhan Pribadi ============ --}}
-    <div id="biayaNotifWrap">
+    <div id="biayaNotifWrap" class="anm-wrap">
         @if(!$biayaCount)
         <div class="bg-orange-50 border border-orange-200 text-orange-700 px-4 py-3 rounded-xl flex items-center gap-3 shadow-sm">
             <i class="fas fa-clock text-orange-500 text-lg"></i>
@@ -94,7 +105,7 @@ $hasCustomRange = request()->has('from') && request()->has('to');
     </div>
 
     {{-- Empty State (AJAX) --}}
-    <div id="emptyStateWrap"></div>
+    <div id="emptyStateWrap" class="anm-wrap"></div>
 
     {{-- SVG Gradient Defs for sparklines --}}
     <svg width="0" height="0" style="position:absolute;pointer-events:none">
@@ -112,7 +123,7 @@ $hasCustomRange = request()->has('from') && request()->has('to');
 
     {{-- ============ BAGIAN A: Ringkasan Keuangan ============ --}}
     {{-- 4 KPI utama: Pengeluaran | Omzet | Kebutuhan Pribadi | Profit --}}
-    <section class="space-y-3" id="kpiSection">
+        <section class="space-y-3 anm-wrap" id="kpiSection">
         <div class="flex items-center gap-2">
             <span class="h-5 w-1.5 rounded-full bg-gradient-to-b from-yellow-500 to-amber-500"></span>
             <h2 class="text-sm font-bold text-gray-800 uppercase tracking-wide">Ringkasan Keuangan</h2>
@@ -135,20 +146,25 @@ $hasCustomRange = request()->has('from') && request()->has('to');
     </section>
 
     {{-- ============ BAGIAN B: Grafik & Status ============ --}}
-    <section class="space-y-3" id="chartSection">
+        <section class="space-y-3 anm-wrap" id="chartSection">
         <div class="flex items-center gap-2">
             <span class="h-5 w-1.5 rounded-full bg-gradient-to-b from-yellow-500 to-amber-500"></span>
             <h2 class="text-sm font-bold text-gray-800 uppercase tracking-wide">Grafik &amp; Status</h2>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 bg-white border border-gray-200 rounded-xl shadow-sm px-5 pt-5 pb-3 sm:pb-4 transition-all duration-200 ease-in-out hover:-translate-y-1 hover:shadow-lg flex flex-col">
+            <div class="lg:col-span-2 bg-white border border-gray-200 rounded-xl shadow-sm p-5 pb-1 transition-all duration-200 ease-in-out hover:-translate-y-1 hover:shadow-lg flex flex-col">
                 <h3 class="text-sm font-semibold text-gray-700 mb-1 flex items-center gap-2">
                     <i class="fas fa-chart-bar text-yellow-500"></i>
                     Grafik <span id="chartPeriodLabel">{{ $periodLabels[$period] }}</span>
                 </h3>
                 <p class="text-[10px] text-gray-400 italic mb-3">Perbandingan Omzet, Pengeluaran &amp; Profit per periode</p>
                 <div class="relative flex-1 min-h-[180px] sm:min-h-[260px]">
-                    <canvas id="revenueChart" class="w-full h-full"></canvas>
+                    <canvas id="revenueChart" class="absolute inset-0 w-full h-full"></canvas>
+                </div>
+                <div class="flex flex-nowrap items-center justify-center gap-x-3 pt-3 pb-0.5 text-xs text-gray-500 overflow-x-auto">
+                    <span class="flex items-center gap-1.5 whitespace-nowrap"><span class="inline-block w-3 h-3 rounded-sm" style="background:rgba(16,185,129,0.7)"></span> Omzet</span>
+                    <span class="flex items-center gap-1.5 whitespace-nowrap"><span class="inline-block w-3 h-3 rounded-sm" style="background:rgba(239,68,68,0.5)"></span> Pengeluaran</span>
+                    <span class="flex items-center gap-1.5 whitespace-nowrap"><span class="inline-block w-3 h-3 rounded-sm" style="background:rgba(99,102,241,0.6)"></span> Profit</span>
                 </div>
             </div>
             <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5 transition-all duration-200 ease-in-out hover:-translate-y-1 hover:shadow-lg">
@@ -168,7 +184,7 @@ $hasCustomRange = request()->has('from') && request()->has('to');
     </section>
 
     {{-- ============ BAGIAN C: Service Terbaru ============ --}}
-    <section class="space-y-3">
+    <section class="space-y-3 anm-wrap">
         <div class="flex items-center justify-between gap-2">
             <div class="flex items-center gap-2">
                 <span class="h-5 w-1.5 rounded-full bg-gradient-to-b from-yellow-500 to-amber-500"></span>
@@ -180,7 +196,7 @@ $hasCustomRange = request()->has('from') && request()->has('to');
             <p class="px-4 sm:px-5 pt-3 text-[10px] text-gray-400 italic">10 service terakhir yang dicatat</p>
             <div class="divide-y divide-gray-100" id="recentServicesList">
                 @forelse($recentServices as $service)
-                <div class="px-3 sm:px-5 py-2.5 sm:py-3 flex items-center justify-between hover:bg-gray-50/50">
+                <div class="anm-row px-3 sm:px-5 py-2.5 sm:py-3 flex items-center justify-between hover:bg-gray-50/50">
                     <div class="flex items-center gap-2 sm:gap-3 min-w-0">
                         <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-yellow-50 to-amber-100 flex items-center justify-center flex-shrink-0 hidden xs:flex">
                             <i class="fas fa-mobile-alt text-yellow-600 text-[10px] sm:text-xs"></i>
@@ -304,7 +320,7 @@ function updateRecentServices(services) {
     services.forEach(function(s) {
         var st = statusMap[s.status] || { cls: 'bg-gray-100 text-gray-600', label: s.status };
         var kerusakan = Array.isArray(s.kerusakan) ? s.kerusakan.join(', ') : (s.kerusakan || '-');
-        html += '<div class="px-5 py-3 flex items-center justify-between hover:bg-gray-50/50">'
+        html += '<div class="anm-row px-5 py-3 flex items-center justify-between hover:bg-gray-50/50">'
             + '<div class="flex items-center gap-3 min-w-0">'
             +   '<div class="w-8 h-8 rounded-full bg-gradient-to-br from-yellow-50 to-amber-100 flex items-center justify-center flex-shrink-0"><i class="fas fa-mobile-alt text-yellow-600 text-xs"></i></div>'
             +   '<div class="min-w-0">'
@@ -338,26 +354,26 @@ function kpiCardHTML(cfg) {
         changeHtml = '<div class="flex items-center gap-1 mt-1"><span class="text-xs font-medium text-gray-400">— vs periode lalu</span></div>';
     }
 
-    var foot  = cfg.foot  ? '<p class="text-xs text-gray-400 mt-1">' + cfg.foot + '</p>' : '';
+    var foot  = cfg.foot  ? '<p class="text-xs text-gray-400 mt-3">' + cfg.foot + '</p>' : '';
     var extra = cfg.extra || '';
 
     return ''
     + '<div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden group flex flex-col h-full transition-all duration-200 ease-in-out hover:-translate-y-1 hover:shadow-lg">'
-    +   '<div class="p-5 flex-1">'
+    +   '<div class="p-4 sm:p-5 flex-1 flex flex-col">'
     +     '<div class="flex items-start justify-between">'
     +       '<div class="flex-1 min-w-0">'
     +         '<p class="text-xs text-gray-500 uppercase tracking-wider font-medium">' + cfg.title + '</p>'
-    +         '<p class="text-[10px] text-gray-400 italic mt-1">' + cfg.desc + '</p>'
-    +         '<p class="text-2xl font-bold mt-1 ' + cfg.valueCls + '">' + fmtRp(cfg.value) + '</p>'
+    +         '<p class="text-[10px] text-gray-400 italic mt-1 hidden sm:block">' + cfg.desc + '</p>'
+    +                             '<p class="text-xl sm:text-2xl font-bold mt-1 kpi-value ' + cfg.valueCls + '" data-value="' + cfg.value + '">' + fmtRp(cfg.value) + '</p>'
     +         extra
-    +         foot
     +         changeHtml
     +       '</div>'
-    +       '<div class="w-11 h-11 rounded-xl bg-gradient-to-br ' + cfg.iconBg + ' flex items-center justify-center shadow-md flex-shrink-0">'
-    +         '<i class="fas ' + cfg.icon + ' text-' + cfg.iconColor + ' text-lg"></i>'
+    +       '<div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br ' + cfg.iconBg + ' flex items-center justify-center shadow-md flex-shrink-0">'
+    +         '<i class="fas ' + cfg.icon + ' text-' + cfg.iconColor + ' text-sm sm:text-lg"></i>'
     +       '</div>'
     +     '</div>'
-    +     '<div class="mt-3">'
+    +     foot
+    +     '<div class="mt-auto pt-3 hidden sm:block">'
     +       '<svg class="w-full h-8" viewBox="0 0 200 30" preserveAspectRatio="none">'
     +         '<path d="' + cfg.sparkPath + '" fill="none" stroke="' + cfg.sparkStroke + '" stroke-width="2" stroke-linecap="round"/>'
     +         '<path d="' + cfg.sparkPath + ' L200,30 L0,30 Z" fill="' + cfg.sparkFill + '" opacity="0.15"/>'
@@ -399,14 +415,11 @@ function buildKpiCardsHTML(d, periodLabel) {
             value: d.kebutuhan_pribadi, valueCls: 'text-orange-600',
             icon: 'fa-wallet', iconBg: 'from-orange-50 to-amber-100', iconColor: 'orange-600',
             change: d.changeKebutuhan, upIsGood: false,
-            extra: '<div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs">'
-                + '<span class="text-gray-400">Bank Jago:</span><span class="font-medium text-blue-600">' + fmtRp(d.bank_jago) + '</span>'
-                + '<span class="text-gray-300">|</span>'
-                + '<span class="text-gray-400">Gaji Edi:</span><span class="font-medium text-purple-600">' + fmtRp(d.gaji_edi) + '</span>'
-                + '<span class="text-gray-300">|</span>'
-                + '<span class="text-gray-400">Gaji Nur:</span><span class="font-medium text-purple-600">' + fmtRp(d.gaji_nur) + '</span>'
-                + '<span class="text-gray-300">|</span>'
-                + '<span class="text-gray-400">Lainnya:</span><span class="font-medium text-amber-600">' + fmtRp(d.lainnya) + '</span>'
+            extra: '<div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 mt-1 text-xs">'
+                + '<div class="flex items-center gap-1"><span class="text-gray-400">Bank Jago:</span><span class="font-medium text-blue-600">' + fmtRp(d.bank_jago) + '</span></div>'
+                + '<div class="flex items-center gap-1"><span class="text-gray-400">Gaji Edi:</span><span class="font-medium text-purple-600">' + fmtRp(d.gaji_edi) + '</span></div>'
+                + '<div class="flex items-center gap-1"><span class="text-gray-400">Gaji Nur:</span><span class="font-medium text-purple-600">' + fmtRp(d.gaji_nur) + '</span></div>'
+                + '<div class="flex items-center gap-1"><span class="text-gray-400">Lainnya:</span><span class="font-medium text-amber-600">' + fmtRp(d.lainnya) + '</span></div>'
                 + '</div>',
             sparkPath: 'M0,25 Q20,20 40,22 T80,15 T120,18 T160,8 T200,10',
             sparkStroke: '#F59E0B', sparkFill: 'url(#sparkAmber)',
@@ -464,6 +477,27 @@ function updateCards(d) {
     updateKpiOnly(d, periodLabel);
 }
 
+function animateCounter(el, target, duration) {
+    var start = 0;
+    var startTime = null;
+    function step(timestamp) {
+        if (!startTime) startTime = timestamp;
+        var progress = Math.min((timestamp - startTime) / duration, 1);
+        var eased = 1 - (1 - progress) * (1 - progress);
+        var current = Math.round(start + (target - start) * eased);
+        el.textContent = 'Rp ' + current.toLocaleString('id-ID');
+        if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+}
+
+function animateKpiCounters() {
+    document.querySelectorAll('.kpi-value').forEach(function(el) {
+        var target = parseFloat(el.dataset.value) || 0;
+        animateCounter(el, target, 800);
+    });
+}
+
 function updateKpiOnly(d, periodLabel) {
     // Restore date inputs via Alpine x-model — tahan terhadap Chrome autofill
     if (d.fromDateInput && d.toDateInput) dateFilterApi.set(d.fromDateInput, d.toDateInput);
@@ -497,7 +531,8 @@ function updateKpiOnly(d, periodLabel) {
 
     // === 4 KPI Cards — Pengeluaran | Omzet | Kebutuhan Pribadi | Profit ===
     document.getElementById('rowKpi').innerHTML = buildKpiCardsHTML(d, periodLabel);
-
+    animateKpiCounters();
+    
     // Grafik
     updateChart(d.chartData);
 }
@@ -525,13 +560,14 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
+                animation: { duration: 800, easing: 'easeOutQuart' },
                 layout: { padding: { top: 5, right: 10, bottom: 0, left: 5 } },
                 plugins: {
-                    legend: { position: 'bottom', labels: { boxWidth: 10, padding: 8, font: { size: 10 } } },
+                    legend: { display: false },
                     tooltip: { mode: 'index', intersect: false }
                 },
                 scales: {
-                    y: { beginAtZero: true, ticks: { callback: function(v) { return 'Rp ' + v.toLocaleString('id-ID'); }, font: { size: 9 } }, grid: { color: 'rgba(0,0,0,0.06)' } },
+                    y: { beginAtZero: true, min: 0, ticks: { callback: function(v) { return 'Rp ' + v.toLocaleString('id-ID'); }, font: { size: 9 } }, grid: { color: 'rgba(0,0,0,0.06)' } },
                     x: { grid: { display: false }, ticks: { maxRotation: 0, font: { size: 9 }, autoSkip: true, maxTicksLimit: 8 } }
                 }
             }
@@ -610,6 +646,28 @@ document.addEventListener('DOMContentLoaded', function() {
         if (chartInstance) chartInstance.resize();
         if (statusChartInstance) statusChartInstance.resize();
     });
+
+    // ===== Animations =====
+    setTimeout(function() {
+        document.querySelectorAll('.anm-wrap').forEach(function(el) {
+            el.classList.add('anm-show');
+        });
+    }, 50);
+
+    setTimeout(function() {
+        document.querySelectorAll('.anm-card').forEach(function(el) {
+            el.classList.add('anm-show');
+        });
+    }, 350);
+
+    setTimeout(function() {
+        document.querySelectorAll('.anm-row').forEach(function(el, i) {
+            setTimeout(function() { el.classList.add('anm-show'); }, i * 60);
+        });
+    }, 100);
+
+    var badge = document.getElementById('infoBadge');
+    if (badge && badge.textContent.includes('Belum')) badge.classList.add('anm-pulse');
 });
 </script>
 @endpush

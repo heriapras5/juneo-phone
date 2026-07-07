@@ -11,6 +11,7 @@ use App\Models\Customer;
 use App\Models\Service;
 use App\Models\Setting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
@@ -223,6 +224,104 @@ class ReportController extends Controller
         $pdf->setPaper('A4', 'landscape');
         $pdf->setOptions(['show_warnings' => true]);
         return $pdf->stream('Laporan-Service-' . $dateLabel . '-' . $slug . '.pdf');
+    }
+
+    public function previewPdf()
+    {
+        $from       = request('from');
+        $to         = request('to');
+        $tahun      = (int) request('tahun', now()->format('Y'));
+        $customerId = request('customer_id') ? (int) request('customer_id') : null;
+        $namaToko   = Setting::getValue('nama_toko', 'Juneo Phone');
+
+        $query = Service::with(['customer', 'serviceItems'])
+            ->where('status', '!=', 'batal')
+            ->when($from && $to, function ($q) use ($from, $to) {
+                $q->whereDate('tanggal', '>=', $from)
+                  ->whereDate('tanggal', '<=', $to);
+            }, function ($q) use ($tahun) {
+                $q->whereYear('tanggal', $tahun);
+            })
+            ->when($customerId, fn($q, $v) => $q->where('customer_id', $v))
+            ->orderBy('tanggal')
+            ->orderBy('created_at');
+
+        $services = $query->cursor();
+
+        $namaBulan = [
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret',
+            4 => 'April', 5 => 'Mei', 6 => 'Juni',
+            7 => 'Juli', 8 => 'Agustus', 9 => 'September',
+            10 => 'Oktober', 11 => 'November', 12 => 'Desember',
+        ];
+
+        $bulanMap = [];
+        $bulanList = [];
+        foreach ($services as $service) {
+            $ym = $service->tanggal->format('Y-m');
+            $monthNum = (int) $service->tanggal->format('m');
+            $yearNum = (int) $service->tanggal->format('Y');
+            if (!isset($bulanList[$ym])) {
+                $bulanList[$ym] = [];
+                $bulanMap[$ym] = $namaBulan[$monthNum] . ' ' . $yearNum;
+            }
+            $bulanList[$ym][] = $service;
+        }
+
+        $rekapBulan = [];
+        foreach ($bulanList as $ym => $data) {
+            [$year, $month] = explode('-', $ym);
+            $biayaHarian = BiayaHarian::whereYear('tanggal', $year)
+                ->whereMonth('tanggal', $month)
+                ->sum('jumlah');
+
+            $rekapBulan[$ym] = [
+                'totalPengeluaran' => collect($data)->sum('pengeluaran'),
+                'totalJasa' => collect($data)->sum('jasa'),
+                'totalKeuntungan' => collect($data)->sum('keuntungan'),
+                'biayaHarian' => $biayaHarian,
+            ];
+        }
+
+        $grandPengeluaran = array_sum(array_column($rekapBulan, 'totalPengeluaran'));
+        $grandJasa = array_sum(array_column($rekapBulan, 'totalJasa'));
+        $grandBiayaHarian = array_sum(array_column($rekapBulan, 'biayaHarian'));
+
+        $customerName = null;
+        if ($customerId) {
+            $customer = Customer::find($customerId);
+            $customerName = $customer?->nama;
+        }
+
+        ini_set('memory_limit', '256M');
+        ini_set('max_execution_time', 120);
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('exports.pdf-services-yearly', compact(
+            'bulanList', 'rekapBulan', 'bulanMap',
+            'grandPengeluaran', 'grandJasa',
+            'grandBiayaHarian',
+            'tahun', 'namaToko', 'customerName', 'from', 'to'
+        ));
+        $pdf->setPaper('A4', 'landscape');
+
+        $hash = md5(uniqid((string) mt_rand(), true));
+        $filename = "temp/pdf-{$hash}.pdf";
+        Storage::disk('public')->put($filename, $pdf->output());
+
+        // Hapus file temp lebih dari 1 jam
+        $tempFiles = Storage::disk('public')->files('temp');
+        foreach ($tempFiles as $file) {
+            if (Storage::disk('public')->lastModified($file) < now()->subHour()->timestamp) {
+                Storage::disk('public')->delete($file);
+            }
+        }
+
+        $pdfUrl = route('storage.file', ['path' => $filename]);
+        $favicon = Setting::getValue('logo')
+            ? asset('storage/' . Setting::getValue('logo'))
+            : asset('favicon.ico');
+
+        return view('exports.pdf-preview', compact('pdfUrl', 'favicon', 'namaToko'));
     }
 
     public function importForm()

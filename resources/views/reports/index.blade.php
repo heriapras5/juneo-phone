@@ -57,8 +57,8 @@
                     class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm hover:bg-emerald-700 flex items-center gap-1.5 shadow-sm">
                     <i class="fas fa-file-excel"></i> Download Excel
                 </a>
-                <a href="{{ route('reports.export-pdf', request()->query()) }}" target="_blank"
-                    @click.prevent="loading = true; $nextTick(() => { window.open('{{ route('reports.export-pdf', request()->query()) }}', '_blank'); setTimeout(() => loading = false, 8000); })"
+                <a href="{{ route('reports.preview-pdf', request()->query()) }}" target="_blank"
+                    @click.prevent="loading = true; $nextTick(() => { window.open('{{ route('reports.preview-pdf', request()->query()) }}', '_blank'); setTimeout(() => loading = false, 8000); })"
                     class="px-4 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 flex items-center gap-1.5 shadow-sm"
                     :class="{ 'opacity-50 cursor-not-allowed': loading }">
                     <i x-show="!loading" class="fas fa-file-pdf"></i>
