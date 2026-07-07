@@ -37,8 +37,8 @@ window._pageData = {
                 @endif
             </form>
             <button type="button" @click="openCreateModal()"
-                class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg text-sm  flex items-center gap-2 shadow-sm">
-                <i class="fas fa-plus"></i> Tambah Pelanggan
+                class="px-3 sm:px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm whitespace-nowrap">
+                <i class="fas fa-plus"></i> <span class="hidden sm:inline">Tambah Pelanggan</span><span class="sm:hidden">Tambah</span>
             </button>
         </div>
 
@@ -46,27 +46,27 @@ window._pageData = {
             <table class="w-full">
                 <thead>
                     <tr class="bg-gray-50">
-                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">No</th>
-                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left">Nama</th>
-                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left">No. HP</th>
-                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left">Alamat</th>
-                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Total Service</th>
-                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Aksi</th>
+                        <th class="px-3 sm:px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">No</th>
+                        <th class="px-3 sm:px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left">Nama</th>
+                        <th class="px-3 sm:px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left">No. HP</th>
+                        <th class="px-3 sm:px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left">Alamat</th>
+                        <th class="px-3 sm:px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Total Service</th>
+                        <th class="px-3 sm:px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
                     @forelse($customers as $customer)
                     <tr class="hover:bg-yellow-50/50">
-                        <td class="px-5 py-4 text-sm text-gray-500">{{ $loop->iteration + ($customers->currentPage() - 1) * $customers->perPage() }}</td>
-                        <td class="px-5 py-4">
+                        <td class="px-3 sm:px-5 py-4 text-sm text-gray-500">{{ $loop->iteration + ($customers->currentPage() - 1) * $customers->perPage() }}</td>
+                        <td class="px-3 sm:px-5 py-4">
                             <a href="{{ route('customers.show', $customer) }}" class="text-sm font-medium text-yellow-600 hover:text-yellow-700">
                                 {{ $customer->nama }}
                             </a>
                         </td>
-                        <td class="px-5 py-4 text-sm text-gray-600">{{ $customer->no_hp ?? '-' }}</td>
-                        <td class="px-5 py-4 text-sm text-gray-600 max-w-xs truncate">{{ $customer->alamat ?? '-' }}</td>
-                        <td class="px-5 py-4 text-sm text-gray-600 text-center">{{ $customer->services_count }}</td>
-                        <td class="px-5 py-4 text-right">
+                        <td class="px-3 sm:px-5 py-4 text-sm text-gray-600">{{ $customer->no_hp ?? '-' }}</td>
+                        <td class="px-3 sm:px-5 py-4 text-sm text-gray-600 max-w-xs truncate">{{ $customer->alamat ?? '-' }}</td>
+                        <td class="px-3 sm:px-5 py-4 text-sm text-gray-600 text-center">{{ $customer->services_count }}</td>
+                        <td class="px-3 sm:px-5 py-4 text-right">
                             <div class="flex items-center justify-end gap-1">
                                 <a href="{{ route('customers.show', $customer) }}" title="Lihat Detail"
                                     class="p-2 text-gray-400 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg ">

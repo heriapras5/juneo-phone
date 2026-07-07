@@ -115,7 +115,7 @@ class ReportController extends Controller
         $dateLabel  = (string) $tahun;
 
         return Excel::download(
-            new LaporanExport($tahun, null, $namaToko, $customerId),
+            new LaporanExport(null, $namaToko, $customerId, null, null, $tahun),
             'Laporan-Service-' . $dateLabel . '-' . $slug . '.xlsx'
         );
     }

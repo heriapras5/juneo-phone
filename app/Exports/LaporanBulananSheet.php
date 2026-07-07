@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Helpers\ServiceHelper;
 use App\Models\BiayaHarian;
 use App\Models\Service;
 use Maatwebsite\Excel\Concerns\FromCollection;
@@ -98,23 +99,12 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
         $teknisiLabel = match ($row->teknisi) {
             'edi' => 'Edi',
             'nur' => 'Nur',
-            default => 'Adit',
+            default => '',
         };
 
-        $allTypes = collect([$row->type_hp])
-            ->concat($row->serviceItems->pluck('type_hp'))
-            ->unique()->values();
-        $allTypesText = '• ' . $allTypes->implode(' | • ');
+        $allTypesText = ServiceHelper::getAllTypesText($row);
 
-        $allKerusakan = collect();
-        $parentKr = is_string($row->kerusakan) ? (json_decode($row->kerusakan, true) ?? [$row->kerusakan]) : (array) ($row->kerusakan ?? []);
-        foreach ($parentKr as $kr) { $allKerusakan->push($kr); }
-        foreach ($row->serviceItems as $item) {
-            $itemKr = is_array($item->kerusakan) ? $item->kerusakan : (json_decode($item->kerusakan, true) ?? []);
-            foreach ($itemKr as $kr) { $allKerusakan->push($kr); }
-        }
-        $allKerusakan = $allKerusakan->unique()->values();
-        $kerusakanText = '• ' . $allKerusakan->implode(' | • ');
+        $kerusakanText = ServiceHelper::getAllKerusakanText($row);
 
         return [
             $this->no,
@@ -196,9 +186,15 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
                     $sheet->getStyle('K' . $dataStartRow . ':K' . $lastDataRow)
                         ->getNumberFormat()->setFormatCode('"Rp"#,##0');
 
-                    // Conditional warna Keuntungan (kolom K)
-                    $profitRange = 'K' . $dataStartRow . ':K' . $lastDataRow;
-                    $sheet->getStyle($profitRange)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+                    // Conditional warna Keuntungan (kolom K) — hijau/merah per baris
+                    for ($r = $dataStartRow; $r <= $lastDataRow; $r++) {
+                        $cellValue = $sheet->getCell('K' . $r)->getCalculatedValue();
+                        if (is_numeric($cellValue)) {
+                            $color = $cellValue >= 0 ? 'FF10B981' : 'FFEF4444';
+                            $sheet->getStyle('K' . $r)->getFont()->getColor()->setARGB($color);
+                        }
+                    }
+                    $sheet->getStyle('K' . $dataStartRow . ':K' . $lastDataRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
                     $services = $this->collection();
                     $totalPengeluaran = $services->sum('pengeluaran');
@@ -250,7 +246,7 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
                     $sheet->getStyle('A' . $footerRow)->getFont()->setSize(8)->setItalic(true)->getColor()->setARGB('FF999999');
                 }
 
-                $sheet->getColumnDimension('A')->setWidth(4);
+                $sheet->getColumnDimension('A')->setWidth(5);
                 $sheet->getColumnDimension('B')->setWidth(18);
                 $sheet->getColumnDimension('C')->setWidth(12);
                 $sheet->getColumnDimension('D')->setWidth(20);

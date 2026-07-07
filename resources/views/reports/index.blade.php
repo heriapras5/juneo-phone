@@ -12,7 +12,7 @@
 @section('content')
 <div class="space-y-4" x-data="{ loading: false }">
     <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
-        <form method="GET" class="space-y-3">
+        <form method="GET">
             <div class="flex flex-wrap items-end gap-3">
                 <div>
                     <label class="block text-xs font-medium text-gray-500 mb-1">Tahun</label>
@@ -53,8 +53,6 @@
                     <i class="fas fa-times"></i> Reset
                 </a>
                 @endif
-            </div>
-            <div class="flex flex-wrap items-center gap-2 pt-1 border-t border-gray-100">
                 <a href="{{ route('reports.export-excel', request()->query()) }}"
                     class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm hover:bg-emerald-700 flex items-center gap-1.5 shadow-sm">
                     <i class="fas fa-file-excel"></i> Download Excel

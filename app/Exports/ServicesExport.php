@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Helpers\ServiceHelper;
 use App\Models\Service;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -58,22 +59,11 @@ class ServicesExport implements FromQuery, WithHeadings, WithMapping, WithStyles
     {
         $this->no++;
 
-        $allTypes = collect([$row->type_hp])
-            ->concat($row->serviceItems->pluck('type_hp'))
-            ->unique()->values();
-        $allTypesText = '• ' . $allTypes->implode(' | • ');
+        $allTypesText = ServiceHelper::getAllTypesText($row);
 
-        $allKerusakan = collect();
-        $parentKr = is_string($row->kerusakan) ? (json_decode($row->kerusakan, true) ?? [$row->kerusakan]) : (array) ($row->kerusakan ?? []);
-        foreach ($parentKr as $kr) { $allKerusakan->push($kr); }
-        foreach ($row->serviceItems as $item) {
-            $itemKr = is_array($item->kerusakan) ? $item->kerusakan : (json_decode($item->kerusakan, true) ?? []);
-            foreach ($itemKr as $kr) { $allKerusakan->push($kr); }
-        }
-        $allKerusakan = $allKerusakan->unique()->values();
-        $kerusakanText = '• ' . $allKerusakan->implode(' | • ');
+        $kerusakanText = ServiceHelper::getAllKerusakanText($row);
 
-        $teknisiLabel = match($row->teknisi) { 'edi' => 'Edi', 'nur' => 'Nur', default => 'Adit' };
+        $teknisiLabel = match($row->teknisi) { 'edi' => 'Edi', 'nur' => 'Nur', default => '' };
 
         $statusLabels = ['menunggu' => 'Menunggu', 'dikerjakan' => 'Dikerjakan', 'selesai' => 'Selesai', 'diambil' => 'Diambil', 'batal' => 'Batal'];
 

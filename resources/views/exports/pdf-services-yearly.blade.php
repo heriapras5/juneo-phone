@@ -15,12 +15,8 @@
     th { background: #B8860B; color: white; padding: 5px 6px; text-align: left; font-size: 7px; }
     td { padding: 3px 6px; border-bottom: 1px solid #ddd; font-size: 7px; }
     tr:nth-child(even) { background: #f9fafb; }
-    .subtotal-row td { font-weight: bold; border-top: 2px solid #B8860B; background: #fff8e1; padding-top: 5px; }
+    .subtotal-row td { font-weight: bold; border-top: 1px solid #B8860B; background: #fff8e1; padding-top: 4px; }
     .grand-title { font-size: 12px; font-weight: bold; margin-top: 18px; margin-bottom: 6px; color: #333; border-bottom: 2px solid #333; padding-bottom: 3px; }
-    .grand-table td { padding: 4px 10px; font-size: 10px; }
-    .grand-table .label { font-weight: bold; }
-    .grand-table .value { text-align: right; font-weight: bold; }
-    .grand-table .total-row td { border-top: 2px solid #333; font-size: 11px; padding-top: 6px; }
     .footer { text-align: center; margin-top: 16px; font-size: 8px; color: #888; border-top: 1px solid #ddd; padding-top: 8px; }
     .page-break { page-break-before: always; }
     .text-right { text-align: right; }
@@ -78,24 +74,14 @@
                     <td>{{ $service->service_number }}</td>
                     <td class="text-center">{{ $service->tanggal->format('d/m/Y') }}</td>
                     <td>{{ $service->customer->nama ?? '-' }}</td>
-                    @php
-                        $pdfTypes = collect([$service->type_hp])
-                            ->concat($service->serviceItems->pluck('type_hp'))
-                            ->unique()->values();
-                    @endphp
+                    @php $pdfTypes = \App\Helpers\ServiceHelper::getAllTypesArray($service); @endphp
                     <td>
                         @foreach($pdfTypes as $type)
                         <div>• {{ $type }}</div>
                         @endforeach
                     </td>
                     <td>
-                        @php
-                            $krService = $service->kerusakan;
-                            $krDecoded = is_string($krService) ? (json_decode($krService, true) ?? [$krService]) : (array) $krService;
-                            $pdfKerusakan = collect($krDecoded)
-                                ->concat($service->serviceItems->pluck('kerusakan')->flatten())
-                                ->unique()->values();
-                        @endphp
+                        @php $pdfKerusakan = \App\Helpers\ServiceHelper::getAllKerusakanArray($service); @endphp
                         @foreach($pdfKerusakan as $kr)
                         <div>• {{ $kr }}</div>
                         @endforeach
@@ -109,19 +95,32 @@
                 @endforeach
             </tbody>
             <tfoot>
+                @php $subProfit = $rekap['totalJasa'] - $rekap['totalPengeluaran'] - $rekap['biayaHarian']; @endphp
                 <tr class="subtotal-row">
-                    <td colspan="7" class="text-right">Subtotal {{ $label }}</td>
-                    <td class="text-right">Rp {{ number_format($rekap['totalJasa'], 0, ',', '.') }}</td>
-                    <td></td>
-                    <td></td>
-                    <td class="text-right">Rp {{ number_format($rekap['totalJasa'] - $rekap['totalPengeluaran'] - $rekap['biayaHarian'], 0, ',', '.') }}</td>
+                    <td colspan="6" class="text-right" style="font-size:8px; font-weight:bold;">RINGKASAN {{ strtoupper($label) }}</td>
+                    <td colspan="5"></td>
                 </tr>
-                <tr>
-                    <td colspan="7" class="text-right" style="font-size:6px; color:#888;">Kebutuhan Pribadi: Rp {{ number_format($rekap['biayaHarian'], 0, ',', '.') }} | Pengeluaran: Rp {{ number_format($rekap['totalPengeluaran'], 0, ',', '.') }}</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td class="text-right" style="font-size:6px; color:#888;">Biaya: Rp {{ number_format($rekap['biayaHarian'], 0, ',', '.') }}</td>
+                <tr class="subtotal-row">
+                    <td colspan="6" class="text-right">Pengeluaran</td>
+                    <td class="text-right">Rp {{ number_format($rekap['totalPengeluaran'], 0, ',', '.') }}</td>
+                    <td colspan="4"></td>
+                </tr>
+                <tr class="subtotal-row">
+                    <td colspan="6" class="text-right">Omzet</td>
+                    <td class="text-right">Rp {{ number_format($rekap['totalJasa'], 0, ',', '.') }}</td>
+                    <td colspan="4"></td>
+                </tr>
+                <tr class="subtotal-row">
+                    <td colspan="6" class="text-right">Kebutuhan Pribadi</td>
+                    <td class="text-right">Rp {{ number_format($rekap['biayaHarian'], 0, ',', '.') }}</td>
+                    <td colspan="4"></td>
+                </tr>
+                <tr style="border-top:2px solid #333; background:#fff8e1;">
+                    <td colspan="6" class="text-right" style="font-size:9px; font-weight:bold;">Profit</td>
+                    <td class="text-right {{ $subProfit >= 0 ? 'text-green' : 'text-red' }}" style="font-size:9px; font-weight:bold;">
+                        Rp {{ number_format($subProfit, 0, ',', '.') }}
+                    </td>
+                    <td colspan="4"></td>
                 </tr>
             </tfoot>
         </table>
@@ -140,25 +139,43 @@
     @php $grandProfit = $grandJasa - $grandPengeluaran - $grandBiayaHarian; @endphp
     <div class="grand-title">REKAP {{ !empty($from) && !empty($to) ? 'PERIODE' : 'TAHUNAN ' . $tahun }}</div>
 
-    <table class="grand-table" style="width:60%; margin-left:auto; margin-right:auto;">
-        <tr>
-            <td class="label">Pengeluaran</td>
-            <td class="value">Rp {{ number_format($grandPengeluaran, 0, ',', '.') }}</td>
-        </tr>
-        <tr>
-            <td class="label">Omzet</td>
-            <td class="value">Rp {{ number_format($grandJasa, 0, ',', '.') }}</td>
-        </tr>
-        <tr><td colspan="2" style="padding:2px;"></td></tr>
-        <tr>
-            <td class="label">Kebutuhan Pribadi</td>
-            <td class="value">Rp {{ number_format($grandBiayaHarian, 0, ',', '.') }}</td>
-        </tr>
-        <tr><td colspan="2" style="padding:2px;"></td></tr>
-        <tr class="total-row">
-            <td class="label">Profit</td>
-            <td class="value {{ $grandProfit >= 0 ? 'text-green' : 'text-red' }}">Rp {{ number_format($grandProfit, 0, ',', '.') }}</td>
-        </tr>
+    <table style="width:100%; border-collapse:collapse; margin-top:8px;">
+        <thead>
+            <tr>
+                <th style="width:25%;">Bulan</th>
+                <th style="width:15%;">Total Service</th>
+                <th style="width:15%;">Omzet</th>
+                <th style="width:15%;">Pengeluaran</th>
+                <th style="width:15%;">Kebutuhan Pribadi</th>
+                <th style="width:15%;">Profit</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($bulanList as $ym => $data)
+            @php
+                $r = $rekapBulan[$ym];
+                $p = $r['totalJasa'] - $r['totalPengeluaran'] - $r['biayaHarian'];
+            @endphp
+            <tr>
+                <td>{{ $bulanMap[$ym] ?? $ym }}</td>
+                <td class="text-center">{{ count($data) }}</td>
+                <td class="text-right">Rp {{ number_format($r['totalJasa'], 0, ',', '.') }}</td>
+                <td class="text-right">Rp {{ number_format($r['totalPengeluaran'], 0, ',', '.') }}</td>
+                <td class="text-right">Rp {{ number_format($r['biayaHarian'], 0, ',', '.') }}</td>
+                <td class="text-right {{ $p >= 0 ? 'text-green' : 'text-red' }}">Rp {{ number_format($p, 0, ',', '.') }}</td>
+            </tr>
+            @endforeach
+        </tbody>
+        <tfoot>
+            <tr style="border-top:2px solid #333; background:#fff8e1; font-weight:bold;">
+                <td>TOTAL {{ count($bulanList) }} BULAN</td>
+                <td class="text-center">{{ array_sum(array_map('count', $bulanList)) }}</td>
+                <td class="text-right">Rp {{ number_format($grandJasa, 0, ',', '.') }}</td>
+                <td class="text-right">Rp {{ number_format($grandPengeluaran, 0, ',', '.') }}</td>
+                <td class="text-right">Rp {{ number_format($grandBiayaHarian, 0, ',', '.') }}</td>
+                <td class="text-right {{ $grandProfit >= 0 ? 'text-green' : 'text-red' }}">Rp {{ number_format($grandProfit, 0, ',', '.') }}</td>
+            </tr>
+        </tfoot>
     </table>
 
     <div class="footer">

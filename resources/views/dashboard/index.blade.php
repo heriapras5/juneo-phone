@@ -147,7 +147,7 @@ $hasCustomRange = request()->has('from') && request()->has('to');
                     Grafik <span id="chartPeriodLabel">{{ $periodLabels[$period] }}</span>
                 </h3>
                 <p class="text-[10px] text-gray-400 italic mb-3">Perbandingan Omzet, Pengeluaran &amp; Profit per periode</p>
-                <div class="relative" style="height: 260px;">
+                <div class="relative h-48 sm:h-64">
                     <canvas id="revenueChart" style="max-height:100%;max-width:100%;"></canvas>
                 </div>
             </div>
@@ -158,7 +158,7 @@ $hasCustomRange = request()->has('from') && request()->has('to');
                 </h3>
                 <p class="text-[10px] text-gray-400 italic mb-3">Persentase status pengerjaan service saat ini</p>
                 <div>
-                    <div class="relative" style="height: 260px;">
+                    <div class="relative h-48 sm:h-64">
                         <canvas id="statusChart" style="max-height:100%;max-width:100%;"></canvas>
                     </div>
                     <div id="statusLegend" class="flex flex-nowrap items-center justify-center gap-x-3 overflow-x-auto mt-3 px-1"></div>
@@ -196,7 +196,7 @@ $hasCustomRange = request()->has('from') && request()->has('to');
                         $cls = match($service->status) { 'menunggu' => 'bg-yellow-100 text-yellow-700', 'dikerjakan' => 'bg-blue-100 text-blue-700', 'selesai' => 'bg-emerald-100 text-emerald-700', 'diambil' => 'bg-gray-100 text-gray-600', 'batal' => 'bg-red-100 text-red-700', default => 'bg-gray-100 text-gray-600' };
                         $label = match($service->status) { 'menunggu' => 'Menunggu', 'dikerjakan' => 'Dikerjakan', 'selesai' => 'Selesai', 'diambil' => 'Diambil', 'batal' => 'Batal', default => $service->status };
                         @endphp
-                        <span class="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-medium min-w-[90px] leading-none {{ $cls }}">{{ $label }}</span>
+                        <span class="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-medium min-w-[75px] sm:min-w-[90px] leading-none {{ $cls }}">{{ $label }}</span>
                         <span class="text-xs text-gray-400 w-10 text-right">{{ $service->tanggal->format('d/m') }}</span>
                     </div>
                 </div>
@@ -312,7 +312,7 @@ function updateRecentServices(services) {
             +   '</div>'
             + '</div>'
             + '<div class="flex items-center gap-2 flex-shrink-0">'
-            +   '<span class="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-medium min-w-[90px] leading-none ' + st.cls + '">' + st.label + '</span>'
+            +   '<span class="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-medium min-w-[75px] sm:min-w-[90px] leading-none ' + st.cls + '">' + st.label + '</span>'
             +   '<span class="text-xs text-gray-400 w-10 text-right">' + s.tanggal + '</span>'
             + '</div></div>';
     });

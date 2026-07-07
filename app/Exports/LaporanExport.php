@@ -14,9 +14,9 @@ class LaporanExport implements WithMultipleSheets
     protected $fromDate;
     protected $toDate;
 
-    public function __construct($bulanData = null, ?string $namaToko = null, ?int $customerId = null, ?string $fromDate = null, ?string $toDate = null)
+    public function __construct($bulanData = null, ?string $namaToko = null, ?int $customerId = null, ?string $fromDate = null, ?string $toDate = null, ?int $tahun = null)
     {
-        $this->tahun = (int) now()->format('Y');
+        $this->tahun = $tahun ?? (int) now()->format('Y');
         $this->namaToko = $namaToko ?? 'Juneo Phone';
         $this->customerId = $customerId;
         $this->fromDate = $fromDate;

@@ -22,12 +22,12 @@ $profitPositive = $periodTotals->profit >= 0;
                 </div>
                 @endif
             </div>
-            <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-red-50 to-rose-100 flex items-center justify-center shadow-md flex-shrink-0">
-                <i class="fas fa-cart-shopping text-red-600 text-lg"></i>
+            <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-red-50 to-rose-100 flex items-center justify-center shadow-md flex-shrink-0">
+                <i class="fas fa-cart-shopping text-red-600 text-sm sm:text-lg"></i>
             </div>
         </div>
         <p class="text-xs text-gray-400 mt-3">{{ $periodTotals->services }} service tercatat</p>
-        <div class="mt-auto pt-3">
+        <div class="mt-auto pt-3 hidden sm:block">
             <svg class="w-full h-8" viewBox="0 0 200 30" preserveAspectRatio="none">
                 <path d="M0,25 Q20,20 40,22 T80,15 T120,18 T160,8 T200,10" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round"/>
                 <path d="M0,25 Q20,20 40,22 T80,15 T120,18 T160,8 T200,10 L200,30 L0,30 Z" fill="url(#sparkAmber)" opacity="0.15"/>
@@ -57,12 +57,12 @@ $profitPositive = $periodTotals->profit >= 0;
                 </div>
                 @endif
             </div>
-            <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-50 to-green-100 flex items-center justify-center shadow-md flex-shrink-0">
-                <i class="fas fa-money-bill-wave text-emerald-600 text-lg"></i>
+            <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-emerald-50 to-green-100 flex items-center justify-center shadow-md flex-shrink-0">
+                <i class="fas fa-money-bill-wave text-emerald-600 text-sm sm:text-lg"></i>
             </div>
         </div>
         <p class="text-xs text-gray-400 mt-3">{{ $periodTotals->services }} service tercatat</p>
-        <div class="mt-auto pt-3">
+        <div class="mt-auto pt-3 hidden sm:block">
             <svg class="w-full h-8" viewBox="0 0 200 30" preserveAspectRatio="none">
                 <path d="M0,25 Q25,15 45,20 T85,10 T125,14 T165,6 T200,12" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round"/>
                 <path d="M0,25 Q25,15 45,20 T85,10 T125,14 T165,6 T200,12 L200,30 L0,30 Z" fill="url(#sparkEmerald)" opacity="0.15"/>
@@ -105,11 +105,11 @@ $profitPositive = $periodTotals->profit >= 0;
                 </div>
                 @endif
             </div>
-            <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-orange-50 to-amber-100 flex items-center justify-center shadow-md flex-shrink-0">
-                <i class="fas fa-wallet text-orange-600 text-lg"></i>
+            <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-orange-50 to-amber-100 flex items-center justify-center shadow-md flex-shrink-0">
+                <i class="fas fa-wallet text-orange-600 text-sm sm:text-lg"></i>
             </div>
         </div>
-        <div class="mt-auto pt-3">
+        <div class="mt-auto pt-3 hidden sm:block">
             <svg class="w-full h-8" viewBox="0 0 200 30" preserveAspectRatio="none">
                 <path d="M0,25 Q20,20 40,22 T80,15 T120,18 T160,8 T200,10" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
                 <path d="M0,25 Q20,20 40,22 T80,15 T120,18 T160,8 T200,10 L200,30 L0,30 Z" fill="url(#sparkAmber)" opacity="0.15"/>
@@ -142,11 +142,11 @@ $profitPositive = $periodTotals->profit >= 0;
                 </div>
                 @endif
             </div>
-            <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-50 to-green-100 flex items-center justify-center shadow-md flex-shrink-0">
-                <i class="fas fa-coins text-emerald-600 text-lg"></i>
+            <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-emerald-50 to-green-100 flex items-center justify-center shadow-md flex-shrink-0">
+                <i class="fas fa-coins text-emerald-600 text-sm sm:text-lg"></i>
             </div>
         </div>
-        <div class="mt-auto pt-3">
+        <div class="mt-auto pt-3 hidden sm:block">
             <svg class="w-full h-8" viewBox="0 0 200 30" preserveAspectRatio="none">
                 <path d="M0,22 Q30,18 50,20 T100,12 T140,16 T180,5 T200,8" fill="none" stroke="{{ $profitPositive ? '#10B981' : '#EF4444' }}" stroke-width="2" stroke-linecap="round"/>
                 <path d="M0,22 Q30,18 50,20 T100,12 T140,16 T180,5 T200,8 L200,30 L0,30 Z" fill="{{ $profitPositive ? 'url(#sparkEmerald)' : 'url(#sparkAmber)' }}" opacity="0.15"/>
