@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\LaporanExport;
 use App\Exports\ServicesExport;
+use App\Exports\ServicesTemplateExport;
 use App\Imports\MultiSheetImport;
 use App\Imports\ServicesSheetImport;
 use App\Models\BiayaHarian;
@@ -327,6 +328,11 @@ class ReportController extends Controller
     public function importForm()
     {
         return view('reports.import');
+    }
+
+    public function importTemplate()
+    {
+        return Excel::download(new ServicesTemplateExport, 'template-import-service.xlsx');
     }
 
     public function import(Request $request)

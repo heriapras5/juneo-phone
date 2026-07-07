@@ -4,7 +4,7 @@
 @section('page-title', 'Backup & Reset Data')
 
 @section('content')
-<div class="space-y-6">
+<div class="lg:grid lg:grid-cols-2 lg:gap-6 space-y-6 lg:space-y-0">
 
     {{-- Backup Section --}}
     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5">
@@ -12,33 +12,33 @@
             <div class="w-1 h-6 bg-blue-500 rounded-full"></div>
             <span class="text-sm font-semibold text-gray-700">Backup Data</span>
         </div>
-        <p class="text-xs text-gray-500 mb-4">Download seluruh data transaksional (Service, Pelanggan, Kebutuhan Pribadi, Gaji Karyawan) dalam format Excel (.xlsx).</p>
+        <p class="text-xs text-gray-500 mb-4">Download seluruh data transaksional (Service, Pelanggan, Kebutuhan Pribadi) dalam format Excel (.xlsx).</p>
 
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-            <div class="bg-gray-50 rounded-lg p-3 text-center">
+        <div class="grid grid-cols-3 gap-3 mb-4">
+            <div class="bg-blue-50/50 rounded-lg p-3 text-center">
+                <i class="fas fa-wrench text-blue-400 text-lg mb-1"></i>
                 <p class="text-lg font-bold text-gray-800">{{ number_format($serviceCount, 0, ',', '.') }}</p>
                 <p class="text-[10px] text-gray-500">Service</p>
             </div>
-            <div class="bg-gray-50 rounded-lg p-3 text-center">
+            <div class="bg-green-50/50 rounded-lg p-3 text-center">
+                <i class="fas fa-users text-green-400 text-lg mb-1"></i>
                 <p class="text-lg font-bold text-gray-800">{{ number_format($customerCount, 0, ',', '.') }}</p>
                 <p class="text-[10px] text-gray-500">Pelanggan</p>
             </div>
-            <div class="bg-gray-50 rounded-lg p-3 text-center">
+            <div class="bg-purple-50/50 rounded-lg p-3 text-center">
+                <i class="fas fa-shopping-bag text-purple-400 text-lg mb-1"></i>
                 <p class="text-lg font-bold text-gray-800">{{ number_format($biayaCount, 0, ',', '.') }}</p>
                 <p class="text-[10px] text-gray-500">Kebutuhan Pribadi</p>
             </div>
-            <div class="bg-gray-50 rounded-lg p-3 text-center">
-                <p class="text-lg font-bold text-gray-800">{{ number_format($gajiCount, 0, ',', '.') }}</p>
-                <p class="text-[10px] text-gray-500">Gaji Karyawan</p>
-            </div>
         </div>
 
-        <form method="POST" action="{{ route('data.backup') }}">
+        <form method="POST" action="{{ route('data.backup') }}" x-data="{ loading: false }" @submit="loading = true">
             @csrf
-            <button type="submit"
-                class="px-5 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm">
-                <i class="fas fa-download"></i>
-                Download Backup Excel
+            <button type="submit" :disabled="loading"
+                    class="px-5 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                <i x-show="!loading" class="fas fa-download"></i>
+                <i x-show="loading" class="fas fa-spinner fa-spin"></i>
+                <span x-text="loading ? 'Mengunduh...' : 'Download Backup Excel'"></span>
             </button>
         </form>
     </div>
@@ -55,37 +55,24 @@
                 <i class="fas fa-exclamation-triangle text-red-500 mt-0.5"></i>
                 <div>
                     <p class="text-sm font-medium text-red-700">Peringatan!</p>
-                    <p class="text-xs text-red-600">Tindakan ini akan menghapus SEMUA data service, pelanggan, Kebutuhan Pribadi, dan gaji karyawan. Data tidak dapat dikembalikan. <strong>Backup data terlebih dahulu sebelum reset.</strong></p>
+                    <p class="text-xs text-red-600">Tindakan ini akan menghapus SEMUA data service, pelanggan, dan Kebutuhan Pribadi. Data tidak dapat dikembalikan. <strong>Backup data terlebih dahulu sebelum reset.</strong></p>
                 </div>
             </div>
         </div>
 
-        <form id="resetForm" method="POST" action="{{ route('data.reset') }}">
+        <form id="resetForm" method="POST" action="{{ route('data.reset') }}" x-data="{ confirmText: '' }">
             @csrf
-            <input type="hidden" name="confirmation" value="RESET">
-            <button type="button" @click="Swal.fire({
-                icon: 'warning',
-                title: 'Reset Semua Data?',
-                text: 'Data service, pelanggan, Kebutuhan Pribadi, dan gaji karyawan akan dihapus permanen!',
-                showCancelButton: true,
-                confirmButtonColor: '#EF4444',
-                cancelButtonColor: '#6B7280',
-                confirmButtonText: 'Ya, Reset!',
-                cancelButtonText: 'Batal',
-                reverseButtons: true,
-            }).then((result) => {
-                if (result.isConfirmed) document.getElementById('resetForm').submit();
-            })"
-                class="px-5 py-2 bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-400 hover:to-rose-400 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm">
-                <i class="fas fa-trash-alt"></i>
-                Reset Semua Data
+            <div class="mb-3">
+                <label class="text-xs text-gray-500 mb-1 block">Ketik <strong>RESET</strong> untuk konfirmasi</label>
+                <input type="text" x-model="confirmText" autocomplete="off"
+                       class="w-full border border-red-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300">
+            </div>
+            <button type="submit" :disabled="confirmText !== 'RESET'"
+                    class="px-5 py-2 bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-400 hover:to-rose-400 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">
+                <i class="fas fa-trash-alt"></i> Reset Semua Data
             </button>
         </form>
     </div>
 
 </div>
 @endsection
-
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-@endpush

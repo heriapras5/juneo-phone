@@ -61,6 +61,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/reports/preview-pdf', [ReportController::class, 'previewPdf'])->name('reports.preview-pdf');
         Route::get('/reports/import', [ReportController::class, 'importForm'])->name('reports.import');
         Route::post('/reports/import', [ReportController::class, 'import']);
+        Route::get('/reports/import/template', [ReportController::class, 'importTemplate'])->name('reports.import.template');
 
         Route::get('/data', [DataController::class, 'index'])->name('data.index');
         Route::post('/data/backup', [DataController::class, 'backup'])->name('data.backup');

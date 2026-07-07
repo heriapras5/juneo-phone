@@ -6,13 +6,20 @@
 @section('content')
 <div class="max-w-2xl mx-auto space-y-6">
     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-        <h3 class="font-semibold text-gray-900 mb-4">Upload File Excel / CSV</h3>
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="font-semibold text-gray-900">Upload File Excel / CSV</h3>
+            <a href="{{ route('reports.import.template') }}"
+               class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm flex items-center gap-2 transition-colors">
+                <i class="fas fa-download"></i>
+                Download Template
+            </a>
+        </div>
 
-        <form method="POST" action="{{ route('reports.import') }}" enctype="multipart/form-data" x-data="{ loading: false }" @submit="loading = true">
+        <form method="POST" action="{{ route('reports.import') }}" enctype="multipart/form-data" x-data="{ loading: false, fileName: '', fileSize: '' }" @submit="loading = true">
             @csrf
 
-            <div class="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:border-yellow-400/50  cursor-pointer bg-gray-50/50"
-                :class="{ 'border-yellow-400/50 bg-yellow-50/50': loading }"
+            <div class="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:border-yellow-400/50 cursor-pointer bg-gray-50/50"
+                :class="{ 'border-yellow-400/50 bg-yellow-50/50': loading || fileName }"
                 @click="$refs.fileInput.click()"
                 @dragover.prevent="dragging = true"
                 @dragleave.prevent="dragging = false"
@@ -23,21 +30,30 @@
                     <p class="text-xs text-gray-400">Format: XLSX, XLS, CSV (maks 5MB)</p>
                 </div>
                 <input type="file" name="file" x-ref="fileInput" accept=".xlsx,.xls,.csv"
-                    class="hidden" @change="document.getElementById('file-name').textContent = $event.target.files[0]?.name">
-                <p id="file-name" class="mt-2 text-sm text-yellow-600 font-medium"></p>
+                    class="hidden" @change="fileName = $event.target.files[0]?.name || ''; fileSize = $event.target.files[0] ? ($event.target.files[0].size / 1024).toFixed(1) + ' KB' : ''">
+                <template x-if="fileName">
+                    <div class="mt-3 flex items-center justify-center gap-2 text-sm text-yellow-700">
+                        <i class="fas fa-file-excel"></i>
+                        <span x-text="fileName"></span>
+                        <span class="text-yellow-400" x-text="'(' + fileSize + ')'"></span>
+                    </div>
+                </template>
             </div>
 
             @error('file')
                 <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
             @enderror
 
-            <div class="mt-6">
-                <button type="submit" :disabled="loading"
-                        class="px-6 py-2.5 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg flex items-center gap-2 shadow-sm shadow-yellow-500/25 disabled:opacity-50 disabled:cursor-not-allowed">
+            <div class="mt-6 flex items-center gap-3">
+                <button type="submit" :disabled="loading || !fileName"
+                        class="px-6 py-2.5 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg flex items-center gap-2 shadow-sm shadow-yellow-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
                     <i x-show="!loading" class="fas fa-upload"></i>
                     <i x-show="loading" class="fas fa-spinner fa-spin"></i>
                     <span x-text="loading ? 'Mengimport...' : 'Import Data'"></span>
                 </button>
+                <template x-if="!fileName">
+                    <span class="text-xs text-gray-400">Pilih file terlebih dahulu</span>
+                </template>
             </div>
         </form>
     </div>

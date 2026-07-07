@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Exports\BackupExport;
 use App\Models\BiayaHarian;
 use App\Models\Customer;
-use App\Models\GajiKaryawan;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,9 +17,8 @@ class DataController extends Controller
         $serviceCount = Service::count();
         $customerCount = Customer::count();
         $biayaCount = BiayaHarian::count();
-        $gajiCount = GajiKaryawan::count();
 
-        return view('data.index', compact('serviceCount', 'customerCount', 'biayaCount', 'gajiCount'));
+        return view('data.index', compact('serviceCount', 'customerCount', 'biayaCount'));
     }
 
     public function backup()
@@ -44,7 +42,6 @@ class DataController extends Controller
         Service::truncate();
         Customer::truncate();
         BiayaHarian::truncate();
-        GajiKaryawan::truncate();
         if (DB::getDriverName() !== 'sqlite') {
             DB::statement('SET FOREIGN_KEY_CHECKS = 1');
         }

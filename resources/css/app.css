@@ -44,8 +44,16 @@
 nav::-webkit-scrollbar { width: 6px; height: 6px; }
 
 /* ── Sidebar width & content margin — CSS murni agar tidak ada pergerakan saat mount ── */
-.sidebar-desktop { transition: width 0.12s ease-in-out; }
-.main-content-wrap { transition: margin-left 0.12s ease-in-out; }
+.sidebar-desktop {
+    transition: width 0.12s ease-in-out;
+    will-change: width;
+    transform: translateZ(0);
+}
+.main-content-wrap {
+    transition: margin-left 0.12s ease-in-out;
+    will-change: margin-left;
+}
+.sidebar-desktop nav { contain: layout style; }
 
 @media (min-width: 768px) {
     .sidebar-desktop { width: 5rem; }
