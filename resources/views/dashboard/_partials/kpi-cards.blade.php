@@ -9,7 +9,7 @@ $profitPositive = $periodTotals->profit >= 0;
             <div class="flex-1 min-w-0">
                 <p class="text-xs text-gray-500 uppercase tracking-wider font-medium">Pengeluaran {{ $periodLabels[$period] }}</p>
                 <p class="text-[10px] text-gray-400 italic mt-1 hidden sm:block">Modal sparepart — total biaya beli komponen service</p>
-                <p class="text-xl sm:text-2xl font-bold mt-1 kpi-value text-red-500" data-value="{{ $periodTotals->pengeluaran }}">Rp {{ number_format($periodTotals->pengeluaran, 0, ',', '.') }}</p>
+                <p class="text-base sm:text-xl lg:text-2xl font-bold mt-1 kpi-value text-red-500" data-value="{{ $periodTotals->pengeluaran }}">Rp {{ number_format($periodTotals->pengeluaran, 0, ',', '.') }}</p>
                 @if($changePengeluaran !== null)
                 <div class="flex items-center gap-1 mt-1">
                     <i class="fas fa-{{ $changePengeluaran >= 0 ? 'arrow-up' : 'arrow-down' }} text-{{ $changePengeluaran >= 0 ? 'red' : 'emerald' }}-500 text-xs"></i>
@@ -44,7 +44,7 @@ $profitPositive = $periodTotals->profit >= 0;
             <div class="flex-1 min-w-0">
                 <p class="text-xs text-gray-500 uppercase tracking-wider font-medium">Omzet {{ $periodLabels[$period] }}</p>
                 <p class="text-[10px] text-gray-400 italic mt-1 hidden sm:block">Total tagihan jasa service ke pelanggan — belum dipotong biaya apapun</p>
-                <p class="text-xl sm:text-2xl font-bold mt-1 kpi-value text-gray-900" data-value="{{ $periodTotals->omzet }}">Rp {{ number_format($periodTotals->omzet, 0, ',', '.') }}</p>
+                <p class="text-base sm:text-xl lg:text-2xl font-bold mt-1 kpi-value text-gray-900" data-value="{{ $periodTotals->omzet }}">Rp {{ number_format($periodTotals->omzet, 0, ',', '.') }}</p>
                 @if($changeOmzet !== null)
                 <div class="flex items-center gap-1 mt-1">
                     <i class="fas fa-{{ $changeOmzet >= 0 ? 'arrow-up' : 'arrow-down' }} text-{{ $changeOmzet >= 0 ? 'emerald' : 'red' }}-500 text-xs"></i>
@@ -79,7 +79,7 @@ $profitPositive = $periodTotals->profit >= 0;
             <div class="flex-1 min-w-0">
                 <p class="text-xs text-gray-500 uppercase tracking-wider font-medium">Kebutuhan Pribadi {{ $periodLabels[$period] }}</p>
                 <p class="text-[10px] text-gray-400 italic mt-1 hidden sm:block">Bank Jago + Gaji Edi + Gaji Nur + Lainnya — total biaya kebutuhan harian</p>
-                <p class="text-xl sm:text-2xl font-bold mt-1 kpi-value text-orange-600" data-value="{{ $periodTotals->kebutuhan_pribadi }}">Rp {{ number_format($periodTotals->kebutuhan_pribadi, 0, ',', '.') }}</p>
+                <p class="text-base sm:text-xl lg:text-2xl font-bold mt-1 kpi-value text-orange-600" data-value="{{ $periodTotals->kebutuhan_pribadi }}">Rp {{ number_format($periodTotals->kebutuhan_pribadi, 0, ',', '.') }}</p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 mt-1 text-xs">
                     <div class="flex items-center gap-1">
                         <span class="text-gray-400">Bank Jago:</span>
@@ -131,7 +131,7 @@ $profitPositive = $periodTotals->profit >= 0;
             <div class="flex-1 min-w-0">
                 <p class="text-xs text-gray-500 uppercase tracking-wider font-medium">Profit {{ $periodLabels[$period] }}</p>
                 <p class="text-[10px] text-gray-400 italic mt-1 hidden sm:block">Sisa keuntungan setelah dikurangi seluruh Kebutuhan Pribadi</p>
-                <p class="text-xl sm:text-2xl font-bold mt-1 kpi-value {{ $profitPositive ? 'text-emerald-600' : 'text-red-600' }}" data-value="{{ $periodTotals->profit }}">
+                <p class="text-base sm:text-xl lg:text-2xl font-bold mt-1 kpi-value {{ $profitPositive ? 'text-emerald-600' : 'text-red-600' }}" data-value="{{ $periodTotals->profit }}">
                     Rp {{ number_format($periodTotals->profit, 0, ',', '.') }}
                 </p>
                 <p class="text-xs text-gray-400 mt-1 hidden sm:block">Omzet - Pengeluaran - Kebutuhan Pribadi</p>

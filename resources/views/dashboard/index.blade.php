@@ -92,7 +92,7 @@ $hasCustomRange = request()->has('from') && request()->has('to');
     {{-- ============ Notif Kebutuhan Pribadi ============ --}}
     <div id="biayaNotifWrap" class="anm-wrap">
         @if(!$biayaCount)
-        <div class="bg-orange-50 border border-orange-200 text-orange-700 px-4 py-3 rounded-xl flex items-center gap-3 shadow-sm">
+        <div class="bg-orange-50 border border-orange-200 text-orange-700 px-4 py-3 rounded-xl flex flex-wrap items-center gap-2 sm:gap-3 shadow-sm">
             <i class="fas fa-clock text-orange-500 text-lg"></i>
             <div class="flex-1">
                 Kebutuhan Pribadi hari ini <strong>belum tercatat</strong>
@@ -212,8 +212,8 @@ $hasCustomRange = request()->has('from') && request()->has('to');
                         $cls = match($service->status) { 'menunggu' => 'bg-yellow-100 text-yellow-700', 'dikerjakan' => 'bg-blue-100 text-blue-700', 'selesai' => 'bg-emerald-100 text-emerald-700', 'diambil' => 'bg-gray-100 text-gray-600', 'batal' => 'bg-red-100 text-red-700', default => 'bg-gray-100 text-gray-600' };
                         $label = match($service->status) { 'menunggu' => 'Menunggu', 'dikerjakan' => 'Dikerjakan', 'selesai' => 'Selesai', 'diambil' => 'Diambil', 'batal' => 'Batal', default => $service->status };
                         @endphp
-                        <span class="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-medium min-w-[75px] sm:min-w-[90px] leading-none {{ $cls }}">{{ $label }}</span>
-                        <span class="text-xs text-gray-400 w-10 text-right">{{ $service->tanggal->format('d/m') }}</span>
+                        <span class="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-medium min-w-0 sm:min-w-[75px] leading-none {{ $cls }}">{{ $label }}</span>
+                        <span class="text-xs text-gray-400 w-auto sm:w-10 text-right">{{ $service->tanggal->format('d/m') }}</span>
                     </div>
                 </div>
                 @empty
@@ -320,17 +320,17 @@ function updateRecentServices(services) {
     services.forEach(function(s) {
         var st = statusMap[s.status] || { cls: 'bg-gray-100 text-gray-600', label: s.status };
         var kerusakan = Array.isArray(s.kerusakan) ? s.kerusakan.join(', ') : (s.kerusakan || '-');
-        html += '<div class="anm-row px-5 py-3 flex items-center justify-between hover:bg-gray-50/50">'
-            + '<div class="flex items-center gap-3 min-w-0">'
-            +   '<div class="w-8 h-8 rounded-full bg-gradient-to-br from-yellow-50 to-amber-100 flex items-center justify-center flex-shrink-0"><i class="fas fa-mobile-alt text-yellow-600 text-xs"></i></div>'
+                    html += '<div class="anm-row px-3 sm:px-5 py-2.5 sm:py-3 flex items-center justify-between hover:bg-gray-50/50">'
+            + '<div class="flex items-center gap-2 sm:gap-3 min-w-0">'
+            +   '<div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-yellow-50 to-amber-100 flex items-center justify-center flex-shrink-0 hidden xs:flex"><i class="fas fa-mobile-alt text-yellow-600 text-[10px] sm:text-xs"></i></div>'
             +   '<div class="min-w-0">'
             +     '<p class="text-sm font-medium text-gray-900 truncate">' + s.customer_name + '</p>'
             +     '<p class="text-xs text-gray-500 truncate">' + s.type_hp + ' — ' + kerusakan + '</p>'
             +   '</div>'
             + '</div>'
             + '<div class="flex items-center gap-2 flex-shrink-0">'
-            +   '<span class="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-medium min-w-[75px] sm:min-w-[90px] leading-none ' + st.cls + '">' + st.label + '</span>'
-            +   '<span class="text-xs text-gray-400 w-10 text-right">' + s.tanggal + '</span>'
+            +   '<span class="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-medium min-w-0 sm:min-w-[75px] leading-none ' + st.cls + '">' + st.label + '</span>'
+            +   '<span class="text-xs text-gray-400 w-auto sm:w-10 text-right">' + s.tanggal + '</span>'
             + '</div></div>';
     });
     wrap.innerHTML = html;
@@ -369,7 +369,7 @@ function kpiCardHTML(cfg) {
     +       '<div class="flex-1 min-w-0">'
     +         '<p class="text-xs text-gray-500 uppercase tracking-wider font-medium">' + cfg.title + '</p>'
     +         '<p class="text-[10px] text-gray-400 italic mt-1 hidden sm:block">' + cfg.desc + '</p>'
-    +                             '<p class="text-xl sm:text-2xl font-bold mt-1 kpi-value ' + cfg.valueCls + '" data-value="' + cfg.value + '">' + fmtRp(cfg.value) + '</p>'
+    +                             '<p class="text-base sm:text-xl lg:text-2xl font-bold mt-1 kpi-value ' + cfg.valueCls + '" data-value="' + cfg.value + '">' + fmtRp(cfg.value) + '</p>'
     +         extra
     +         changeHtml
     +       '</div>'
