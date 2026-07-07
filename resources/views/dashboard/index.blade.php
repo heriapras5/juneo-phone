@@ -334,6 +334,11 @@ function updateRecentServices(services) {
             + '</div></div>';
     });
     wrap.innerHTML = html;
+    setTimeout(function() {
+        wrap.querySelectorAll('.anm-row').forEach(function(el, i) {
+            setTimeout(function() { el.classList.add('anm-show'); }, i * 60);
+        });
+    }, 50);
 }
 
 {{-- Bangun SATU kartu KPI dengan struktur div seimbang (buka = tutup).

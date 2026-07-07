@@ -34,7 +34,7 @@ class ReportController extends Controller
             ->when($customerId, fn($q, $v) => $q->where('customer_id', $v))
             ->orderBy('tanggal', 'desc');
 
-        $services = $query->paginate(15)->withQueryString();
+        $services = $query->paginate(10)->withQueryString();
 
         // Total aggregates untuk baris agregasi — rebuild query independen
         $aggQuery = Service::where('status', '!=', 'batal');
