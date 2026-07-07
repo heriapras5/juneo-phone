@@ -211,6 +211,9 @@ class ReportController extends Controller
 
         $dateLabel = $from && $to ? $from . '-' . $to : 'Tahun-' . $tahun;
 
+        ini_set('memory_limit', '256M');
+        ini_set('max_execution_time', 120);
+
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('exports.pdf-services-yearly', compact(
             'bulanList', 'rekapBulan', 'bulanMap',
             'grandPengeluaran', 'grandJasa',
@@ -218,6 +221,7 @@ class ReportController extends Controller
             'tahun', 'namaToko', 'customerName', 'from', 'to'
         ));
         $pdf->setPaper('A4', 'landscape');
+        $pdf->setOptions(['show_warnings' => true]);
         return $pdf->stream('Laporan-Service-' . $dateLabel . '-' . $slug . '.pdf');
     }
 

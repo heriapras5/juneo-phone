@@ -141,14 +141,14 @@ $hasCustomRange = request()->has('from') && request()->has('to');
             <h2 class="text-sm font-bold text-gray-800 uppercase tracking-wide">Grafik &amp; Status</h2>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 bg-white border border-gray-200 rounded-xl shadow-sm p-5 transition-all duration-200 ease-in-out hover:-translate-y-1 hover:shadow-lg">
+            <div class="lg:col-span-2 bg-white border border-gray-200 rounded-xl shadow-sm px-5 pt-5 pb-3 sm:pb-4 transition-all duration-200 ease-in-out hover:-translate-y-1 hover:shadow-lg flex flex-col">
                 <h3 class="text-sm font-semibold text-gray-700 mb-1 flex items-center gap-2">
                     <i class="fas fa-chart-bar text-yellow-500"></i>
                     Grafik <span id="chartPeriodLabel">{{ $periodLabels[$period] }}</span>
                 </h3>
                 <p class="text-[10px] text-gray-400 italic mb-3">Perbandingan Omzet, Pengeluaran &amp; Profit per periode</p>
-                <div class="relative h-48 sm:h-64">
-                    <canvas id="revenueChart" style="max-height:100%;max-width:100%;"></canvas>
+                <div class="relative flex-1 min-h-[180px] sm:min-h-[260px]">
+                    <canvas id="revenueChart" class="w-full h-full"></canvas>
                 </div>
             </div>
             <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5 transition-all duration-200 ease-in-out hover:-translate-y-1 hover:shadow-lg">
@@ -254,6 +254,7 @@ function updateChart(newChartData) {
         chartInstance.data.labels = newChartData.labels;
         chartInstance.data.datasets[0].data = newChartData.omzet;
         chartInstance.data.datasets[1].data = newChartData.pengeluaran;
+        chartInstance.data.datasets[2].data = newChartData.profit;
         chartInstance.resize();
         chartInstance.update();
     }
@@ -519,18 +520,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 datasets: [
                     { label: 'Omzet', data: chartData.omzet, backgroundColor: 'rgba(16,185,129,0.7)', borderColor: '#10B981', borderWidth: 1, borderRadius: 4, barPercentage: 0.7, categoryPercentage: 0.75 },
                     { label: 'Pengeluaran', data: chartData.pengeluaran, backgroundColor: 'rgba(239,68,68,0.5)', borderColor: '#EF4444', borderWidth: 1, borderRadius: 4, barPercentage: 0.7, categoryPercentage: 0.75 },
+                    { label: 'Profit', data: chartData.profit, backgroundColor: 'rgba(99,102,241,0.6)', borderColor: '#6366F1', borderWidth: 1, borderRadius: 4, barPercentage: 0.7, categoryPercentage: 0.75 },
                 ]
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
-                layout: { padding: { top: 5, right: 10 } },
+                layout: { padding: { top: 5, right: 10, bottom: 0, left: 5 } },
                 plugins: {
-                    legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12, font: { size: 11 } } },
+                    legend: { position: 'bottom', labels: { boxWidth: 10, padding: 8, font: { size: 10 } } },
                     tooltip: { mode: 'index', intersect: false }
                 },
                 scales: {
-                    y: { beginAtZero: true, ticks: { callback: function(v) { return 'Rp ' + v.toLocaleString('id-ID'); }, font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.06)' } },
-                    x: { grid: { display: false }, ticks: { maxRotation: 45, font: { size: 10 }, autoSkip: true, maxTicksLimit: 12 } }
+                    y: { beginAtZero: true, ticks: { callback: function(v) { return 'Rp ' + v.toLocaleString('id-ID'); }, font: { size: 9 } }, grid: { color: 'rgba(0,0,0,0.06)' } },
+                    x: { grid: { display: false }, ticks: { maxRotation: 0, font: { size: 9 }, autoSkip: true, maxTicksLimit: 8 } }
                 }
             }
         });

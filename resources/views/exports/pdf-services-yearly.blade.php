@@ -49,17 +49,17 @@
         <table>
             <thead>
                 <tr>
-                    <th style="width:3%;">No</th>
-                    <th style="width:8%;">No. Service</th>
-                    <th style="width:7%;">Tanggal</th>
-                    <th style="width:10%;">Pelanggan</th>
-                    <th style="width:9%;">Type HP</th>
-                    <th style="width:15%;">Kerusakan</th>
-                    <th style="width:8%;">Pengeluaran</th>
-                    <th style="width:8%;">Jasa</th>
-                    <th style="width:4%;">Teknisi</th>
-                    <th style="width:8%;">Keterangan</th>
-                    <th style="width:8%;">Keuntungan</th>
+                    <th style="width:4%;">No</th>
+                    <th style="width:9%;">No. Service</th>
+                    <th style="width:8%;">Tanggal</th>
+                    <th style="width:11%;">Pelanggan</th>
+                    <th style="width:10%;">Type HP</th>
+                    <th style="width:17%;">Kerusakan</th>
+                    <th style="width:9%;">Pengeluaran</th>
+                    <th style="width:9%;">Jasa</th>
+                    <th style="width:5%;">Teknisi</th>
+                    <th style="width:9%;">Keterangan</th>
+                    <th style="width:9%;">Keuntungan</th>
                 </tr>
             </thead>
             <tbody>
@@ -84,12 +84,10 @@
                     <td class="text-right">Rp {{ number_format($service->pengeluaran, 0, ',', '.') }}</td>
                     <td class="text-right">Rp {{ number_format($service->jasa, 0, ',', '.') }}</td>
                     <td class="text-center">{{ match($service->teknisi) { 'edi' => 'E', 'nur' => 'N', default => '' } }}</td>
-                    <td style="font-size:6px; max-width:80px; word-wrap:break-word;">{{ $service->keterangan ?? '' }}</td>
+                    <td style="font-size:6px; word-break:break-all;">{{ $service->keterangan ?? '' }}</td>
                     <td class="text-right text-bold">Rp {{ number_format($service->keuntungan, 0, ',', '.') }}</td>
                 </tr>
                 @endforeach
-            </tbody>
-            <tfoot>
                 @php $subProfit = $rekap['totalJasa'] - $rekap['totalPengeluaran'] - $rekap['biayaHarian']; @endphp
                 <tr class="subtotal-row">
                     <td colspan="6" class="text-right" style="font-size:8px; font-weight:bold;">RINGKASAN {{ strtoupper($label) }}</td>
@@ -117,7 +115,7 @@
                     </td>
                     <td colspan="4"></td>
                 </tr>
-            </tfoot>
+            </tbody>
         </table>
     @endforeach
 
@@ -160,8 +158,6 @@
                 <td class="text-right text-bold">Rp {{ number_format($p, 0, ',', '.') }}</td>
             </tr>
             @endforeach
-        </tbody>
-        <tfoot>
             <tr style="border-top:2px solid #333; background:#fff8e1; font-weight:bold;">
                 <td>TOTAL {{ count($bulanList) }} BULAN</td>
                 <td class="text-center">{{ array_sum(array_map('count', $bulanList)) }}</td>
@@ -170,7 +166,7 @@
                 <td class="text-right">Rp {{ number_format($grandBiayaHarian, 0, ',', '.') }}</td>
                 <td class="text-right text-bold">Rp {{ number_format($grandProfit, 0, ',', '.') }}</td>
             </tr>
-        </tfoot>
+        </tbody>
     </table>
 
     <div class="footer">
