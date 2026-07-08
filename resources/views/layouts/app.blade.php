@@ -197,7 +197,7 @@
                 </a>
 
                 {{-- Section: DATA MANAGEMENT --}}
-                <div class="sidebar-text text-[10px] font-semibold text-gray-600 uppercase tracking-[2px] px-4 pt-4 pb-1">PENGELOLAAN DATA</div>
+                <div class="sidebar-text text-[10px] font-semibold text-gray-600 uppercase tracking-[2px] px-4 pt-4 pb-1">IMPORT, BACKUP & RESTORE</div>
 
                 <a href="{{ route('reports.import') }}"
                     class="flex items-center gap-3 pl-4 pr-3 py-2.5 text-sm {{ request()->routeIs('reports.import*') ? 'bg-gradient-to-r from-yellow-500/15 to-amber-500/5 border-r-2 border-yellow-500 text-yellow-400' : 'text-gray-400 hover:bg-white/5 hover:text-yellow-400' }}">
