@@ -65,7 +65,7 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/data', [DataController::class, 'index'])->name('data.index');
         Route::post('/data/backup', [DataController::class, 'backup'])->name('data.backup');
-        Route::post('/data/reset', [DataController::class, 'reset'])->name('data.reset');
+        Route::post('/data/restore', [DataController::class, 'restore'])->name('data.restore');
     });
 
     // Shared biaya harian

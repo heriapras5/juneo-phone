@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Backup & Reset Data')
-@section('page-title', 'Backup & Reset Data')
+@section('title', 'Backup & Restore Data')
+@section('page-title', 'Backup & Restore Data')
 
 @section('content')
 <div class="lg:grid lg:grid-cols-2 lg:gap-6 space-y-6 lg:space-y-0">
@@ -43,34 +43,48 @@
         </form>
     </div>
 
-    {{-- Reset Section --}}
-    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5 border-red-200">
+    {{-- Restore Section --}}
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5">
         <div class="flex items-center gap-2 mb-4">
-            <div class="w-1 h-6 bg-red-500 rounded-full"></div>
-            <span class="text-sm font-semibold text-gray-700">Reset Data</span>
+            <div class="w-1 h-6 bg-emerald-500 rounded-full"></div>
+            <span class="text-sm font-semibold text-gray-700">Restore Data</span>
         </div>
+        <p class="text-xs text-gray-500 mb-4">Upload file backup (.xlsx) yang telah di-download sebelumnya untuk mengembalikan data Service, Pelanggan, dan Kebutuhan Pribadi.</p>
 
-        <div class="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
-            <div class="flex items-start gap-2">
-                <i class="fas fa-exclamation-triangle text-red-500 mt-0.5"></i>
-                <div>
-                    <p class="text-sm font-medium text-red-700">Peringatan!</p>
-                    <p class="text-xs text-red-600">Tindakan ini akan menghapus SEMUA data service, pelanggan, dan Kebutuhan Pribadi. Data tidak dapat dikembalikan. <strong>Backup data terlebih dahulu sebelum reset.</strong></p>
-                </div>
-            </div>
-        </div>
-
-        <form id="resetForm" method="POST" action="{{ route('data.reset') }}" x-data="{ confirmText: '' }">
+        <form method="POST" action="{{ route('data.restore') }}" enctype="multipart/form-data"
+              x-data="{ loading: false, fileName: '' }" @submit="loading = true">
             @csrf
-            <div class="mb-3">
-                <label class="text-xs text-gray-500 mb-1 block">Ketik <strong>RESET</strong> untuk konfirmasi</label>
-                <input type="text" x-model="confirmText" autocomplete="off"
-                       class="w-full border border-red-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300">
+
+            <div class="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:border-emerald-400/50 cursor-pointer bg-gray-50/50"
+                :class="{ 'border-emerald-400/50 bg-emerald-50/50': fileName }"
+                @click="$refs.fileInput.click()">
+                <div class="flex flex-col items-center gap-2">
+                    <i class="fas fa-cloud-upload-alt text-3xl text-emerald-500/50"></i>
+                    <p class="text-sm text-gray-500">Klik untuk pilih file backup</p>
+                    <p class="text-xs text-gray-400">Format: .xlsx (maks 5MB)</p>
+                </div>
+                <input type="file" name="file" x-ref="fileInput" accept=".xlsx"
+                    class="hidden" @change="fileName = $event.target.files[0]?.name || ''">
+                <template x-if="fileName">
+                    <div class="mt-3 flex items-center justify-center gap-2 text-sm text-emerald-700">
+                        <i class="fas fa-file-excel"></i>
+                        <span x-text="fileName"></span>
+                    </div>
+                </template>
             </div>
-            <button type="submit" :disabled="confirmText !== 'RESET'"
-                    class="px-5 py-2 bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-400 hover:to-rose-400 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">
-                <i class="fas fa-trash-alt"></i> Reset Semua Data
-            </button>
+
+            @error('file')
+                <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+            @enderror
+
+            <div class="mt-4">
+                <button type="submit" :disabled="loading || !fileName"
+                        class="px-5 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i x-show="!loading" class="fas fa-upload"></i>
+                    <i x-show="loading" class="fas fa-spinner fa-spin"></i>
+                    <span x-text="loading ? 'Merestorasi...' : 'Restore Data'"></span>
+                </button>
+            </div>
         </form>
     </div>
 

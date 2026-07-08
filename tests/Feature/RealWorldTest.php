@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Exports\BackupExport;
 use App\Models\BiayaHarian;
 use App\Models\Customer;
 use App\Models\DamageCategory;
@@ -10,6 +11,9 @@ use App\Models\Service;
 use App\Models\TypeHpOption;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 use Tests\TestCase;
 
 class RealWorldTest extends TestCase
@@ -336,11 +340,12 @@ class RealWorldTest extends TestCase
             ->assertStatus(200);
     }
 
-    /** PHASE 4: Backup & Reset */
-    public function test_phase_4_backup_and_reset()
+    /** PHASE 4: Backup & Restore */
+    public function test_phase_4_backup_and_restore()
     {
         $this->actingAs($this->user);
 
+        // Create test data
         $customer = Customer::create(['nama' => 'Test', 'no_hp' => '081111']);
         for ($i = 0; $i < 3; $i++) {
             Service::create([
@@ -355,6 +360,12 @@ class RealWorldTest extends TestCase
                 'status' => 'menunggu',
             ]);
         }
+        BiayaHarian::create([
+            'tanggal' => now()->format('Y-m-d'),
+            'kategori' => 'bank_jago',
+            'nama' => 'Test Biaya',
+            'jumlah' => 50000,
+        ]);
 
         // Data page loads
         $this->get('/data')->assertStatus(200);
@@ -364,12 +375,31 @@ class RealWorldTest extends TestCase
             ->assertStatus(200)
             ->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 
-        // Reset data
-        $this->post('/data/reset', ['confirmation' => 'RESET'])
-            ->assertSessionHas('success');
+        // Generate backup file for restore test
+        $backupPath = 'test-backup-' . uniqid() . '.xlsx';
+        Excel::store(new BackupExport, $backupPath);
+        $fullPath = Storage::path($backupPath);
 
+        // Delete existing data to verify restore works
+        Service::query()->delete();
+        Customer::query()->delete();
+        BiayaHarian::query()->delete();
         $this->assertEquals(0, Service::count());
         $this->assertEquals(0, Customer::count());
+
+        // Upload backup to restore
+        $uploadedFile = new UploadedFile(
+            $fullPath, 'backup.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', null, true
+        );
+        $this->post('/data/restore', ['file' => $uploadedFile])
+            ->assertSessionHas('success');
+
+        // Verify data restored
+        $this->assertEquals(3, Service::count());
+        $this->assertEquals(1, Customer::count());
+
+        // Clean up
+        Storage::delete($backupPath);
     }
 
     /** PHASE 5: Edge Cases */

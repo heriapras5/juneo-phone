@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Exports\BackupExport;
+use App\Imports\Restore\RestoreMultiSheetImport;
 use App\Models\BiayaHarian;
 use App\Models\Customer;
 use App\Models\Service;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 class DataController extends Controller
@@ -28,25 +28,20 @@ class DataController extends Controller
         return Excel::download(new BackupExport, $filename);
     }
 
-    public function reset(Request $request)
+    public function restore(Request $request)
     {
         $request->validate([
-            'confirmation' => 'required|string|in:RESET',
+            'file' => 'required|mimes:xlsx,xls|max:5120',
         ]);
 
-        if (DB::getDriverName() !== 'sqlite') {
-            DB::statement('SET FOREIGN_KEY_CHECKS = 0');
-        }
-        DB::table('service_histories')->truncate();
-        DB::table('service_items')->truncate();
-        Service::truncate();
-        Customer::truncate();
-        BiayaHarian::truncate();
-        if (DB::getDriverName() !== 'sqlite') {
-            DB::statement('SET FOREIGN_KEY_CHECKS = 1');
-        }
+        try {
+            Excel::import(new RestoreMultiSheetImport, $request->file('file'));
 
-        return redirect()->route('data.index')
-            ->with('success', 'Semua data berhasil direset.');
+            return redirect()->route('data.index')
+                ->with('success', 'Data berhasil direstorasi dari file backup.');
+        } catch (\Exception $e) {
+            return redirect()->route('data.index')
+                ->with('error', 'Gagal merestorasi data: ' . $e->getMessage());
+        }
     }
 }
