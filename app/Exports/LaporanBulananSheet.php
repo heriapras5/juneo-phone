@@ -168,18 +168,17 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
                     ->setFillType(Fill::FILL_SOLID)
                     ->getStartColor()->setARGB('FFB8860B');
                 $sheet->getStyle('A' . $headerRow . ':' . $colCount . $headerRow)->getFont()->getColor()->setARGB('FFFFFFFF');
+                $sheet->getStyle('A' . $headerRow . ':' . $colCount . $headerRow)
+                    ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
                 foreach (['G', 'H', 'K'] as $c) {
                     $sheet->getStyle($c . $headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
                 }
+                $sheet->getStyle('I' . $headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
                 if ($lastDataRow >= $dataStartRow) {
                     $sheet->getStyle('A' . $dataStartRow . ':' . $colCount . $lastDataRow)
-                        ->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
-                    $sheet->getStyle('A' . $dataStartRow . ':' . $colCount . $lastDataRow)
-                        ->getBorders()->getLeft()->setBorderStyle(Border::BORDER_THIN);
-                    $sheet->getStyle('A' . $dataStartRow . ':' . $colCount . $lastDataRow)
-                        ->getBorders()->getRight()->setBorderStyle(Border::BORDER_THIN);
+                        ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
                     $sheet->getStyle('G' . $dataStartRow . ':H' . $lastDataRow)
                         ->getNumberFormat()->setFormatCode('"Rp"#,##0');
@@ -188,68 +187,65 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
 
                     $sheet->getStyle('G' . $dataStartRow . ':H' . $lastDataRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
                     $sheet->getStyle('K' . $dataStartRow . ':K' . $lastDataRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-
-                    $services = $this->collection();
-                    $totalPengeluaran = $services->sum('pengeluaran');
-                    $totalJasa = $services->sum('jasa');
-                    $biayaHarian = $this->getBiayaHarian();
-
-                    $summaryStart = $lastDataRow + 1;
-
-                    $summaryRows = [
-                        ['Pengeluaran', $totalPengeluaran, false, false],
-                        ['Omzet', $totalJasa, false, false],
-                        ['Kebutuhan Pribadi', $biayaHarian, false, true],
-                        ['Profit', $totalJasa - $totalPengeluaran - $biayaHarian, true, false],
-                    ];
-
-                    foreach ($summaryRows as $i => $item) {
-                        $r = $summaryStart + $i;
-                        $sheet->setCellValue('A' . $r, $item[0]);
-                        $sheet->mergeCells('A' . $r . ':J' . $r);
-
-                        if ($item[3]) {
-                            $sheet->getStyle('A' . $r)->getFont()->setItalic(true)->setSize(9);
-                        } else {
-                            $sheet->getStyle('A' . $r)->getFont()->setSize(10);
-                        }
-
-                        $sheet->setCellValue('K' . $r, $item[1]);
-                        $sheet->getStyle('K' . $r)->getNumberFormat()->setFormatCode('"Rp"#,##0');
-
-                        if ($item[2]) {
-                            $sheet->getStyle('A' . $r)->getFont()->setBold(true)->setSize(11);
-                            $sheet->getStyle('K' . $r)->getFont()->setBold(true)->setSize(11);
-                        }
-
-                        if ($i === 0) {
-                            $sheet->getStyle('A' . $r . ':' . $colCount . $r)
-                                ->getBorders()->getTop()->setBorderStyle(Border::BORDER_MEDIUM);
-                        }
-
-                        if ($i === 0) {
-                            $sheet->getStyle('A' . $r . ':' . $colCount . $r)
-                                ->getFill()->setFillType(Fill::FILL_SOLID)
-                                ->getStartColor()->setARGB('FFFFF8E1');
-                        }
-                    }
-
-                    $footerRow = $summaryStart + count($summaryRows) + 1;
-                    $sheet->setCellValue('A' . $footerRow, 'Dicetak: ' . now()->format('d/m/Y H:i'));
-                    $sheet->getStyle('A' . $footerRow)->getFont()->setSize(8)->setItalic(true)->getColor()->setARGB('FF000000');
+                    $sheet->getStyle('I' . $dataStartRow . ':I' . $lastDataRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                 }
 
+                // Summary section - two separate single-line rows (always shown)
+                $services = $this->collection();
+                $totalPengeluaran = $services->sum('pengeluaran');
+                $totalJasa = $services->sum('jasa');
+                $biayaHarian = $this->getBiayaHarian();
+                $profit = $totalJasa - $totalPengeluaran - $biayaHarian;
+
+                $summaryStart = ($lastDataRow >= $dataStartRow ? $lastDataRow : $headerRow) + 1;
+
+                // Row 1: title
+                $titleRow = $summaryStart;
+                $sheet->setCellValue('A' . $titleRow, 'RINGKASAN ' . strtoupper($this->label));
+                $sheet->mergeCells('A' . $titleRow . ':K' . $titleRow);
+                $sheet->getStyle('A' . $titleRow)->getFont()->setBold(true)->setSize(11);
+                $sheet->getStyle('A' . $titleRow)->getAlignment()
+                    ->setHorizontal(Alignment::HORIZONTAL_LEFT)
+                    ->setVertical(Alignment::VERTICAL_CENTER);
+                $sheet->getStyle('A' . $titleRow . ':K' . $titleRow)
+                    ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+                $sheet->getStyle('A' . $titleRow . ':K' . $titleRow)->getFill()
+                    ->setFillType(Fill::FILL_SOLID)
+                    ->getStartColor()->setARGB('FFFFF8E1');
+
+                // Row 2: values (single line)
+                $valueRow = $summaryStart + 1;
+                $summaryText = 'Pengeluaran: Rp ' . number_format($totalPengeluaran, 0, ',', '.') .
+                               '  |  Omzet: Rp ' . number_format($totalJasa, 0, ',', '.') .
+                               '  |  Kebutuhan: Rp ' . number_format($biayaHarian, 0, ',', '.') .
+                               '  |  Profit: Rp ' . number_format($profit, 0, ',', '.');
+                $sheet->setCellValue('A' . $valueRow, $summaryText);
+                $sheet->mergeCells('A' . $valueRow . ':K' . $valueRow);
+                $sheet->getStyle('A' . $valueRow)->getFont()->setSize(10);
+                $sheet->getStyle('A' . $valueRow)->getAlignment()
+                    ->setHorizontal(Alignment::HORIZONTAL_LEFT)
+                    ->setVertical(Alignment::VERTICAL_CENTER);
+                $sheet->getStyle('A' . $valueRow . ':K' . $valueRow)
+                    ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+                $sheet->getStyle('A' . $valueRow . ':K' . $valueRow)->getFill()
+                    ->setFillType(Fill::FILL_SOLID)
+                    ->getStartColor()->setARGB('FFFFF8E1');
+
+                $footerRow = $summaryStart + 3;
+                $sheet->setCellValue('A' . $footerRow, 'Dicetak: ' . now()->format('d/m/Y H:i'));
+                $sheet->getStyle('A' . $footerRow)->getFont()->setSize(8)->setItalic(true)->getColor()->setARGB('FF000000');
+
                 $sheet->getColumnDimension('A')->setWidth(5);
-                $sheet->getColumnDimension('B')->setWidth(18);
-                $sheet->getColumnDimension('C')->setWidth(12);
-                $sheet->getColumnDimension('D')->setWidth(20);
-                $sheet->getColumnDimension('E')->setWidth(16);
-                $sheet->getColumnDimension('F')->setWidth(30);
-                $sheet->getColumnDimension('G')->setWidth(14);
-                $sheet->getColumnDimension('H')->setWidth(14);
-                $sheet->getColumnDimension('I')->setWidth(8);
-                $sheet->getColumnDimension('J')->setWidth(20);
-                $sheet->getColumnDimension('K')->setWidth(16);
+                $sheet->getColumnDimension('B')->setWidth(22);
+                $sheet->getColumnDimension('C')->setWidth(13);
+                $sheet->getColumnDimension('D')->setWidth(25);
+                $sheet->getColumnDimension('E')->setWidth(20);
+                $sheet->getColumnDimension('F')->setWidth(16);
+                $sheet->getColumnDimension('G')->setWidth(15);
+                $sheet->getColumnDimension('H')->setWidth(15);
+                $sheet->getColumnDimension('I')->setWidth(10);
+                $sheet->getColumnDimension('J')->setWidth(22);
+                $sheet->getColumnDimension('K')->setWidth(15);
             },
         ];
     }

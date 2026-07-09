@@ -11,10 +11,14 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class GajiKaryawanSheetExport implements FromCollection, WithHeadings, WithMapping, WithTitle, WithColumnWidths, WithColumnFormatting, WithStyles
+class GajiKaryawanSheetExport implements FromCollection, WithHeadings, WithMapping, WithTitle, WithColumnWidths, WithColumnFormatting, WithStyles, WithEvents
 {
     private int $rowNumber = 0;
 
@@ -48,10 +52,10 @@ class GajiKaryawanSheetExport implements FromCollection, WithHeadings, WithMappi
     public function columnWidths(): array
     {
         return [
-            'A' => 6,
-            'B' => 18,
-            'C' => 25,
-            'D' => 15,
+            'A' => 5,
+            'B' => 14,
+            'C' => 20,
+            'D' => 18,
         ];
     }
 
@@ -67,6 +71,30 @@ class GajiKaryawanSheetExport implements FromCollection, WithHeadings, WithMappi
         return [
             1 => ['font' => ['bold' => true]],
             'D:D' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]],
+        ];
+    }
+
+    public function registerEvents(): array
+    {
+        return [
+            AfterSheet::class => function (AfterSheet $event) {
+                $sheet = $event->sheet;
+                $rowCount = $sheet->getHighestRow();
+                
+                // Header styling
+                $sheet->getStyle('A1:D1')->getFill()
+                    ->setFillType(Fill::FILL_SOLID)
+                    ->getStartColor()->setARGB('FFB8860B');
+                $sheet->getStyle('A1:D1')->getFont()->getColor()->setARGB('FFFFFFFF');
+                $sheet->getStyle('A1:D1')->getFont()->setBold(true);
+                $sheet->getStyle('A1:D1')->getAlignment()
+                    ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                
+                if ($rowCount > 1) {
+                    $sheet->getStyle('A2:D' . $rowCount)
+                        ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+                }
+            },
         ];
     }
 }

@@ -11,10 +11,14 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class ServicesSheetExport implements FromCollection, WithHeadings, WithMapping, WithTitle, WithColumnWidths, WithColumnFormatting, WithStyles
+class ServicesSheetExport implements FromCollection, WithHeadings, WithMapping, WithTitle, WithColumnWidths, WithColumnFormatting, WithStyles, WithEvents
 {
     private int $rowNumber = 0;
 
@@ -33,18 +37,13 @@ class ServicesSheetExport implements FromCollection, WithHeadings, WithMapping, 
             'No. Service',
             'Tanggal',
             'Pelanggan',
-            'No. HP',
             'Type HP',
             'Kerusakan',
-            'Estimasi Selesai',
-            'Tanggal Selesai',
             'Pengeluaran',
             'Jasa',
-            'Keuntungan',
-            'Kebutuhan Pribadi',
             'Teknisi',
-            'Status',
             'Keterangan',
+            'Keuntungan',
         ];
     }
 
@@ -72,18 +71,13 @@ class ServicesSheetExport implements FromCollection, WithHeadings, WithMapping, 
             $service->service_number ?? '',
             $service->tanggal ? Carbon::parse($service->tanggal)->format('d/m/Y') : '',
             $service->customer?->nama ?? '',
-            $service->customer?->no_hp ?? '',
             $typesText,
             $kerusakanText,
-            $service->estimasi_selesai ? Carbon::parse($service->estimasi_selesai)->format('d/m/Y') : '',
-            $service->tanggal_selesai ? Carbon::parse($service->tanggal_selesai)->format('d/m/Y') : '',
             $service->pengeluaran ?: 0,
             $service->jasa ?: 0,
-            $service->keuntungan ?: 0,
-            $service->kebutuhan_pribadi ?: 0,
-            $service->teknisi ?: 'Adit',
-            $service->status ?? '',
+            match ($service->teknisi) { 'edi' => 'Edi', 'nur' => 'Nur', default => '' },
             $service->keterangan ?? '',
+            $service->keuntungan ?: 0,
         ];
     }
 
@@ -95,32 +89,26 @@ class ServicesSheetExport implements FromCollection, WithHeadings, WithMapping, 
     public function columnWidths(): array
     {
         return [
-            'A' => 6,
-            'B' => 18,
-            'C' => 14,
+            'A' => 5,
+            'B' => 22,
+            'C' => 13,
             'D' => 25,
-            'E' => 18,
-            'F' => 20,
-            'G' => 30,
-            'H' => 16,
-            'I' => 16,
-            'J' => 15,
+            'E' => 20,
+            'F' => 16,
+            'G' => 15,
+            'H' => 15,
+            'I' => 10,
+            'J' => 22,
             'K' => 15,
-            'L' => 15,
-            'M' => 18,
-            'N' => 10,
-            'O' => 14,
-            'P' => 30,
         ];
     }
 
     public function columnFormats(): array
     {
         return [
-            'J' => '"Rp"#,##0',
+            'G' => '"Rp"#,##0',
+            'H' => '"Rp"#,##0',
             'K' => '"Rp"#,##0',
-            'L' => '"Rp"#,##0',
-            'M' => '"Rp"#,##0',
         ];
     }
 
@@ -128,10 +116,34 @@ class ServicesSheetExport implements FromCollection, WithHeadings, WithMapping, 
     {
         return [
             1 => ['font' => ['bold' => true]],
-            'J:J' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]],
+            'G:G' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]],
+            'H:H' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]],
             'K:K' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]],
-            'L:L' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]],
-            'M:M' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]],
+            'I:I' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER]],
+        ];
+    }
+
+    public function registerEvents(): array
+    {
+        return [
+            AfterSheet::class => function (AfterSheet $event) {
+                $sheet = $event->sheet;
+                $rowCount = $sheet->getHighestRow();
+                
+                // Header styling
+                $sheet->getStyle('A1:K1')->getFill()
+                    ->setFillType(Fill::FILL_SOLID)
+                    ->getStartColor()->setARGB('FFB8860B');
+                $sheet->getStyle('A1:K1')->getFont()->getColor()->setARGB('FFFFFFFF');
+                $sheet->getStyle('A1:K1')->getFont()->setBold(true);
+                $sheet->getStyle('A1:K1')->getAlignment()
+                    ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                
+                if ($rowCount > 1) {
+                    $sheet->getStyle('A2:K' . $rowCount)
+                        ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+                }
+            },
         ];
     }
 }

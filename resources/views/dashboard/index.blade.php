@@ -13,6 +13,15 @@
 .anm-pulse { animation: pulse-soft 2s ease-in-out infinite; }
 .anm-row { opacity: 0; transform: translateX(-8px); transition: opacity 0.3s ease-out, transform 0.3s ease-out; }
 .anm-row.anm-show { opacity: 1; transform: translateX(0); }
+.kpi-value { transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.kpi-bounce { transform: scale(1.06); }
+.card-glow { transition: all 0.25s ease-in-out; }
+.card-glow:hover { transform: translateY(-3px); box-shadow: 0 12px 24px -8px rgba(245,158,11,0.15), 0 4px 8px -4px rgba(0,0,0,0.08); }
+.card-bar { position: relative; overflow: hidden; }
+.card-bar::after { content: ''; position: absolute; inset: 0; width: 35%; background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%); animation: barShimmer 2.4s ease-in-out infinite; }
+@keyframes barShimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(350%); } }
+.spark-line { stroke-dasharray: 600; stroke-dashoffset: 600; animation: drawLine 3.5s ease-in-out infinite alternate; }
+@keyframes drawLine { 0% { stroke-dashoffset: 600; } 100% { stroke-dashoffset: 0; } }
 </style>
 @endpush
 
@@ -30,7 +39,7 @@ $hasCustomRange = request()->has('from') && request()->has('to');
 <div class="space-y-6" id="dashboard-app">
 
     {{-- ============ Period Filter Bar (AJAX) ============ --}}
-    <div x-data="{ df: '{{ $fromDate->format('Y-m-d') }}', dt: '{{ $toDate->format('Y-m-d') }}' }" id="dashFilterBar" class="anm-wrap bg-white border border-gray-200 rounded-xl shadow-sm px-3 sm:px-4 py-3 sm:py-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:flex-wrap sm:gap-1 lg:gap-2 border-l-4 border-yellow-500/30">
+    <div x-data="{ df: '{{ $fromDate->format('Y-m-d') }}', dt: '{{ $toDate->format('Y-m-d') }}' }" id="dashFilterBar" class="anm-wrap bg-white border border-gray-200 rounded-xl shadow-sm px-3 sm:px-4 py-3 sm:py-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:flex-nowrap sm:gap-0.5 lg:gap-2 border-l-4 border-yellow-500/30">
         <span class="text-[11px] text-gray-500 font-medium flex items-center gap-1 sm:gap-1.5">
             <i class="fas fa-filter text-yellow-500"></i>
             <span>Filter waktu:</span>
@@ -56,10 +65,6 @@ $hasCustomRange = request()->has('from') && request()->has('to');
             <button id="applyDateBtn"
                 class="flex-shrink-0 px-3 sm:px-2 lg:px-4 py-1.5 sm:py-1.5 lg:py-2 text-xs sm:text-xs lg:text-sm font-medium bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white rounded-lg shadow-sm flex items-center justify-center gap-1 sm:gap-2">
                 <i class="fas fa-filter"></i> <span class="hidden sm:inline">Filter</span>
-            </button>
-            <button id="resetDateBtn" @if(!$hasCustomRange) style="display:none" @endif
-                class="flex-shrink-0 px-3 sm:px-2 lg:px-4 py-1.5 sm:py-1.5 lg:py-2 text-xs sm:text-xs lg:text-sm font-medium bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg shadow-sm flex items-center justify-center gap-1 sm:gap-2">
-                <i class="fas fa-undo"></i> <span class="hidden sm:inline">Reset</span>
             </button>
         </div>
     </div>
@@ -368,7 +373,7 @@ function kpiCardHTML(cfg) {
     var extra = cfg.extra || '';
 
     return ''
-    + '<div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden group flex flex-col h-full transition-all duration-200 ease-in-out hover:-translate-y-1 hover:shadow-lg">'
+    + '<div class="anm-card card-glow bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden group flex flex-col h-full transition-all duration-200 ease-in-out hover:-translate-y-1 hover:shadow-lg">'
     +   '<div class="p-4 sm:p-5 flex-1 flex flex-col">'
     +     '<div class="flex items-start justify-between">'
     +       '<div class="flex-1 min-w-0">'
@@ -385,12 +390,12 @@ function kpiCardHTML(cfg) {
     +     foot
     +     '<div class="mt-auto pt-3 hidden sm:block">'
     +       '<svg class="w-full h-8" viewBox="0 0 200 30" preserveAspectRatio="none">'
-    +         '<path d="' + cfg.sparkPath + '" fill="none" stroke="' + cfg.sparkStroke + '" stroke-width="2" stroke-linecap="round"/>'
+    +         '<path class="spark-line" d="' + cfg.sparkPath + '" fill="none" stroke="' + cfg.sparkStroke + '" stroke-width="2" stroke-linecap="round"/>'
     +         '<path d="' + cfg.sparkPath + ' L200,30 L0,30 Z" fill="' + cfg.sparkFill + '" opacity="0.15"/>'
     +       '</svg>'
     +     '</div>'
     +   '</div>'
-    +   '<div class="h-1.5 rounded-b-xl ' + cfg.barCls + '"></div>'
+    +   '<div class="card-bar h-1.5 rounded-b-xl ' + cfg.barCls + '"></div>'
     + '</div>';
 }
 
@@ -425,11 +430,17 @@ function buildKpiCardsHTML(d, periodLabel) {
             value: d.kebutuhan_pribadi, valueCls: 'text-orange-600',
             icon: 'fa-wallet', iconBg: 'from-orange-50 to-amber-100', iconColor: 'orange-600',
             change: d.changeKebutuhan, upIsGood: false,
-            extra: '<div class="grid grid-cols-2 gap-x-2 sm:gap-x-4 mt-1 text-xs kpi-breakdown">'
-                + '<div class="flex items-center gap-1"><span class="text-gray-400">Bank Jago:</span><span class="font-medium text-blue-600">' + fmtRp(d.bank_jago) + '</span></div>'
-                + '<div class="flex items-center gap-1"><span class="text-gray-400">Gaji Edi:</span><span class="font-medium text-purple-600">' + fmtRp(d.gaji_edi) + '</span></div>'
-                + '<div class="flex items-center gap-1"><span class="text-gray-400">Gaji Nur:</span><span class="font-medium text-purple-600">' + fmtRp(d.gaji_nur) + '</span></div>'
-                + '<div class="flex items-center gap-1"><span class="text-gray-400">Lainnya:</span><span class="font-medium text-amber-600">' + fmtRp(d.lainnya) + '</span></div>'
+            extra: '<div class="grid grid-cols-2 gap-x-3 gap-y-0.5 mt-1.5 text-xs sm:hidden">'
+                + '<span class="text-gray-400 truncate"><i class="fas fa-university text-[10px] text-blue-500 mr-1"></i>Bank Jago</span><span class="font-medium text-gray-900 tabular-nums text-right">' + fmtRp(d.bank_jago) + '</span>'
+                + '<span class="text-gray-400 truncate"><i class="fas fa-user text-[10px] text-purple-500 mr-1"></i>Gaji Edi</span><span class="font-medium text-gray-900 tabular-nums text-right">' + fmtRp(d.gaji_edi) + '</span>'
+                + '<span class="text-gray-400 truncate"><i class="fas fa-user text-[10px] text-purple-500 mr-1"></i>Gaji Nur</span><span class="font-medium text-gray-900 tabular-nums text-right">' + fmtRp(d.gaji_nur) + '</span>'
+                + '<span class="text-gray-400 truncate"><i class="fas fa-box text-[10px] text-amber-500 mr-1"></i>Lainnya</span><span class="font-medium text-gray-900 tabular-nums text-right">' + fmtRp(d.lainnya) + '</span>'
+                + '</div>'
+                + '<div class="hidden sm:block space-y-0.5 mt-1.5 text-xs">'
+                + '<div class="flex items-center justify-between gap-2"><span class="text-gray-400 truncate"><i class="fas fa-university text-[10px] text-blue-500 mr-1"></i>Bank Jago</span><span class="font-medium text-gray-900 tabular-nums">' + fmtRp(d.bank_jago) + '</span></div>'
+                + '<div class="flex items-center justify-between gap-2"><span class="text-gray-400 truncate"><i class="fas fa-user text-[10px] text-purple-500 mr-1"></i>Gaji Edi</span><span class="font-medium text-gray-900 tabular-nums">' + fmtRp(d.gaji_edi) + '</span></div>'
+                + '<div class="flex items-center justify-between gap-2"><span class="text-gray-400 truncate"><i class="fas fa-user text-[10px] text-purple-500 mr-1"></i>Gaji Nur</span><span class="font-medium text-gray-900 tabular-nums">' + fmtRp(d.gaji_nur) + '</span></div>'
+                + '<div class="flex items-center justify-between gap-2"><span class="text-gray-400 truncate"><i class="fas fa-box text-[10px] text-amber-500 mr-1"></i>Lainnya</span><span class="font-medium text-gray-900 tabular-nums">' + fmtRp(d.lainnya) + '</span></div>'
                 + '</div>',
             sparkPath: 'M0,25 Q20,20 40,22 T80,15 T120,18 T160,8 T200,10',
             sparkStroke: '#F59E0B', sparkFill: 'url(#sparkAmber)',
@@ -483,10 +494,6 @@ function updateCards(d) {
     // Input date values — Alpine x-model akan sikronkan ke DOM
     dateFilterApi.set(d.fromDateInput, d.toDateInput);
 
-    // Tombol Reset hanya muncul bila sedang mencari tanggal tertentu (custom range)
-    var rb = document.getElementById('resetDateBtn');
-    if (rb) rb.style.display = d.hasCustomRange ? '' : 'none';
-
     // Notif Kebutuhan Pribadi, empty state, KPI, chart
     updateKpiOnly(d, periodLabel);
 }
@@ -494,13 +501,19 @@ function updateCards(d) {
 function animateCounter(el, target, duration) {
     var start = 0;
     var startTime = null;
+    el.classList.remove('kpi-bounce');
     function step(timestamp) {
         if (!startTime) startTime = timestamp;
         var progress = Math.min((timestamp - startTime) / duration, 1);
         var eased = 1 - (1 - progress) * (1 - progress);
         var current = Math.round(start + (target - start) * eased);
         el.textContent = 'Rp ' + current.toLocaleString('id-ID');
-        if (progress < 1) requestAnimationFrame(step);
+        if (progress < 1) {
+            requestAnimationFrame(step);
+        } else {
+            el.classList.add('kpi-bounce');
+            setTimeout(function() { el.classList.remove('kpi-bounce'); }, 250);
+        }
     }
     requestAnimationFrame(step);
 }
@@ -548,6 +561,7 @@ function updateKpiOnly(d, periodLabel) {
     // === 4 KPI Cards — Pengeluaran | Omzet | Kebutuhan Pribadi | Profit ===
     document.getElementById('rowKpi').innerHTML = buildKpiCardsHTML(d, periodLabel);
     animateKpiCounters();
+    document.getElementById('rowKpi').querySelectorAll('.anm-card').forEach(function(el) { setTimeout(function() { el.classList.add('anm-show'); }, 30); });
     
     // Grafik
     updateChart(d.chartData);
@@ -569,18 +583,19 @@ document.addEventListener('DOMContentLoaded', function() {
             data: {
                 labels: chartData.labels,
                 datasets: [
-                    { label: 'Omzet', data: chartData.omzet, backgroundColor: 'rgba(16,185,129,0.7)', borderColor: '#10B981', borderWidth: 1, borderRadius: 4, barPercentage: 0.7, categoryPercentage: 0.75 },
-                    { label: 'Pengeluaran', data: chartData.pengeluaran, backgroundColor: 'rgba(239,68,68,0.5)', borderColor: '#EF4444', borderWidth: 1, borderRadius: 4, barPercentage: 0.7, categoryPercentage: 0.75 },
-                    { label: 'Profit', data: chartData.profit, backgroundColor: 'rgba(99,102,241,0.6)', borderColor: '#6366F1', borderWidth: 1, borderRadius: 4, barPercentage: 0.7, categoryPercentage: 0.75 },
+                    { label: 'Omzet', data: chartData.omzet, backgroundColor: 'rgba(16,185,129,0.7)', borderColor: '#10B981', borderWidth: 1, borderRadius: 4, barPercentage: 0.7, categoryPercentage: 0.75, hoverBackgroundColor: 'rgba(16,185,129,0.95)', hoverBorderColor: '#059669', hoverBorderWidth: 2 },
+                    { label: 'Pengeluaran', data: chartData.pengeluaran, backgroundColor: 'rgba(239,68,68,0.5)', borderColor: '#EF4444', borderWidth: 1, borderRadius: 4, barPercentage: 0.7, categoryPercentage: 0.75, hoverBackgroundColor: 'rgba(239,68,68,0.8)', hoverBorderColor: '#DC2626', hoverBorderWidth: 2 },
+                    { label: 'Profit', data: chartData.profit, backgroundColor: 'rgba(99,102,241,0.6)', borderColor: '#6366F1', borderWidth: 1, borderRadius: 4, barPercentage: 0.7, categoryPercentage: 0.75, hoverBackgroundColor: 'rgba(99,102,241,0.85)', hoverBorderColor: '#4F46E5', hoverBorderWidth: 2 },
                 ]
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
-                animation: { duration: 800, easing: 'easeOutQuart' },
+                animation: { duration: 900, easing: 'easeOutBack' },
                 layout: { padding: { top: 5, right: 10, bottom: 0, left: 5 } },
+                onHover: function(e) { e.native.target.style.cursor = e.chart.getElementsAtEventForMode(e, 'index', { intersect: false }).length ? 'pointer' : 'default'; },
                 plugins: {
                     legend: { display: false },
-                    tooltip: { mode: 'index', intersect: false }
+                    tooltip: { mode: 'index', intersect: false, backgroundColor: 'rgba(0,0,0,0.8)', titleFont: { size: 11 }, bodyFont: { size: 10 }, padding: 8, cornerRadius: 6 }
                 },
                 scales: {
                     y: { beginAtZero: true, min: 0, ticks: { callback: function(v) { return 'Rp ' + v.toLocaleString('id-ID'); }, font: { size: 9 } }, grid: { color: 'rgba(0,0,0,0.06)' } },
@@ -605,6 +620,7 @@ document.addEventListener('DOMContentLoaded', function() {
             options: {
                 responsive: true, maintainAspectRatio: false,
                 cutout: '70%',
+                animation: { animateRotate: true, duration: 1000, easing: 'easeOutQuart' },
                 plugins: { legend: { display: false } }
             }
         });
@@ -629,11 +645,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (from > to) { alert('Tanggal "Dari" tidak boleh lebih besar dari tanggal "Sampai".'); return; }
         dateFilterApi.set(from, to);
         fetchData({ from: from, to: to }).then(function(data) { updateCards(data); });
-    });
-
-    // Reset filter — reload halaman tanpa parameter (auto-detect period)
-    document.getElementById('resetDateBtn').addEventListener('click', function() {
-        window.location.href = '{{ route("dashboard") }}';
     });
 
     // Auto-refresh tiap 30 detik (gentle: lewati jika user baru saja berinteraksi)

@@ -31,31 +31,20 @@ class ServicesRestoreSheetImport implements ToModel, WithHeadingRow, SkipsEmptyR
             return null;
         }
         $customer = Customer::firstOrCreate(
-            ['nama' => $nama],
-            ['no_hp' => $row['no_hp'] ?? null]
+            ['nama' => $nama]
         );
 
         $data = [
             'service_number' => $serviceNumber,
             'tanggal' => $tanggal,
             'customer_id' => $customer->id,
-            'type_hp' => $this->parseTypeHp($row['type_hp'] ?? ''),
+            'type_hp' => $this->parseMultiItem($row['type_hp'] ?? ''),
             'kerusakan' => $this->parseKerusakan($row['kerusakan'] ?? ''),
             'pengeluaran' => $row['pengeluaran'] ?? 0,
             'jasa' => $row['jasa'] ?? 0,
-            'keuntungan' => $row['keuntungan'] ?? 0,
-            'kebutuhan_pribadi' => $row['kebutuhan_pribadi'] ?? 0,
             'teknisi' => $row['teknisi'] ?? 'adit',
-            'status' => $this->parseStatus($row['status'] ?? ''),
             'keterangan' => $row['keterangan'] ?? null,
         ];
-
-        if (!empty($row['estimasi_selesai'])) {
-            $data['estimasi_selesai'] = $this->parseDate($row['estimasi_selesai']);
-        }
-        if (!empty($row['tanggal_selesai'])) {
-            $data['tanggal_selesai'] = $this->parseDate($row['tanggal_selesai']);
-        }
 
         return Service::create($data);
     }
@@ -79,14 +68,14 @@ class ServicesRestoreSheetImport implements ToModel, WithHeadingRow, SkipsEmptyR
         return date('Y-m-d', $timestamp);
     }
 
-    private function parseTypeHp($value)
+    private function parseMultiItem($value)
     {
         if (empty($value)) {
             return '';
         }
         $value = preg_replace('/^•\s*/', '', $value);
-        $types = explode(' | ', $value);
-        return trim($types[0] ?? '');
+        $items = explode(' | ', $value);
+        return trim($items[0] ?? '');
     }
 
     private function parseKerusakan($value)
@@ -98,15 +87,5 @@ class ServicesRestoreSheetImport implements ToModel, WithHeadingRow, SkipsEmptyR
         $items = explode(' | ', $value);
         $items = array_map('trim', $items);
         return json_encode($items);
-    }
-
-    private function parseStatus($value)
-    {
-        $value = strtolower(trim($value));
-        $allowed = ['menunggu', 'dikerjakan', 'selesai', 'diambil', 'batal'];
-        if (in_array($value, $allowed)) {
-            return $value;
-        }
-        return 'menunggu';
     }
 }

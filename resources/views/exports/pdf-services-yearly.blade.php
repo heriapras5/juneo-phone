@@ -12,10 +12,9 @@
     .header .info { margin: 2px 0 0; font-size: 8px; color: #000; }
     .month-title { font-size: 12px; font-weight: bold; margin-top: 14px; margin-bottom: 5px; color: #000; border-bottom: 1px solid #B8860B; padding-bottom: 2px; }
     table { width: 100%; border-collapse: collapse; margin-top: 4px; }
-    th { background: #B8860B; color: #fff; padding: 4px 4px; text-align: left; font-size: 7px; }
-    td { padding: 2px 4px; border-bottom: 1px solid #ddd; font-size: 7px; color: #000; }
+    th { background: #B8860B; color: #fff; padding: 4px 4px; text-align: left; font-size: 7px; border: 1px solid #B8860B; }
+    td { padding: 2px 4px; border: 1px solid #ddd; font-size: 7px; color: #000; }
     tr:nth-child(even) { background: #f9fafb; }
-    .subtotal-row td { font-weight: bold; border-top: 1px solid #B8860B; background: #fff8e1; padding-top: 4px; color: #000; }
     .grand-title { font-size: 12px; font-weight: bold; margin-top: 16px; margin-bottom: 5px; color: #000; border-bottom: 2px solid #000; padding-bottom: 2px; }
     .footer { text-align: center; margin-top: 14px; font-size: 8px; color: #000; border-top: 1px solid #ddd; padding-top: 6px; }
 
@@ -50,16 +49,16 @@
             <thead>
                 <tr>
                     <th style="width:4%;">No</th>
-                    <th style="width:9%;">No. Service</th>
-                    <th style="width:8%;">Tanggal</th>
-                    <th style="width:11%;">Pelanggan</th>
-                    <th style="width:10%;">Type HP</th>
-                    <th style="width:17%;">Kerusakan</th>
-                    <th style="width:9%;">Pengeluaran</th>
-                    <th style="width:9%;">Jasa</th>
-                    <th style="width:5%;">Teknisi</th>
-                    <th style="width:9%;">Keterangan</th>
-                    <th style="width:9%;">Keuntungan</th>
+                    <th style="width:10%;">No. Service</th>
+                    <th style="width:7%;">Tanggal</th>
+                    <th style="width:12%;">Pelanggan</th>
+                    <th style="width:12%;">Type HP</th>
+                    <th style="width:10%;">Kerusakan</th>
+                    <th style="width:10%; text-align:right;">Pengeluaran</th>
+                    <th style="width:10%; text-align:right;">Jasa</th>
+                    <th style="width:4%; text-align:center;">Teknisi</th>
+                    <th style="width:11%;">Keterangan</th>
+                    <th style="width:10%; text-align:right;">Keuntungan</th>
                 </tr>
             </thead>
             <tbody>
@@ -84,39 +83,21 @@
                     <td class="text-right">Rp {{ number_format($service->pengeluaran, 0, ',', '.') }}</td>
                     <td class="text-right">Rp {{ number_format($service->jasa, 0, ',', '.') }}</td>
                     <td class="text-center">{{ match($service->teknisi) { 'edi' => 'E', 'nur' => 'N', default => '' } }}</td>
-                    <td style="font-size:6px; word-break:break-all;">{{ $service->keterangan ?? '' }}</td>
+                    <td style="font-size:6px; word-break:break-word;">{{ $service->keterangan ?? '' }}</td>
                     <td class="text-right text-bold">Rp {{ number_format($service->keuntungan, 0, ',', '.') }}</td>
                 </tr>
                 @endforeach
                 @php $subProfit = $rekap['totalJasa'] - $rekap['totalPengeluaran'] - $rekap['biayaHarian']; @endphp
-                <tr class="subtotal-row">
-                    <td colspan="6" class="text-right" style="font-size:8px; font-weight:bold;">RINGKASAN {{ strtoupper($label) }}</td>
-                    <td colspan="5"></td>
-                </tr>
-                <tr class="subtotal-row">
-                    <td colspan="6" class="text-right">Pengeluaran</td>
-                    <td class="text-right">Rp {{ number_format($rekap['totalPengeluaran'], 0, ',', '.') }}</td>
-                    <td colspan="4"></td>
-                </tr>
-                <tr class="subtotal-row">
-                    <td colspan="6" class="text-right">Omzet</td>
-                    <td class="text-right">Rp {{ number_format($rekap['totalJasa'], 0, ',', '.') }}</td>
-                    <td colspan="4"></td>
-                </tr>
-                <tr class="subtotal-row">
-                    <td colspan="6" class="text-right">Kebutuhan Pribadi</td>
-                    <td class="text-right">Rp {{ number_format($rekap['biayaHarian'], 0, ',', '.') }}</td>
-                    <td colspan="4"></td>
-                </tr>
-                <tr style="border-top:2px solid #333; background:#fff8e1;">
-                    <td colspan="6" class="text-right" style="font-size:9px; font-weight:bold;">Profit</td>
-                    <td class="text-right text-bold" style="font-size:9px; font-weight:bold;">
-                        Rp {{ number_format($subProfit, 0, ',', '.') }}
-                    </td>
-                    <td colspan="4"></td>
-                </tr>
             </tbody>
         </table>
+
+        <div style="margin-top:8px; border:1px solid #B8860B; padding:6px 10px; background:#fff8e1; font-size:7px;">
+            <strong style="font-size:8px;">RINGKASAN {{ strtoupper($label) }}</strong><br>
+            Pengeluaran: <strong>Rp {{ number_format($rekap['totalPengeluaran'], 0, ',', '.') }}</strong> &nbsp;|&nbsp;
+            Omzet: <strong>Rp {{ number_format($rekap['totalJasa'], 0, ',', '.') }}</strong> &nbsp;|&nbsp;
+            Kebutuhan: <strong>Rp {{ number_format($rekap['biayaHarian'], 0, ',', '.') }}</strong> &nbsp;|&nbsp;
+            Profit: <strong style="font-size:8px;">Rp {{ number_format($subProfit, 0, ',', '.') }}</strong>
+        </div>
     @endforeach
 
     @if(empty($bulanList))
@@ -135,12 +116,12 @@
     <table style="width:100%; border-collapse:collapse; margin-top:8px;">
         <thead>
             <tr>
-                <th style="width:25%;">Bulan</th>
-                <th style="width:15%;">Total Service</th>
-                <th style="width:15%;">Omzet</th>
-                <th style="width:15%;">Pengeluaran</th>
-                <th style="width:15%;">Kebutuhan Pribadi</th>
-                <th style="width:15%;">Profit</th>
+                <th style="width:20%;">Bulan</th>
+                <th style="width:14%; text-align:center;">Total Service</th>
+                <th style="width:18%; text-align:right;">Omzet</th>
+                <th style="width:18%; text-align:right;">Pengeluaran</th>
+                <th style="width:14%; text-align:right;">Kebutuhan Pribadi</th>
+                <th style="width:16%; text-align:right;">Profit</th>
             </tr>
         </thead>
         <tbody>
@@ -150,21 +131,21 @@
                 $p = $r['totalJasa'] - $r['totalPengeluaran'] - $r['biayaHarian'];
             @endphp
             <tr>
-                <td>{{ $bulanMap[$ym] ?? $ym }}</td>
-                <td class="text-center">{{ count($data) }}</td>
-                <td class="text-right">Rp {{ number_format($r['totalJasa'], 0, ',', '.') }}</td>
-                <td class="text-right">Rp {{ number_format($r['totalPengeluaran'], 0, ',', '.') }}</td>
-                <td class="text-right">Rp {{ number_format($r['biayaHarian'], 0, ',', '.') }}</td>
-                <td class="text-right text-bold">Rp {{ number_format($p, 0, ',', '.') }}</td>
+                <td style="padding:3px 6px; font-size:7px;">{{ $bulanMap[$ym] ?? $ym }}</td>
+                <td style="padding:3px 6px; font-size:7px; text-align:center;">{{ count($data) }}</td>
+                <td style="padding:3px 6px; font-size:7px; text-align:right;">Rp {{ number_format($r['totalJasa'], 0, ',', '.') }}</td>
+                <td style="padding:3px 6px; font-size:7px; text-align:right;">Rp {{ number_format($r['totalPengeluaran'], 0, ',', '.') }}</td>
+                <td style="padding:3px 6px; font-size:7px; text-align:right;">Rp {{ number_format($r['biayaHarian'], 0, ',', '.') }}</td>
+                <td style="padding:3px 6px; font-size:7px; text-align:right; font-weight:bold;">Rp {{ number_format($p, 0, ',', '.') }}</td>
             </tr>
             @endforeach
-            <tr style="border-top:2px solid #333; background:#fff8e1; font-weight:bold;">
-                <td>TOTAL {{ count($bulanList) }} BULAN</td>
-                <td class="text-center">{{ array_sum(array_map('count', $bulanList)) }}</td>
-                <td class="text-right">Rp {{ number_format($grandJasa, 0, ',', '.') }}</td>
-                <td class="text-right">Rp {{ number_format($grandPengeluaran, 0, ',', '.') }}</td>
-                <td class="text-right">Rp {{ number_format($grandBiayaHarian, 0, ',', '.') }}</td>
-                <td class="text-right text-bold">Rp {{ number_format($grandProfit, 0, ',', '.') }}</td>
+            <tr style="background:#fff8e1; font-weight:bold;">
+                <td style="border:1px solid #B8860B; padding:4px 6px; font-size:8px;">TOTAL {{ count($bulanList) }} BULAN</td>
+                <td style="border:1px solid #B8860B; padding:4px 6px; font-size:8px; text-align:center;">{{ array_sum(array_map('count', $bulanList)) }}</td>
+                <td style="border:1px solid #B8860B; padding:4px 6px; font-size:8px; text-align:right;">Rp {{ number_format($grandJasa, 0, ',', '.') }}</td>
+                <td style="border:1px solid #B8860B; padding:4px 6px; font-size:8px; text-align:right;">Rp {{ number_format($grandPengeluaran, 0, ',', '.') }}</td>
+                <td style="border:1px solid #B8860B; padding:4px 6px; font-size:8px; text-align:right;">Rp {{ number_format($grandBiayaHarian, 0, ',', '.') }}</td>
+                <td style="border:1px solid #B8860B; padding:4px 6px; font-size:8px; text-align:right; font-weight:bold;">Rp {{ number_format($grandProfit, 0, ',', '.') }}</td>
             </tr>
         </tbody>
     </table>

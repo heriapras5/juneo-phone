@@ -11,10 +11,14 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class BiayaHarianSheetExport implements FromCollection, WithHeadings, WithMapping, WithTitle, WithColumnWidths, WithColumnFormatting, WithStyles
+class BiayaHarianSheetExport implements FromCollection, WithHeadings, WithMapping, WithTitle, WithColumnWidths, WithColumnFormatting, WithStyles, WithEvents
 {
     private int $rowNumber = 0;
 
@@ -50,12 +54,12 @@ class BiayaHarianSheetExport implements FromCollection, WithHeadings, WithMappin
     public function columnWidths(): array
     {
         return [
-            'A' => 6,
-            'B' => 18,
+            'A' => 5,
+            'B' => 14,
             'C' => 20,
-            'D' => 30,
-            'E' => 15,
-            'F' => 40,
+            'D' => 28,
+            'E' => 18,
+            'F' => 30,
         ];
     }
 
@@ -71,6 +75,30 @@ class BiayaHarianSheetExport implements FromCollection, WithHeadings, WithMappin
         return [
             1 => ['font' => ['bold' => true]],
             'E:E' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]],
+        ];
+    }
+
+    public function registerEvents(): array
+    {
+        return [
+            AfterSheet::class => function (AfterSheet $event) {
+                $sheet = $event->sheet;
+                $rowCount = $sheet->getHighestRow();
+                
+                // Header styling
+                $sheet->getStyle('A1:F1')->getFill()
+                    ->setFillType(Fill::FILL_SOLID)
+                    ->getStartColor()->setARGB('FFB8860B');
+                $sheet->getStyle('A1:F1')->getFont()->getColor()->setARGB('FFFFFFFF');
+                $sheet->getStyle('A1:F1')->getFont()->setBold(true);
+                $sheet->getStyle('A1:F1')->getAlignment()
+                    ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                
+                if ($rowCount > 1) {
+                    $sheet->getStyle('A2:F' . $rowCount)
+                        ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+                }
+            },
         ];
     }
 }

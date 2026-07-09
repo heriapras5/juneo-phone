@@ -14,7 +14,6 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\Style\Color;
 
 class LaporanRekapSheet implements FromArray, WithHeadings, WithTitle, WithStyles, WithEvents
 {
@@ -25,8 +24,6 @@ class LaporanRekapSheet implements FromArray, WithHeadings, WithTitle, WithStyle
     protected $fromDate;
     protected $toDate;
     protected $data;
-    protected $profitColumnIndex = 0;
-
     public function __construct(array $bulan, int $tahun, ?string $namaToko = null, ?int $customerId = null, ?string $fromDate = null, ?string $toDate = null)
     {
         $this->bulan = $bulan;
@@ -87,7 +84,6 @@ class LaporanRekapSheet implements FromArray, WithHeadings, WithTitle, WithStyle
         $totalBiayaHarian = array_sum(array_column($this->data, 4));
         $totalProfit = $totalJasa - $totalPengeluaran - $totalBiayaHarian;
 
-        $this->data[] = ['', '', '', '', '', ''];
         $this->data[] = [
             $labelTotal,
             $totalCount,
@@ -156,7 +152,7 @@ class LaporanRekapSheet implements FromArray, WithHeadings, WithTitle, WithStyle
                     ->setVertical(Alignment::VERTICAL_CENTER);
 
                 $headerRow = 3;
-                $lastRow = $rowCount + 1;
+                $lastRow = $rowCount + 2;
 
                 $sheet->getStyle('A' . $headerRow . ':F' . $headerRow)->getFill()
                     ->setFillType(Fill::FILL_SOLID)
@@ -168,7 +164,6 @@ class LaporanRekapSheet implements FromArray, WithHeadings, WithTitle, WithStyle
                     ->setVertical(Alignment::VERTICAL_CENTER);
 
                 $totalRowIndex = $lastRow;
-                $separatorRow = $totalRowIndex - 1;
 
                 // Styling total row
                 $sheet->getStyle('A' . $totalRowIndex . ':F' . $totalRowIndex)->getFont()->setBold(true)->setSize(11);
@@ -179,11 +174,6 @@ class LaporanRekapSheet implements FromArray, WithHeadings, WithTitle, WithStyle
                     ->getBorders()->getTop()->setBorderStyle(Border::BORDER_MEDIUM);
                 $sheet->getStyle('A' . $totalRowIndex . ':F' . $totalRowIndex)
                     ->getBorders()->getBottom()->setBorderStyle(Border::BORDER_MEDIUM);
-
-                if ($separatorRow > $headerRow) {
-                    $sheet->getStyle('A' . $separatorRow . ':F' . $separatorRow)
-                        ->getBorders()->getTop()->setBorderStyle(Border::BORDER_DOTTED);
-                }
 
                 // Format Rp untuk kolom C, D, E, F
                 foreach (range(4, $lastRow) as $r) {
@@ -196,12 +186,12 @@ class LaporanRekapSheet implements FromArray, WithHeadings, WithTitle, WithStyle
                     }
                 }
 
-                $sheet->getColumnDimension('A')->setWidth(22);
-                $sheet->getColumnDimension('B')->setWidth(16);
-                $sheet->getColumnDimension('C')->setWidth(18);
-                $sheet->getColumnDimension('D')->setWidth(20);
-                $sheet->getColumnDimension('E')->setWidth(20);
-                $sheet->getColumnDimension('F')->setWidth(22);
+                $sheet->getColumnDimension('A')->setWidth(18);
+                $sheet->getColumnDimension('B')->setWidth(14);
+                $sheet->getColumnDimension('C')->setWidth(24);
+                $sheet->getColumnDimension('D')->setWidth(24);
+                $sheet->getColumnDimension('E')->setWidth(24);
+                $sheet->getColumnDimension('F')->setWidth(24);
 
                 // Border all data cells
                 $sheet->getStyle('A' . $headerRow . ':F' . $lastRow)

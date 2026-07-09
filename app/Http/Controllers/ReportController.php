@@ -341,18 +341,11 @@ class ReportController extends Controller
             'file' => 'required|mimes:xlsx,xls,csv|max:5120',
         ]);
 
-        ServicesSheetImport::$skippedBatal = 0;
-
         try {
             Excel::import(new MultiSheetImport, $request->file('file'));
 
-            $message = 'Data berhasil diimport.';
-            if (ServicesSheetImport::$skippedBatal > 0) {
-                $message .= ' (' . ServicesSheetImport::$skippedBatal . ' baris status "batal" dilewati)';
-            }
-
             return redirect()->route('reports.import')
-                ->with('success', $message);
+                ->with('success', 'Data berhasil diimport.');
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal import: ' . $e->getMessage());
         }
