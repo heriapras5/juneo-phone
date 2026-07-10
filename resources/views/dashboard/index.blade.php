@@ -377,8 +377,8 @@ function kpiCardHTML(cfg) {
     +   '<div class="p-4 sm:p-5 flex-1 flex flex-col">'
     +     '<div class="flex items-start justify-between">'
     +       '<div class="flex-1 min-w-0">'
-    +         '<p class="text-xs text-gray-500 uppercase tracking-wider font-medium">' + cfg.title + '</p>'
-    +         '<p class="text-[10px] text-gray-400 italic mt-1 hidden sm:block">' + cfg.desc + '</p>'
++ '<p class="text-xs text-gray-500 uppercase tracking-wider font-medium truncate">' + cfg.title + '</p>'
++ '<p class="text-[10px] text-gray-400 italic mt-1 hidden sm:block truncate">' + cfg.desc + '</p>'
     +                             '<p class="text-base sm:text-xl lg:text-2xl font-bold mt-1 kpi-value ' + cfg.valueCls + '" data-value="' + cfg.value + '">' + fmtRp(cfg.value) + '</p>'
     +         extra
     +         changeHtml
@@ -430,13 +430,13 @@ function buildKpiCardsHTML(d, periodLabel) {
             value: d.kebutuhan_pribadi, valueCls: 'text-orange-600',
             icon: 'fa-wallet', iconBg: 'from-orange-50 to-amber-100', iconColor: 'orange-600',
             change: d.changeKebutuhan, upIsGood: false,
-            extra: '<div class="grid grid-cols-2 gap-x-3 gap-y-0.5 mt-1.5 text-xs sm:hidden">'
+            extra: '<div class="grid grid-cols-2 gap-x-3 gap-y-0.5 mt-3 text-xs sm:hidden">'
                 + '<span class="text-gray-400 truncate"><i class="fas fa-university text-[10px] text-blue-500 mr-1"></i>Bank Jago</span><span class="font-medium text-gray-900 tabular-nums text-right">' + fmtRp(d.bank_jago) + '</span>'
                 + '<span class="text-gray-400 truncate"><i class="fas fa-user text-[10px] text-purple-500 mr-1"></i>Gaji Edi</span><span class="font-medium text-gray-900 tabular-nums text-right">' + fmtRp(d.gaji_edi) + '</span>'
                 + '<span class="text-gray-400 truncate"><i class="fas fa-user text-[10px] text-purple-500 mr-1"></i>Gaji Nur</span><span class="font-medium text-gray-900 tabular-nums text-right">' + fmtRp(d.gaji_nur) + '</span>'
                 + '<span class="text-gray-400 truncate"><i class="fas fa-box text-[10px] text-amber-500 mr-1"></i>Lainnya</span><span class="font-medium text-gray-900 tabular-nums text-right">' + fmtRp(d.lainnya) + '</span>'
                 + '</div>'
-                + '<div class="hidden sm:block space-y-0.5 mt-1.5 text-xs">'
+                + '<div class="hidden sm:block space-y-0.5 mt-3 text-xs">'
                 + '<div class="flex items-center justify-between gap-2"><span class="text-gray-400 truncate"><i class="fas fa-university text-[10px] text-blue-500 mr-1"></i>Bank Jago</span><span class="font-medium text-gray-900 tabular-nums">' + fmtRp(d.bank_jago) + '</span></div>'
                 + '<div class="flex items-center justify-between gap-2"><span class="text-gray-400 truncate"><i class="fas fa-user text-[10px] text-purple-500 mr-1"></i>Gaji Edi</span><span class="font-medium text-gray-900 tabular-nums">' + fmtRp(d.gaji_edi) + '</span></div>'
                 + '<div class="flex items-center justify-between gap-2"><span class="text-gray-400 truncate"><i class="fas fa-user text-[10px] text-purple-500 mr-1"></i>Gaji Nur</span><span class="font-medium text-gray-900 tabular-nums">' + fmtRp(d.gaji_nur) + '</span></div>'
