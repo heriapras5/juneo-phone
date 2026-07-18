@@ -38,7 +38,7 @@ window._pageData = {
             </form>
             <button type="button" @click="openCreateModal()"
                 class="px-3 sm:px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm whitespace-nowrap">
-                <i class="fas fa-plus"></i> <span class="hidden sm:inline">Tambah Pelanggan</span><span class="sm:hidden">Tambah</span>
+                <i class="fas fa-plus"></i> Tambah
             </button>
         </div>
 
@@ -146,13 +146,13 @@ window._pageData = {
                 </div>
                 <div class="flex items-center gap-3 mt-6 pt-4 border-t border-gray-100">
                     <button type="submit" :disabled="loading"
-                        class="px-6 py-2.5 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg  flex items-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                        class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg flex items-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
                         <i x-show="!loading" class="fas fa-save"></i>
                         <i x-show="loading" class="fas fa-spinner fa-spin"></i>
-                        <span x-text="editingId ? 'Simpan Perubahan' : 'Simpan'"></span>
+                        <span x-text="editingId ? 'Update' : 'Save'"></span>
                     </button>
                         <button type="button" @click="showModal = false"
-                            class="px-6 py-2.5 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 ">Batal</button>
+                            class="px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200">Batal</button>
                 </div>
             </form>
         </div>

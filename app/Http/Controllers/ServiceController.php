@@ -8,6 +8,7 @@ use App\Models\Service;
 use App\Models\ServiceItem;
 use App\Models\Setting;
 use App\Models\TypeHpOption;
+use App\Models\Helper;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -43,7 +44,9 @@ class ServiceController extends Controller
             ->where('tanggal', '<=', now()->subDays(3))
             ->count();
 
-        return view('services.queue', compact('services', 'completedServices', 'statusCount', 'urgentCount', 'warningCount'));
+        $helpers = Helper::where('role', 'teknisi')->orderBy('id')->get();
+
+        return view('services.queue', compact('services', 'completedServices', 'statusCount', 'urgentCount', 'warningCount', 'helpers'));
     }
 
     public function index()
@@ -79,7 +82,9 @@ class ServiceController extends Controller
             $editService = Service::with(['customer', 'serviceItems'])->find((int) request('edit'));
         }
 
-        return view('services.index', compact('services', 'customers', 'statusCount', 'kerusakanOptions', 'editService', 'typeHpOptions'));
+        $helpers = Helper::where('role', 'teknisi')->orderBy('id')->get();
+
+        return view('services.index', compact('services', 'customers', 'statusCount', 'kerusakanOptions', 'editService', 'typeHpOptions', 'helpers'));
     }
 
     public function create()
@@ -89,19 +94,6 @@ class ServiceController extends Controller
 
     public function store(Request $request)
     {
-        if ($request->has('items')) {
-            $items = $request->input('items');
-            foreach ($items as $i => $item) {
-                if (isset($item['jasa'])) {
-                    $items[$i]['jasa'] = preg_replace('/\.(?=\d{3}(?:\.|$))/', '', $item['jasa']);
-                }
-                if (isset($item['pengeluaran'])) {
-                    $items[$i]['pengeluaran'] = preg_replace('/\.(?=\d{3}(?:\.|$))/', '', $item['pengeluaran']);
-                }
-            }
-            $request->merge(['items' => $items]);
-        }
-
         $validated = $request->validate([
             'tanggal' => 'required|date|before_or_equal:today',
             'customer_id' => 'required|exists:customers,id',
@@ -112,14 +104,10 @@ class ServiceController extends Controller
             'items' => 'required|array|min:1',
             'items.*.type_hp' => 'required|string|max:255',
             'items.*.kerusakan' => 'required|string',
-            'items.*.jasa' => 'nullable|numeric|min:0|max:999999999',
-            'items.*.pengeluaran' => 'nullable|numeric|min:0|max:999999999',
             'items.*.keterangan' => 'nullable|string|max:1000',
         ], [], [
             'items.*.type_hp' => 'Tipe HP',
             'items.*.kerusakan' => 'Kerusakan',
-            'items.*.jasa' => 'Biaya Jasa',
-            'items.*.pengeluaran' => 'Biaya Pengeluaran',
             'items' => 'Item service',
         ]);
 
@@ -127,8 +115,14 @@ class ServiceController extends Controller
         $totalJasa = 0;
         $totalPengeluaran = 0;
         foreach ($items as $item) {
-            $totalJasa += (float) ($item['jasa'] ?? 0);
-            $totalPengeluaran += (float) ($item['pengeluaran'] ?? 0);
+            $kerusakan = json_decode($item['kerusakan'] ?? '[]', true);
+            if (!is_array($kerusakan)) $kerusakan = [$item['kerusakan']];
+            foreach ($kerusakan as $kr) {
+                if (is_array($kr)) {
+                    $totalJasa += (float) ($kr['jasa'] ?? 0);
+                    $totalPengeluaran += (float) ($kr['pengeluaran'] ?? 0);
+                }
+            }
         }
 
         $firstItem = reset($items);
@@ -149,12 +143,28 @@ class ServiceController extends Controller
             foreach ($items as $item) {
                 $kerusakan = json_decode($item['kerusakan'] ?? '[]', true);
                 if (!is_array($kerusakan)) $kerusakan = [$item['kerusakan']];
+                $itemJasa = 0;
+                $itemPengeluaran = 0;
+                foreach ($kerusakan as $kr) {
+                    if (is_array($kr)) {
+                        $itemJasa += (float) ($kr['jasa'] ?? 0);
+                        $itemPengeluaran += (float) ($kr['pengeluaran'] ?? 0);
+                    }
+                }
+                $itemTeknisi = '';
+                foreach ($kerusakan as $kr) {
+                    if (is_array($kr) && !empty($kr['teknisi'])) {
+                        $itemTeknisi = $kr['teknisi'];
+                        break;
+                    }
+                }
                 $si = new ServiceItem([
                     'type_hp' => $item['type_hp'],
                     'kerusakan' => $kerusakan,
-                    'jasa' => $item['jasa'] ?? 0,
-                    'pengeluaran' => $item['pengeluaran'] ?? 0,
+                    'jasa' => $itemJasa,
+                    'pengeluaran' => $itemPengeluaran,
                     'keterangan' => $item['keterangan'] ?? '',
+                    'teknisi' => $itemTeknisi ?: ($validated['teknisi'] ?? ''),
                 ]);
                 $serviceItems[] = $si;
             }
@@ -182,7 +192,8 @@ class ServiceController extends Controller
     public function show(Service $service)
     {
         $service->load(['customer', 'histories.user', 'serviceItems']);
-        return view('services.show', compact('service'));
+        $helpers = Helper::where('role', 'teknisi')->orderBy('id')->get();
+        return view('services.show', compact('service', 'helpers'));
     }
 
     public function edit(Service $service)
@@ -192,19 +203,6 @@ class ServiceController extends Controller
 
     public function update(Request $request, Service $service)
     {
-        if ($request->has('items')) {
-            $items = $request->input('items');
-            foreach ($items as $i => $item) {
-                if (isset($item['jasa'])) {
-                    $items[$i]['jasa'] = preg_replace('/\.(?=\d{3}(?:\.|$))/', '', $item['jasa']);
-                }
-                if (isset($item['pengeluaran'])) {
-                    $items[$i]['pengeluaran'] = preg_replace('/\.(?=\d{3}(?:\.|$))/', '', $item['pengeluaran']);
-                }
-            }
-            $request->merge(['items' => $items]);
-        }
-
         $validated = $request->validate([
             'tanggal' => 'required|date',
             'customer_id' => 'required|exists:customers,id',
@@ -216,14 +214,10 @@ class ServiceController extends Controller
             'items' => 'required|array|min:1',
             'items.*.type_hp' => 'required|string|max:255',
             'items.*.kerusakan' => 'required|string',
-            'items.*.jasa' => 'nullable|numeric|min:0|max:999999999',
-            'items.*.pengeluaran' => 'nullable|numeric|min:0|max:999999999',
             'items.*.keterangan' => 'nullable|string|max:1000',
         ], [], [
             'items.*.type_hp' => 'Tipe HP',
             'items.*.kerusakan' => 'Kerusakan',
-            'items.*.jasa' => 'Biaya Jasa',
-            'items.*.pengeluaran' => 'Biaya Pengeluaran',
             'items' => 'Item service',
         ]);
 
@@ -242,8 +236,14 @@ class ServiceController extends Controller
         $totalJasa = 0;
         $totalPengeluaran = 0;
         foreach ($items as $item) {
-            $totalJasa += (float) ($item['jasa'] ?? 0);
-            $totalPengeluaran += (float) ($item['pengeluaran'] ?? 0);
+            $kerusakan = json_decode($item['kerusakan'] ?? '[]', true);
+            if (!is_array($kerusakan)) $kerusakan = [$item['kerusakan']];
+            foreach ($kerusakan as $kr) {
+                if (is_array($kr)) {
+                    $totalJasa += (float) ($kr['jasa'] ?? 0);
+                    $totalPengeluaran += (float) ($kr['pengeluaran'] ?? 0);
+                }
+            }
         }
 
         $firstItem = reset($items);
@@ -280,12 +280,28 @@ class ServiceController extends Controller
             foreach ($items as $item) {
                 $kerusakan = json_decode($item['kerusakan'] ?? '[]', true);
                 if (!is_array($kerusakan)) $kerusakan = [$item['kerusakan']];
+                $itemJasa = 0;
+                $itemPengeluaran = 0;
+                foreach ($kerusakan as $kr) {
+                    if (is_array($kr)) {
+                        $itemJasa += (float) ($kr['jasa'] ?? 0);
+                        $itemPengeluaran += (float) ($kr['pengeluaran'] ?? 0);
+                    }
+                }
+                $itemTeknisi = '';
+                foreach ($kerusakan as $kr) {
+                    if (is_array($kr) && !empty($kr['teknisi'])) {
+                        $itemTeknisi = $kr['teknisi'];
+                        break;
+                    }
+                }
                 $itemData = [
                     'type_hp' => $item['type_hp'],
                     'kerusakan' => $kerusakan,
-                    'jasa' => (float) ($item['jasa'] ?? 0),
-                    'pengeluaran' => (float) ($item['pengeluaran'] ?? 0),
+                    'jasa' => $itemJasa,
+                    'pengeluaran' => $itemPengeluaran,
                     'keterangan' => $item['keterangan'] ?? null,
+                    'teknisi' => $itemTeknisi ?: ($validated['teknisi'] ?? ''),
                 ];
                 if (!empty($item['id']) && in_array((int) $item['id'], $existingIds)) {
                     $serviceItem = $service->serviceItems()->find((int) $item['id']);
@@ -328,7 +344,6 @@ class ServiceController extends Controller
     {
         $request->validate([
             'status' => 'required|in:menunggu,dikerjakan,selesai,diambil,batal',
-            'garansi' => 'nullable',
         ]);
 
         $allowedTransitions = Service::allowedTransitions();
@@ -346,11 +361,7 @@ class ServiceController extends Controller
             ], 422);
         }
 
-        $data = ['status' => $requested];
-        if ($request->filled('garansi')) {
-            $data['garansi'] = $request->garansi;
-        }
-        $service->update($data);
+        $service->update(['status' => $requested]);
 
         $statusCount = Service::select('status', DB::raw('COUNT(*) as total'))
             ->groupBy('status')
@@ -365,17 +376,6 @@ class ServiceController extends Controller
             'statusCount' => $statusCount,
             'nextTransitions' => Service::allowedTransitions()[$requested] ?? [],
         ]);
-    }
-
-    public function updateGaransi(Request $request, Service $service)
-    {
-        $request->validate([
-            'garansi' => 'nullable',
-        ]);
-
-        $service->update(['garansi' => $request->garansi]);
-
-        return redirect()->back()->with('success', 'Garansi berhasil diperbarui.');
     }
 
     public function quickUpdate(Request $request, Service $service)

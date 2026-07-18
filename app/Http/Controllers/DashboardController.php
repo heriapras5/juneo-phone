@@ -18,22 +18,9 @@ class DashboardController extends Controller
         $to     = request('to');
 
         if (!$period && !$from && !$to) {
-            $latestService = Service::where('status', '!=', 'batal')
-                ->orderBy('tanggal', 'desc')
-                ->value('tanggal');
-
-            if ($latestService) {
-                $diffDays = now()->startOfDay()->diffInDays(\Carbon\Carbon::parse($latestService)->startOfDay());
-                $period = match (true) {
-                    $diffDays <= 1  => 'daily',
-                    $diffDays <= 7  => 'weekly',
-                    default         => 'monthly',
-                };
-            } else {
-                $period = 'monthly';
-            }
+            $period = 'daily';
         } else {
-            $period = $period ?: ($from && $to ? 'custom' : 'monthly');
+            $period = $period ?: ($from && $to ? 'custom' : 'daily');
         }
 
         [$fromDate, $toDate] = $service->deriveDateRange($period, $from, $to);
@@ -113,13 +100,12 @@ class DashboardController extends Controller
 
     public function data(DashboardService $service): JsonResponse
     {
-        $period = request('period', 'monthly');
+        $period = request('period', 'daily');
         $from   = request('from');
         $to     = request('to');
 
         [$fromDate, $toDate] = $service->deriveDateRange($period, $from, $to);
 
-        // Tentukan granularitas chart yang sesuai berdasarkan durasi rentang
         $chartPeriod = $period;
         if ($from && $to) {
             $days = $fromDate->diffInDays($toDate) + 1;
@@ -162,9 +148,8 @@ class DashboardController extends Controller
             'profit'           => $periodTotals->profit,
             'services'         => $periodTotals->services,
             'bank_jago'        => $periodTotals->bank_jago,
-            'gaji_edi'         => $periodTotals->gaji_edi,
-            'gaji_nur'         => $periodTotals->gaji_nur,
             'lainnya'          => $periodTotals->lainnya,
+            'fees'             => $periodTotals->fees,
 
             'changeOmzet'       => $changeOmzet,
             'changePengeluaran' => $changePengeluaran,

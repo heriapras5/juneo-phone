@@ -13,6 +13,7 @@ class ServiceItem extends Model
         'pengeluaran',
         'jasa',
         'keterangan',
+        'teknisi',
     ];
 
     protected function casts(): array

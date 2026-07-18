@@ -84,9 +84,9 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
             'Pelanggan',
             'Type HP',
             'Kerusakan',
+            'Teknisi',
             'Pengeluaran',
             'Jasa',
-            'Teknisi',
             'Keterangan',
             'Keuntungan',
         ];
@@ -96,15 +96,11 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
     {
         $this->no++;
 
-        $teknisiLabel = match ($row->teknisi) {
-            'edi' => 'Edi',
-            'nur' => 'Nur',
-            default => '',
-        };
-
         $allTypesText = ServiceHelper::getAllTypesText($row);
 
-        $kerusakanText = ServiceHelper::getAllKerusakanText($row);
+        $merger = ServiceHelper::getKerusakanTeknisiMerger($row);
+        $kerusakanText = $merger->map(fn($i) => '• ' . $i['nama'])->implode("\n");
+        $teknisiText = $merger->map(fn($i) => $i['teknisi'] ? ServiceHelper::getTeknisiLabel($i['teknisi']) : '-')->implode("\n");
 
         return [
             $this->no,
@@ -113,9 +109,9 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
             $row->customer->nama ?? '',
             $allTypesText,
             $kerusakanText,
+            $teknisiText,
             $row->pengeluaran,
             $row->jasa,
-            $teknisiLabel,
             $row->keterangan ?? '',
             $row->keuntungan,
         ];
@@ -171,23 +167,31 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
                 $sheet->getStyle('A' . $headerRow . ':' . $colCount . $headerRow)
                     ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
-                foreach (['G', 'H', 'K'] as $c) {
+                foreach (['H', 'I', 'K'] as $c) {
                     $sheet->getStyle($c . $headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
                 }
-                $sheet->getStyle('I' . $headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('G' . $headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
                 if ($lastDataRow >= $dataStartRow) {
                     $sheet->getStyle('A' . $dataStartRow . ':' . $colCount . $lastDataRow)
                         ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
-                    $sheet->getStyle('G' . $dataStartRow . ':H' . $lastDataRow)
+                    $sheet->getStyle('E' . $dataStartRow . ':G' . $lastDataRow)
+                        ->getAlignment()->setWrapText(true)
+                        ->setVertical(Alignment::VERTICAL_TOP);
+
+                    for ($r = $dataStartRow; $r <= $lastDataRow; $r++) {
+                        $sheet->getRowDimension($r)->setRowHeight(-1);
+                    }
+
+                    $sheet->getStyle('H' . $dataStartRow . ':I' . $lastDataRow)
                         ->getNumberFormat()->setFormatCode('"Rp"#,##0');
                     $sheet->getStyle('K' . $dataStartRow . ':K' . $lastDataRow)
                         ->getNumberFormat()->setFormatCode('"Rp"#,##0');
 
-                    $sheet->getStyle('G' . $dataStartRow . ':H' . $lastDataRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+                    $sheet->getStyle('H' . $dataStartRow . ':I' . $lastDataRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
                     $sheet->getStyle('K' . $dataStartRow . ':K' . $lastDataRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-                    $sheet->getStyle('I' . $dataStartRow . ':I' . $lastDataRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                    $sheet->getStyle('G' . $dataStartRow . ':G' . $lastDataRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                 }
 
                 // Summary section - two separate single-line rows (always shown)
@@ -239,11 +243,11 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
                 $sheet->getColumnDimension('B')->setWidth(22);
                 $sheet->getColumnDimension('C')->setWidth(13);
                 $sheet->getColumnDimension('D')->setWidth(25);
-                $sheet->getColumnDimension('E')->setWidth(20);
+                $sheet->getColumnDimension('E')->setWidth(22);
                 $sheet->getColumnDimension('F')->setWidth(16);
-                $sheet->getColumnDimension('G')->setWidth(15);
+                $sheet->getColumnDimension('G')->setWidth(10);
                 $sheet->getColumnDimension('H')->setWidth(15);
-                $sheet->getColumnDimension('I')->setWidth(10);
+                $sheet->getColumnDimension('I')->setWidth(15);
                 $sheet->getColumnDimension('J')->setWidth(22);
                 $sheet->getColumnDimension('K')->setWidth(15);
             },

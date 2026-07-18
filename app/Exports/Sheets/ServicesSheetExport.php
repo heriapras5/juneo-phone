@@ -58,10 +58,10 @@ class ServicesSheetExport implements FromCollection, WithHeadings, WithMapping, 
 
         $allKerusakan = collect();
         $parentKr = is_string($service->kerusakan) ? (json_decode($service->kerusakan, true) ?? [$service->kerusakan]) : (array) ($service->kerusakan ?? []);
-        foreach ($parentKr as $kr) { $allKerusakan->push($kr); }
+        foreach ($parentKr as $kr) { $allKerusakan->push(is_array($kr) ? ($kr['nama'] ?? '') : $kr); }
         foreach ($service->serviceItems as $item) {
             $itemKr = is_array($item->kerusakan) ? $item->kerusakan : (json_decode($item->kerusakan, true) ?? []);
-            foreach ($itemKr as $kr) { $allKerusakan->push($kr); }
+            foreach ($itemKr as $kr) { $allKerusakan->push(is_array($kr) ? ($kr['nama'] ?? '') : $kr); }
         }
         $allKerusakan = $allKerusakan->unique()->values();
         $kerusakanText = '• ' . $allKerusakan->implode(' | • ');
@@ -75,7 +75,7 @@ class ServicesSheetExport implements FromCollection, WithHeadings, WithMapping, 
             $kerusakanText,
             $service->pengeluaran ?: 0,
             $service->jasa ?: 0,
-            match ($service->teknisi) { 'edi' => 'Edi', 'nur' => 'Nur', default => '' },
+            $service->serviceItems->pluck('teknisi')->filter()->unique()->map(fn($t) => $t === 'edi' ? 'Edi' : ($t === 'nur' ? 'Nur' : 'Adit'))->values()->join(', ') ?: 'Adit',
             $service->keterangan ?? '',
             $service->keuntungan ?: 0,
         ];

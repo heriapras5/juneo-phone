@@ -25,8 +25,11 @@ class BiayaHarianController extends Controller
 
         $defaults = BiayaHarian::defaultValues();
         $kategoriLabels = BiayaHarian::kategoriLabels();
+        $kategoriList = BiayaHarian::kategoriList();
 
-        return view('biaya-harian.index', compact('biaya', 'riwayat', 'defaults', 'kategoriLabels', 'date', 'bulan'));
+        $tambahan = BiayaHarian::whereDate('tanggal', $date)->where('kategori', 'fee_tambahan')->get();
+
+        return view('biaya-harian.index', compact('biaya', 'riwayat', 'defaults', 'kategoriLabels', 'date', 'bulan', 'kategoriList', 'tambahan'));
     }
 
     public function update(Request $request)
@@ -42,18 +45,23 @@ class BiayaHarianController extends Controller
         }
         $request->merge(['items' => $items]);
 
+        $kategoriList = BiayaHarian::kategoriList();
+
         $validated = $request->validate([
             'tanggal' => 'required|date',
             'items' => 'required|array',
-            'items.*.kategori' => 'required|in:bank_jago,fee_edi,fee_nur,lainnya',
+            'items.*.kategori' => 'required|in:' . implode(',', $kategoriList),
             'items.*.jumlah' => 'nullable|numeric|min:0',
             'items.*.keterangan' => 'nullable|string|max:255',
+            'items.*.nama' => 'nullable|string|max:255',
         ]);
 
         $dateOnly = Carbon::parse($validated['tanggal'])->format('Y-m-d');
 
         DB::beginTransaction();
         try {
+            BiayaHarian::whereDate('tanggal', $dateOnly)->where('kategori', 'fee_tambahan')->delete();
+
             foreach ($validated['items'] as $item) {
                 $jumlah = isset($item['jumlah']) && $item['jumlah'] !== '' ? (float) $item['jumlah'] : 0;
                 $existing = BiayaHarian::whereDate('tanggal', $dateOnly)
@@ -62,20 +70,32 @@ class BiayaHarianController extends Controller
 
                 $kategoriLabels = BiayaHarian::kategoriLabels();
 
-                if ($existing) {
-                    $existing->update([
-                        'tanggal' => $dateOnly,
-                        'jumlah' => $jumlah,
-                        'keterangan' => $item['keterangan'] ?? null,
-                    ]);
+                $data = [
+                    'tanggal' => $dateOnly,
+                    'jumlah' => $jumlah,
+                    'keterangan' => $item['keterangan'] ?? null,
+                ];
+
+                if (isset($item['nama']) && $item['nama'] !== '') {
+                    $data['nama'] = $item['nama'];
+                }
+
+                if ($item['kategori'] === 'fee_tambahan') {
+                    if (!isset($data['nama'])) {
+                        $data['nama'] = 'Fee Tambahan';
+                    }
+                    BiayaHarian::create(array_merge($data, [
+                        'kategori' => 'fee_tambahan',
+                    ]));
+                } elseif ($existing) {
+                    $existing->update($data);
                 } else {
-                    BiayaHarian::create([
-                        'tanggal' => $dateOnly,
+                    if (!isset($data['nama'])) {
+                        $data['nama'] = $kategoriLabels[$item['kategori']] ?? $item['kategori'];
+                    }
+                    BiayaHarian::create(array_merge($data, [
                         'kategori' => $item['kategori'],
-                        'nama' => $kategoriLabels[$item['kategori']] ?? $item['kategori'],
-                        'jumlah' => $jumlah,
-                        'keterangan' => $item['keterangan'] ?? null,
-                    ]);
+                    ]));
                 }
             }
 
@@ -95,9 +115,11 @@ class BiayaHarianController extends Controller
         $cleanDate = Carbon::parse($date)->format('Y-m-d');
         $kategori = $request->input('kategori');
 
+        $kategoriList = BiayaHarian::kategoriList();
+
         try {
             $query = BiayaHarian::whereDate('tanggal', $cleanDate);
-            if ($kategori && in_array($kategori, ['bank_jago', 'fee_edi', 'fee_nur', 'lainnya'])) {
+            if ($kategori && in_array($kategori, $kategoriList)) {
                 $query->where('kategori', $kategori);
             }
             $query->delete();
@@ -115,6 +137,4 @@ class BiayaHarianController extends Controller
                 ->with('error', 'Gagal menghapus biaya harian: ' . $e->getMessage());
         }
     }
-
-
 }

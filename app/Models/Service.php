@@ -25,7 +25,6 @@ class Service extends Model
         'customer_id',
         'type_hp',
         'kerusakan',
-        'garansi',
         'pengeluaran',
         'jasa',
         'keuntungan',
@@ -299,22 +298,20 @@ class Service extends Model
 
     protected static function generateServiceNumber()
     {
-        $prefix = 'SRV-' . now()->format('Ymd') . '-';
-
-        return DB::transaction(function () use ($prefix) {
-            $last = static::where('service_number', 'like', $prefix . '%')
+        return DB::transaction(function () {
+            $last = static::where('service_number', 'like', 'JN-%')
                 ->lockForUpdate()
                 ->orderBy('service_number', 'desc')
                 ->value('service_number');
 
             if ($last) {
-                $lastNum = (int) substr($last, -5);
-                $newNum = str_pad($lastNum + 1, 5, '0', STR_PAD_LEFT);
+                $lastNum = (int) substr($last, -4);
+                $newNum = str_pad($lastNum + 1, 4, '0', STR_PAD_LEFT);
             } else {
-                $newNum = '00001';
+                $newNum = '0001';
             }
 
-            return $prefix . $newNum;
+            return 'JN-' . $newNum;
         });
     }
 }

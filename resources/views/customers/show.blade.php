@@ -47,9 +47,9 @@ $statusLabels = \App\Models\Service::statusLabels();
                         <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap">Tanggal</th>
                         <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left">Type HP</th>
                         <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left">Kerusakan</th>
+                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Teknisi</th>
                         <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right">Jasa</th>
                         <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Status</th>
-                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Teknisi</th>
                         <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -59,22 +59,58 @@ $statusLabels = \App\Models\Service::statusLabels();
                         <td class="px-5 py-4 text-sm font-mono text-yellow-600">{{ $service->service_number }}</td>
                         <td class="px-5 py-4 text-sm text-gray-600">{{ $service->tanggal->format('d/m/Y') }}</td>
                         <td class="px-5 py-4 text-sm text-gray-600">{{ $service->type_hp }}</td>
-                                                @php $sKerusakan = json_decode($service->kerusakan, true); @endphp
-                        <td class="px-5 py-4 text-sm text-gray-600 max-w-xs truncate">{{ is_array($sKerusakan) ? implode(', ', $sKerusakan) : $service->kerusakan }}</td>
+                                                @php
+                                                    $sMerger = collect();
+                                                    $sItems = $service->serviceItems;
+                                                    if ($sItems->isNotEmpty()) {
+                                                        foreach ($sItems as $sItem) {
+                                                            $sKrList = is_array($sItem->kerusakan) ? $sItem->kerusakan : (json_decode($sItem->kerusakan, true) ?: []);
+                                                            foreach ($sKrList as $sKr) {
+                                                                $sMerger->push([
+                                                                    'nama' => is_array($sKr) ? ($sKr['nama'] ?? '') : $sKr,
+                                                                    'teknisi' => is_array($sKr) ? ($sKr['teknisi'] ?? '') : ($sItem->teknisi ?? $service->teknisi ?? ''),
+                                                                ]);
+                                                            }
+                                                        }
+                                                    } elseif ($service->kerusakan) {
+                                                        $sKrList = is_array($service->kerusakan) ? $service->kerusakan : (json_decode($service->kerusakan, true) ?: []);
+                                                        foreach ($sKrList as $sKr) {
+                                                            $sMerger->push([
+                                                                'nama' => is_array($sKr) ? ($sKr['nama'] ?? '') : $sKr,
+                                                                'teknisi' => is_array($sKr) ? ($sKr['teknisi'] ?? '') : ($service->teknisi ?? ''),
+                                                            ]);
+                                                        }
+                                                    }
+                                                @endphp
+                        <td class="px-5 py-4 text-sm text-gray-600 max-w-xs whitespace-nowrap">
+                            @forelse($sMerger as $sKr)
+                                <div class="truncate leading-relaxed">
+                                    <span class="text-gray-400">•</span>
+                                    <span>{{ $sKr['nama'] }}</span>
+                                </div>
+                            @empty
+                                <span class="text-gray-400">-</span>
+                            @endforelse
+                        </td>
+                        <td class="px-5 py-4 text-sm text-center whitespace-nowrap">
+                            @forelse($sMerger as $sKr)
+                                @php $sKrHelper = $sKr['teknisi'] ? $helpers->first(fn($h) => strtolower($h->nama) === strtolower($sKr['teknisi'])) : null; @endphp
+                                <div class="leading-relaxed">
+                                    @if($sKr['teknisi'])
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium border {{ $sKrHelper?->warna ?? 'bg-gray-100 text-gray-600 border-gray-200' }}">{{ $sKrHelper?->nama ?? ucfirst($sKr['teknisi']) }}</span>
+                                    @else
+                                        <span class="text-gray-400">-</span>
+                                    @endif
+                                </div>
+                            @empty
+                                <span class="text-gray-400">-</span>
+                            @endforelse
+                        </td>
                         <td class="px-5 py-4 text-sm text-gray-900 text-right">Rp {{ number_format($service->jasa, 0, ',', '.') }}</td>
                         <td class="px-5 py-4 text-center">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusClasses[$service->status] ?? 'bg-gray-100 text-gray-600' }}">
                                 {{ $statusLabels[$service->status] ?? $service->status }}
                             </span>
-                        </td>
-                        <td class="px-5 py-4 text-center">
-                            @if($service->teknisi === 'edi')
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700 border border-blue-200">E</span>
-                            @elseif($service->teknisi === 'nur')
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200">N</span>
-                            @else
-                                <span class="text-gray-300">-</span>
-                            @endif
                         </td>
                         <td class="px-5 py-4 text-right">
                             <a href="{{ route('services.show', $service) }}" title="Lihat Detail" class="p-2 text-gray-400 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg  inline-block">

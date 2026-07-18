@@ -13,6 +13,7 @@ $nextStatus = \App\Models\Service::allowedTransitions();
 window._pageData = {
     kerusakanOptions: @json($kerusakanOptions ?? []),
     typeHpOptions: @json($typeHpOptions ?? []),
+    helpers: @json($helpers ?? []),
     statusCounts: @json($statusCount),
     statusLabels: @json(\App\Models\Service::statusLabels()),
     allowedTransitions: @json($nextStatus),
@@ -74,7 +75,7 @@ window._pageData = {
             </form>
             <button type="button" onclick="Alpine.$data(document.querySelector('[x-data=&quot;servicePage&quot;]')).openCreateModal()"
                 class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm flex-shrink-0">
-                <i class="fas fa-plus"></i> Tambah Service
+                <i class="fas fa-plus"></i> Tambah
             </button>
         </div>
     </div>
@@ -89,37 +90,34 @@ window._pageData = {
                     <thead>
                     <tr class="bg-gray-50">
                         <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap w-10">No</th>
-                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">No. Service</th>
                         <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap">Tanggal</th>
-                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap">Tgl Selesai</th>
                         <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Pelanggan</th>
                         <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap">Status</th>
-                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Type HP</th>
-                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Kerusakan</th>
+                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap w-44">Type HP</th>
+                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap w-52">Kerusakan</th>
+                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap w-20">Teknisi</th>
                         <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right whitespace-nowrap">Pengeluaran</th>
                         <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right whitespace-nowrap">Jasa</th>
                         <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right whitespace-nowrap">Keuntungan</th>
                         <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Keterangan</th>
+                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">No. Service</th>
                         <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap">Estimasi</th>
-                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap">Teknisi</th>
-                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap w-16">Aksi</th>
+                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap">Tgl Selesai</th>
+                        <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap w-16 sticky right-0 bg-gray-50 z-10">Aksi</th>
                     </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                     @forelse($services as $service)
                     @php
                         $serviceItems = $service->serviceItems;
-                        $allTypes = $serviceItems->pluck('type_hp')->unique()->values();
-                        if ($allTypes->isEmpty()) { $allTypes = collect([$service->type_hp]); }
                     @endphp
                     <tr class="hover:bg-gray-50/50" data-row="{{ $service->id }}">
                         <td class="px-5 py-3 text-sm text-gray-500 text-center whitespace-nowrap">{{ $loop->iteration + ($services->currentPage() - 1) * $services->perPage() }}</td>
-                        <td class="px-5 py-3 text-sm font-medium text-gray-900 whitespace-nowrap">
-                            <a href="{{ route('services.show', $service) }}" class="text-yellow-600 hover:text-yellow-700 hover:underline">{{ $service->service_number }}</a>
+                        <td class="px-5 py-3 text-sm text-gray-600 whitespace-nowrap text-center">
+                            <a href="{{ route('services.show', $service) }}" class="text-gray-600 hover:text-yellow-600">{{ \Carbon\Carbon::parse($service->tanggal)->format('d/m/Y') }}</a>
                         </td>
-                        <td class="px-5 py-3 text-sm text-gray-600 whitespace-nowrap text-center">{{ \Carbon\Carbon::parse($service->tanggal)->format('d/m/Y') }}</td>
-                        <td class="px-5 py-3 text-sm text-gray-600 whitespace-nowrap text-center">{{ $service->tanggal_selesai?->format('d/m/Y') ?? '-' }}</td>
-                        <td class="px-5 py-3 text-sm text-gray-700 whitespace-nowrap">{{ $service->customer?->nama ?? '-' }}</td>
+                        <td class="px-5 py-3 text-sm text-gray-700 whitespace-nowrap">
+                            <a href="{{ route('services.show', $service) }}" class="text-gray-700 hover:text-yellow-600 hover:underline">{{ $service->customer?->nama ?? '-' }}</a>
                         <td class="px-5 py-3 text-center whitespace-nowrap">
                             <div class="inline-flex flex-col items-center">
                                 <button data-status-badge @click="toggleStatus({{ $service->id }}, $event)"
@@ -154,6 +152,10 @@ window._pageData = {
                             </div>
                         </td>
                         <td class="px-5 py-3 text-sm text-gray-600 whitespace-nowrap">
+                            @php
+                                $allTypes = $serviceItems->pluck('type_hp')->unique()->values();
+                                if ($allTypes->isEmpty()) { $allTypes = collect([$service->type_hp]); }
+                            @endphp
                             @foreach($allTypes as $tipe)
                                 <div class="leading-relaxed whitespace-nowrap">
                                     <span class="text-gray-400">•</span>
@@ -161,31 +163,53 @@ window._pageData = {
                                 </div>
                             @endforeach
                         </td>
-                        <td class="px-5 py-3 text-sm text-gray-600">
-                            @foreach($serviceItems as $item)
-                                @php
+                        @php
+                            $mergerList = collect();
+                            if ($serviceItems->isNotEmpty()) {
+                                foreach ($serviceItems as $item) {
                                     $krList = is_array($item->kerusakan) ? $item->kerusakan : (json_decode($item->kerusakan, true) ?: []);
-                                @endphp
-                                @foreach($krList as $kr)
-                                    <div class="leading-relaxed whitespace-nowrap">
-                                        <span class="text-gray-400">•</span>
-                                        <span>{{ $kr }}</span>
-                                    </div>
-                                @endforeach
-                            @endforeach
-                            @if($serviceItems->isEmpty() && $service->kerusakan)
-                                @php
-                                    $krList = is_array($service->kerusakan) ? $service->kerusakan : (json_decode($service->kerusakan, true) ?: []);
-                                @endphp
-                                @foreach($krList as $kr)
-                                    <div class="leading-relaxed whitespace-nowrap">
-                                        <span class="text-gray-400">•</span>
-                                        <span>{{ $kr }}</span>
-                                    </div>
-                                @endforeach
-                            @elseif($serviceItems->isEmpty())
+                                    foreach ($krList as $kr) {
+                                        $mergerList->push([
+                                            'nama' => is_array($kr) ? ($kr['nama'] ?? '') : $kr,
+                                            'teknisi' => is_array($kr) ? ($kr['teknisi'] ?? '') : ($item->teknisi ?? $service->teknisi ?? ''),
+                                        ]);
+                                    }
+                                }
+                            } else {
+                                $krList = $service->kerusakan ? (is_array($service->kerusakan) ? $service->kerusakan : (json_decode($service->kerusakan, true) ?: [])) : [];
+                                foreach ($krList as $kr) {
+                                    $mergerList->push([
+                                        'nama' => is_array($kr) ? ($kr['nama'] ?? '') : $kr,
+                                        'teknisi' => is_array($kr) ? ($kr['teknisi'] ?? '') : ($service->teknisi ?? ''),
+                                    ]);
+                                }
+                            }
+                        @endphp
+                        <td class="px-5 py-3 text-sm text-gray-600 whitespace-nowrap">
+                            @forelse($mergerList as $kr)
+                                <div class="leading-relaxed whitespace-nowrap">
+                                    <span class="text-gray-400">•</span>
+                                    <span>{{ $kr['nama'] }}</span>
+                                </div>
+                            @empty
                                 <span class="text-gray-400">-</span>
-                            @endif
+                            @endforelse
+                        </td>
+                        <td class="px-5 py-3 text-sm text-center whitespace-nowrap">
+                            @forelse($mergerList as $kr)
+                                @php
+                                    $krTekHelper = $kr['teknisi'] ? $helpers->first(fn($h) => strtolower($h->nama) === strtolower($kr['teknisi'])) : null;
+                                @endphp
+                                <div class="leading-relaxed">
+                                    @if($kr['teknisi'])
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium border {{ $krTekHelper?->warna ?? 'bg-gray-100 text-gray-600 border-gray-200' }}">{{ $krTekHelper?->nama ?? ucfirst($kr['teknisi']) }}</span>
+                                    @else
+                                        <span class="text-gray-400">-</span>
+                                    @endif
+                                </div>
+                            @empty
+                                <span class="text-gray-400">-</span>
+                            @endforelse
                         </td>
                         <td class="px-5 py-3 text-sm text-red-700 text-right whitespace-nowrap tabular-nums">Rp {{ number_format($service->pengeluaran, 0, ',', '.') }}</td>
                         <td class="px-5 py-3 text-sm text-gray-900 text-right whitespace-nowrap tabular-nums">Rp {{ number_format($service->jasa, 0, ',', '.') }}</td>
@@ -193,6 +217,9 @@ window._pageData = {
                             Rp {{ number_format($service->keuntungan, 0, ',', '.') }}
                         </td>
                         <td class="px-5 py-3 text-sm text-gray-600 max-w-[180px] truncate whitespace-nowrap">{{ $service->keterangan ?? '' }}</td>
+                        <td class="px-5 py-3 text-sm font-medium text-gray-900 whitespace-nowrap">
+                            <a href="{{ route('services.show', $service) }}" class="text-yellow-600 hover:text-yellow-700 hover:underline">{{ $service->service_number }}</a>
+                        </td>
                         <td class="px-5 py-3 text-sm text-center whitespace-nowrap">
                             @if($service->estimasi_selesai)
                                 @php
@@ -206,16 +233,8 @@ window._pageData = {
                                 <span class="text-gray-300">-</span>
                             @endif
                         </td>
-                        <td class="px-5 py-3 text-center whitespace-nowrap">
-                            @if($service->teknisi === 'edi')
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700 border border-blue-200">E</span>
-                            @elseif($service->teknisi === 'nur')
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200">N</span>
-                            @else
-                                <span class="text-gray-300">-</span>
-                            @endif
-                        </td>
-                        <td class="px-5 py-3 text-center whitespace-nowrap">
+                        <td class="px-5 py-3 text-sm text-gray-600 whitespace-nowrap text-center">{{ $service->tanggal_selesai?->format('d/m/Y') ?? '-' }}</td>
+                        <td class="px-5 py-3 text-center whitespace-nowrap sticky right-0 bg-white z-10">
                             <div class="inline-flex flex-col items-center">
                                 <button @click="toggleAction({{ $service->id }}, $event)"
                                     class="text-gray-400 hover:text-gray-600 p-1">
@@ -243,9 +262,9 @@ window._pageData = {
                             </div>
                         </td>
                     </tr>
-                    @empty
-                    <tr>
-                        <td colspan="15" class="px-5 py-12 text-center text-gray-400">
+                        @empty
+                        <tr>
+                            <td colspan="15" class="px-5 py-12 text-center text-gray-400">
                             <i class="fas fa-inbox text-3xl mb-2 block"></i>
                             Belum ada data service
                         </td>
@@ -312,7 +331,7 @@ window._pageData = {
                                 <button type="button" @click="customerDropdownOpen = !customerDropdownOpen; $nextTick(() => { if(customerDropdownOpen) { const el = $refs.customerSearchInput; if(el) setTimeout(() => el.focus(), 50); } })"
                                     class="w-full flex items-center justify-between px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none cursor-pointer"
                                     :class="{ 'border-yellow-500 ring-2 ring-yellow-500/30': customerDropdownOpen }">
-                                    <span class="truncate" x-text="selectedCustomer ? selectedCustomer.nama + ' (' + selectedCustomer.no_hp + ')' : '-- Pilih Pelanggan --'"></span>
+                                    <span class="truncate" x-text="selectedCustomer ? (selectedCustomer.nama + (selectedCustomer.no_hp ? ' (' + selectedCustomer.no_hp + ')' : '')) : '-- Pilih Pelanggan --'"></span>
                                     <i class="fas fa-chevron-down text-gray-400 text-xs" :class="{ 'rotate-180': customerDropdownOpen }"></i>
                                 </button>
                                 <div x-show="customerDropdownOpen" x-cloak
@@ -329,17 +348,17 @@ window._pageData = {
                                                 class="w-full text-left px-3 py-2 text-sm hover:bg-yellow-50 flex items-center justify-between"
                                                 :class="{ 'bg-yellow-50 text-yellow-700 font-medium': formData.customer_id == c.id }">
                                                 <span x-text="c.nama"></span>
-                                                <span class="text-xs text-gray-400" x-text="c.no_hp"></span>
+                                                <span class="text-xs text-gray-400" x-text="c.no_hp || ''"></span>
                                             </button>
                                         </template>
-                                        <div x-show="filteredCustomers.length === 0" class="px-3 py-4 text-sm text-gray-400 text-center">
-                                            <i class="fas fa-search mr-1"></i> Tidak ditemukan
+                                        <div x-show="filteredCustomers.length === 0 && customerSearch.trim() === ''" class="px-3 py-4 text-sm text-gray-400 text-center">
+                                            <i class="fas fa-search mr-1"></i> Ketik nama untuk mencari
                                         </div>
-                                        <div class="border-t border-gray-100 p-2">
-                                            <button type="button" @click.stop="openAddCustomer()"
-                                                class="w-full flex items-center gap-2 px-3 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
-                                                <i class="fas fa-plus-circle"></i>
-                                                <span>Tambah Pelanggan Baru</span>
+                                        <div x-show="filteredCustomers.length === 0 && customerSearch.trim() !== ''" class="px-3 py-2 border-t border-gray-100">
+                                            <button type="button" @click="quickAddCustomer(customerSearch)"
+                                                class="w-full text-left text-sm text-indigo-600 hover:text-indigo-700 flex items-center gap-1 py-1">
+                                                <i class="fas fa-plus text-xs"></i>
+                                                <span>Buat baru: "</span><span x-text="customerSearch"></span><span>"</span>
                                             </button>
                                         </div>
                                     </div>
@@ -347,48 +366,14 @@ window._pageData = {
                             </div>
                             <input type="hidden" name="customer_id" :value="formData.customer_id">
                             @error('customer_id') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                            <template x-if="selectedCustomer">
+                            <template x-if="selectedCustomer && selectedCustomer.no_hp">
                                 <p class="text-xs text-gray-400 mt-1" x-text="'No. HP: ' + selectedCustomer.no_hp"></p>
                             </template>
                         </div>
                     </div>
                 </div>
 
-                {{-- Quick Add Customer Modal --}}
-                <div x-show="showAddCustomer" x-cloak
-                    class="fixed inset-0 z-[60] flex items-center justify-center bg-black/40"
-                    @click="showAddCustomer = false">
-                    <div @click.stop class="bg-white rounded-2xl shadow-2xl p-5 w-full max-w-sm mx-4 border border-gray-200">
-                        <div class="flex items-center justify-between mb-4">
-                            <h4 class="text-sm font-semibold text-gray-900">Tambah Pelanggan Baru</h4>
-                            <button type="button" @click="showAddCustomer = false" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
-                        </div>
-                        <div class="space-y-3">
-                            <div>
-                                <label class="block text-xs font-medium text-gray-500 mb-1">Nama <span class="text-red-500">*</span></label>
-                                <input type="text" x-model="addCustomerForm.nama" placeholder="Nama pelanggan..."
-                                    @keydown.enter.prevent="saveNewCustomer"
-                                    class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 placeholder-gray-400 outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-500 mb-1">No. HP</label>
-                                <input type="text" x-model="addCustomerForm.no_hp" placeholder="08xxx..."
-                                    @keydown.enter.prevent="saveNewCustomer"
-                                    class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 placeholder-gray-400 outline-none">
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-end gap-3 mt-5 pt-3 border-t border-gray-100">
-                            <button type="button" @click="showAddCustomer = false"
-                                class="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm hover:bg-gray-200">Batal</button>
-                            <button type="button" @click="saveNewCustomer" :disabled="customerSaving"
-                                class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm disabled:opacity-50">
-                                <i x-show="customerSaving" class="fas fa-spinner fa-spin"></i>
-                                <i x-show="!customerSaving" class="fas fa-save"></i>
-                                Simpan
-                            </button>
-                        </div>
-                    </div>
-                </div>
+
 
                 {{-- Section 3: Data Service (items) --}}
                 <div class="mb-5">
@@ -412,7 +397,7 @@ window._pageData = {
                                         <i class="fas fa-times mr-1"></i> Hapus
                                     </button>
                                 </div>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
                                     <div>
                                         <label class="block text-xs font-medium text-gray-500 mb-1.5">Type HP</label>
                                         <div class="relative" @click.outside="item.typeHpDropdownOpen = false">
@@ -450,70 +435,101 @@ window._pageData = {
                                             </div>
                                         </div>
                                     </div>
-                                    <div>
-                                        <label class="block text-xs font-medium text-gray-500 mb-1.5">Kerusakan</label>
-                                        <div class="space-y-1.5">
-                                            <template x-for="(k, ki) in (item.kerusakanList || [])" :key="ki">
-                                                <div class="inline-flex items-center gap-1 px-2.5 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs">
-                                                    <span x-text="k"></span>
-                                                    <button type="button" @click="item.kerusakanList = item.kerusakanList.filter(function(_, i) { return i !== ki; })"
-                                                        class="text-indigo-400 hover:text-red-500">
-                                                        <i class="fas fa-times text-[10px]"></i>
-                                                    </button>
-                                                </div>
-                                            </template>
-                                        </div>
-                                        <div class="relative" @click.outside="item.kerusakanDropdownOpen = false">
-                                            <button type="button" @click="item.kerusakanDropdownOpen = !item.kerusakanDropdownOpen"
-                                                class="w-full flex items-center justify-between px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none cursor-pointer"
-                                                :class="{ 'border-yellow-500 ring-2 ring-yellow-500/30': item.kerusakanDropdownOpen }">
-                                                <span class="truncate text-sm" x-text="(item.kerusakanList || []).length > 0 ? (item.kerusakanList || []).length + ' kerusakan dipilih' : '-- Pilih Kerusakan --'"></span>
-                                                <i class="fas fa-chevron-down text-gray-400 text-xs flex-shrink-0 ml-1" :class="{ 'rotate-180': item.kerusakanDropdownOpen }"></i>
-                                            </button>
-                                            <div x-show="item.kerusakanDropdownOpen" x-cloak
-                                                class="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
-                                                <div class="p-2 border-b border-gray-100">
-                                                    <input type="text" x-model="item.kerusakanSearch"
-                                                        placeholder="Cari kerusakan..."
-                                                        @click.stop
-                                                        class="w-full px-3 py-1.5 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 placeholder-gray-400 outline-none">
-                                                </div>
-                                                <div class="max-h-40 overflow-y-auto">
-                                                    <template x-for="o in filteredKerusakanForItem(index)" :key="o">
-                                                        <button type="button" @click="selectKerusakanItem(index, o); item.kerusakanSearch = '';"
-                                                            class="w-full text-left px-3 py-2 text-sm hover:bg-yellow-50 flex items-center justify-between"
-                                                            :class="{ 'bg-yellow-50 text-yellow-700 font-medium': (item.kerusakanList || []).includes(o) }">
-                                                            <span x-text="o"></span>
-                                                            <i x-show="(item.kerusakanList || []).includes(o)" class="fas fa-check text-yellow-500 text-xs"></i>
-                                                        </button>
+                                </div>
+                                <div class="mt-4">
+                                    <label class="block text-xs font-medium text-gray-500 mb-1.5">Kerusakan</label>
+                                    <div class="space-y-1.5 mb-2">
+                                        <template x-for="(k, ki) in (item.kerusakanList || [])" :key="ki">
+                                            <div class="flex items-center gap-3 px-3 py-1.5 bg-indigo-50 border border-indigo-100 rounded-lg text-xs">
+                                                <span class="flex-1 text-indigo-700 font-medium min-w-[80px]" x-text="kerusakanNama(k)"></span>
+                                                <input type="text" inputmode="numeric" placeholder="Pengeluaran"
+                                                    :value="displayNumber(k.pengeluaran)"
+                                                    @input="formatCurrencyKerusakan(index, ki, 'pengeluaran', $event)"
+                                                    class="w-32 px-2 py-1 bg-white border border-gray-200 rounded text-xs text-right outline-none focus:ring-1 focus:ring-yellow-500/30 text-gray-900">
+                                                <input type="text" inputmode="numeric" placeholder="Jasa"
+                                                    :value="displayNumber(k.jasa)"
+                                                    @input="formatCurrencyKerusakan(index, ki, 'jasa', $event)"
+                                                    class="w-32 px-2 py-1 bg-white border border-gray-200 rounded text-xs text-right outline-none focus:ring-1 focus:ring-yellow-500/30 text-gray-900">
+                                                <select x-model="k.teknisi"
+                                                    class="w-36 px-1 py-1 bg-white border border-indigo-200 rounded text-xs outline-none focus:ring-1 focus:ring-yellow-500/30 text-gray-700">
+                                                    <option value="">Teknisi</option>
+                                                    <template x-for="h in helpers" :key="h.id">
+                                                        <option :value="h.nama.toLowerCase()" x-text="h.nama"></option>
                                                     </template>
-                                                    <div x-show="item.kerusakanSearch.trim() !== ''" class="px-3 py-2 border-t border-gray-100">
-                                                        <button type="button" @click="selectKerusakanItem(index, item.kerusakanSearch); item.kerusakanSearch = '';"
-                                                            class="w-full text-left text-sm text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
-                                                            <i class="fas fa-plus text-xs"></i>
-                                                            <span>Tambah: "</span><span x-text="item.kerusakanSearch"></span><span>"</span>
-                                                        </button>
-                                                    </div>
+                                                </select>
+                                                <button type="button" @click="openAddTeknisi(index)"
+                                                    class="flex-shrink-0 text-indigo-300 hover:text-indigo-600" title="Tambah teknisi">
+                                                    <i class="fas fa-plus text-[10px]"></i>
+                                                </button>
+                                                <button type="button" @click="removeKerusakan(index, ki)"
+                                                    class="flex-shrink-0 text-indigo-300 hover:text-red-500">
+                                                    <i class="fas fa-times text-[10px]"></i>
+                                                </button>
+                                            </div>
+                                        </template>
+                                    </div>
+                                    <div class="relative" @click.outside="item.kerusakanDropdownOpen = false">
+                                        <button type="button" @click="item.kerusakanDropdownOpen = !item.kerusakanDropdownOpen"
+                                            class="w-full flex items-center justify-between px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none cursor-pointer"
+                                            :class="{ 'border-yellow-500 ring-2 ring-yellow-500/30': item.kerusakanDropdownOpen }">
+                                            <span class="truncate text-sm" x-text="(item.kerusakanList || []).length > 0 ? '+ Tambah Kerusakan' : '-- Pilih Kerusakan --'"></span>
+                                            <i class="fas fa-chevron-down text-gray-400 text-xs flex-shrink-0 ml-1" :class="{ 'rotate-180': item.kerusakanDropdownOpen }"></i>
+                                        </button>
+                                        <div x-show="item.kerusakanDropdownOpen" x-cloak
+                                            class="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+                                            <div class="p-2 border-b border-gray-100">
+                                                <input type="text" x-model="item.kerusakanSearch"
+                                                    placeholder="Cari kerusakan..."
+                                                    @click.stop
+                                                    class="w-full px-3 py-1.5 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 placeholder-gray-400 outline-none">
+                                            </div>
+                                            <div class="max-h-40 overflow-y-auto">
+                                                <template x-for="o in filteredKerusakanForItem(index)" :key="o">
+                                                    <button type="button" @click="selectKerusakanItem(index, o); item.kerusakanSearch = '';"
+                                                        class="w-full text-left px-3 py-2 text-sm hover:bg-yellow-50 flex items-center justify-between"
+                                                        :class="{ 'bg-yellow-50 text-yellow-700 font-medium': kerusakanTerpilih(item.kerusakanList || [], o) }">
+                                                        <span x-text="o"></span>
+                                                        <i x-show="kerusakanTerpilih(item.kerusakanList || [], o)" class="fas fa-check text-yellow-500 text-xs"></i>
+                                                    </button>
+                                                </template>
+                                                <div x-show="item.kerusakanSearch.trim() !== ''" class="px-3 py-2 border-t border-gray-100">
+                                                    <button type="button" @click="selectKerusakanItem(index, item.kerusakanSearch); item.kerusakanSearch = '';"
+                                                        class="w-full text-left text-sm text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
+                                                        <i class="fas fa-plus text-xs"></i>
+                                                        <span>Tambah: "</span><span x-text="item.kerusakanSearch"></span><span>"</span>
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div>
-                                        <label class="block text-xs font-medium text-gray-500 mb-1.5">Pengeluaran</label>
-                                        <input type="text" inputmode="numeric"
-                                            :value="displayNumber(item.pengeluaran)"
-                                            @input="formatCurrencyItem(index, 'pengeluaran', $event)"
-                                            class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-right focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
-                                    </div>
-                                    <div>
-                                        <label class="block text-xs font-medium text-gray-500 mb-1.5">Jasa</label>
-                                        <input type="text" inputmode="numeric"
-                                            :value="displayNumber(item.jasa)"
-                                            @input="formatCurrencyItem(index, 'jasa', $event)"
-                                            class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-right focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
+                                    <div x-show="addTeknisiIndex === index" x-cloak class="mt-2 p-2 bg-gray-50 rounded-lg border border-gray-200">
+                                        <div class="flex items-center gap-2">
+                                            <input type="text" x-model="newTeknisiNama" placeholder="Nama teknisi..."
+                                                class="flex-1 px-2 py-1.5 text-xs border border-gray-200 rounded outline-none focus:ring-1 focus:ring-yellow-500/30 focus:border-yellow-500">
+                                            <select x-model="newTeknisiWarna"
+                                                class="flex-shrink-0 px-2 py-1.5 text-xs border border-gray-200 rounded outline-none focus:ring-1 focus:ring-yellow-500/30">
+                                                @foreach([
+                                                    'bg-gray-100 text-gray-600 border-gray-200',
+                                                    'bg-blue-100 text-blue-700 border-blue-200',
+                                                    'bg-purple-100 text-purple-700 border-purple-200',
+                                                    'bg-emerald-100 text-emerald-700 border-emerald-200',
+                                                    'bg-red-100 text-red-700 border-red-200',
+                                                    'bg-amber-100 text-amber-700 border-amber-200',
+                                                    'bg-rose-100 text-rose-700 border-rose-200',
+                                                    'bg-cyan-100 text-cyan-700 border-cyan-200',
+                                                    'bg-indigo-100 text-indigo-700 border-indigo-200',
+                                                ] as $c)
+                                                <option value="{{ $c }}">{{ $c }}</option>
+                                                @endforeach
+                                            </select>
+                                            <button type="button" @click="saveNewTeknisi()"
+                                                class="px-3 py-1.5 text-xs bg-indigo-600 text-white rounded hover:bg-indigo-700 flex-shrink-0">Simpan</button>
+                                            <button type="button" @click="addTeknisiIndex = null"
+                                                class="px-3 py-1.5 text-xs text-gray-600 hover:text-gray-800 flex-shrink-0">Batal</button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                        </div>
                         </template>
                     </div>
                     <template x-for="(item, index) in formData.items" :key="'hidden-' + index">
@@ -525,12 +541,8 @@ window._pageData = {
                     <template x-for="(item, index) in formData.items" :key="'kerusakan-' + index">
                         <input type="hidden" :name="'items[' + index + '][kerusakan]'" :value="JSON.stringify(item.kerusakanList || [])">
                     </template>
-                    <template x-for="(item, index) in formData.items" :key="'jasa-' + index">
-                        <input type="hidden" :name="'items[' + index + '][jasa]'" :value="item.jasa || '0'">
-                    </template>
-                    <template x-for="(item, index) in formData.items" :key="'pengeluaran-' + index">
-                        <input type="hidden" :name="'items[' + index + '][pengeluaran]'" :value="item.pengeluaran || '0'">
-                    </template>
+
+
                 </div>
 
                 {{-- Section 2: Ringkasan Biaya (otomatis dari item) --}}
@@ -574,26 +586,7 @@ window._pageData = {
                                 class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
                             @error('tanggal_selesai') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                         </div>
-                        <div x-show="!editingId" x-cloak>
-                            <label class="block text-xs font-medium text-gray-500 mb-1.5">Teknisi</label>
-                            <select name="teknisi" x-model="formData.teknisi"
-                                class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
-                                <option value="">Adit</option>
-                                <option value="edi">Edi (Karyawan 1)</option>
-                                <option value="nur">Nur (Karyawan 2)</option>
-                            </select>
-                            @error('teknisi') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                        </div>
-                    </div>
-                    <div x-show="editingId" class="mt-4">
-                        <label class="block text-xs font-medium text-gray-500 mb-1.5">Teknisi</label>
-                        <select name="teknisi" x-model="formData.teknisi"
-                            class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none md:w-1/3">
-                            <option value="">Adit</option>
-                            <option value="edi">Edi (Karyawan 1)</option>
-                            <option value="nur">Nur (Karyawan 2)</option>
-                        </select>
-                        @error('teknisi') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                        <input type="hidden" name="teknisi" :value="formData.teknisi">
                     </div>
                     <div class="mt-4">
                         <label class="block text-xs font-medium text-gray-500 mb-1.5">Keterangan</label>
@@ -634,46 +627,10 @@ window._pageData = {
                         :disabled="loading">
                         <i class="fas fa-spinner fa-spin" x-show="loading"></i>
                         <i class="fas fa-save" x-show="!loading"></i>
-                        <span x-text="editingId ? 'Update' : 'Simpan'"></span>
+                        <span x-text="editingId ? 'Update' : 'Save'"></span>
                     </button>
                 </div>
             </form>
-        </div>
-    </div>
-
-    {{-- Modal Garansi --}}
-    <div x-show="showGaransiModal" x-cloak
-        x-transition:enter="transition-opacity duration-100"
-        x-transition:enter-start="opacity-0"
-        x-transition:enter-end="opacity-100"
-        x-transition:leave="transition-opacity duration-75"
-        x-transition:leave-start="opacity-100"
-        x-transition:leave-end="opacity-0"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-        <div @click.stop class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4 border border-gray-200">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                    <i class="fas fa-shield text-yellow-500"></i>
-                    Garansi Service
-                </h3>
-                <button @click="skipGaransi" title="Tutup" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
-            </div>
-            <p class="text-sm text-gray-500 mb-4">
-                Status akan diubah ke <strong>Diambil</strong>.
-                Isi keterangan garansi jika ada:
-            </p>
-            <input type="text" x-model="garansiPending.garansi" placeholder="Keterangan garansi (opsional)..."
-                class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 placeholder-gray-400 outline-none">
-            <div class="flex items-center justify-end gap-3 mt-5">
-                <button type="button" @click="skipGaransi"
-                    class="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm hover:bg-gray-200">
-                    Lewati
-                </button>
-                <button type="button" @click="confirmGaransi"
-                    class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm">
-                    <i class="fas fa-check"></i> Konfirmasi
-                </button>
-            </div>
         </div>
     </div>
 

@@ -54,9 +54,9 @@
                     <th style="width:12%;">Pelanggan</th>
                     <th style="width:12%;">Type HP</th>
                     <th style="width:10%;">Kerusakan</th>
+                    <th style="width:4%; text-align:center;">Teknisi</th>
                     <th style="width:10%; text-align:right;">Pengeluaran</th>
                     <th style="width:10%; text-align:right;">Jasa</th>
-                    <th style="width:4%; text-align:center;">Teknisi</th>
                     <th style="width:11%;">Keterangan</th>
                     <th style="width:10%; text-align:right;">Keuntungan</th>
                 </tr>
@@ -75,14 +75,18 @@
                         @endforeach
                     </td>
                     <td>
-                        @php $pdfKerusakan = \App\Helpers\ServiceHelper::getAllKerusakanArray($service); @endphp
-                        @foreach($pdfKerusakan as $kr)
-                        <div>• {{ $kr }}</div>
+                        @php $pdfMerger = \App\Helpers\ServiceHelper::getKerusakanTeknisiMerger($service); @endphp
+                        @foreach($pdfMerger as $kr)
+                        <div>• {{ $kr['nama'] }}</div>
+                        @endforeach
+                    </td>
+                    <td style="text-align:center;">
+                        @foreach($pdfMerger as $kr)
+                        <div>{{ $kr['teknisi'] ? \App\Helpers\ServiceHelper::getTeknisiLabel($kr['teknisi']) : '-' }}</div>
                         @endforeach
                     </td>
                     <td class="text-right">Rp {{ number_format($service->pengeluaran, 0, ',', '.') }}</td>
                     <td class="text-right">Rp {{ number_format($service->jasa, 0, ',', '.') }}</td>
-                    <td class="text-center">{{ match($service->teknisi) { 'edi' => 'E', 'nur' => 'N', default => '' } }}</td>
                     <td style="font-size:6px; word-break:break-word;">{{ $service->keterangan ?? '' }}</td>
                     <td class="text-right text-bold">Rp {{ number_format($service->keuntungan, 0, ',', '.') }}</td>
                 </tr>

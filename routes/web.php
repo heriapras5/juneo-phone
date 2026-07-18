@@ -6,10 +6,13 @@ use App\Http\Controllers\BiayaHarianController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DataController;
+use App\Http\Controllers\HelperController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\SparepartController;
+use App\Http\Controllers\TokoController;
 use Illuminate\Support\Facades\Route;
 
 use Illuminate\Support\Facades\Storage;
@@ -52,7 +55,15 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/services/{service}/print-pdf', [ServiceController::class, 'printPdf'])->name('services.print-pdf');
         Route::put('/services/{service}/status', [ServiceController::class, 'updateStatus'])->name('services.update-status');
         Route::put('/services/{service}/quick-update', [ServiceController::class, 'quickUpdate'])->name('services.quick-update');
-        Route::put('/services/{service}/garansi', [ServiceController::class, 'updateGaransi'])->name('services.garansi');
+
+        Route::get('/spareparts/export-excel', [SparepartController::class, 'exportExcel'])->name('spareparts.export-excel');
+        Route::get('/spareparts/export-pdf', [SparepartController::class, 'exportPdf'])->name('spareparts.export-pdf');
+        Route::resource('spareparts', SparepartController::class);
+        Route::get('/spareparts/{sparepart}/mutasi', [SparepartController::class, 'mutasiCreate'])->name('spareparts.mutasi-create');
+        Route::post('/spareparts/{sparepart}/mutasi', [SparepartController::class, 'mutasiStore'])->name('spareparts.mutasi-store');
+        Route::post('/tokos', [TokoController::class, 'store'])->name('tokos.store');
+        Route::put('/tokos/{toko}', [TokoController::class, 'update'])->name('tokos.update');
+        Route::delete('/tokos/{toko}', [TokoController::class, 'destroy'])->name('tokos.destroy');
 
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
         Route::get('/reports/export-excel', [ReportController::class, 'exportExcel'])->name('reports.export-excel');
@@ -86,6 +97,11 @@ Route::middleware(['auth'])->group(function () {
 
         Route::post('/settings/type-hp/quick', [SettingController::class, 'quickStoreTypeHp'])->name('settings.type-hp.quick');
         Route::delete('/settings/type-hp/{typeHpOption}', [SettingController::class, 'destroyTypeHp'])->name('settings.type-hp.destroy');
+
+        Route::post('/helpers', [HelperController::class, 'store'])->name('helpers.store');
+        Route::post('/helpers/quick', [HelperController::class, 'quickStore'])->name('helpers.quick');
+        Route::put('/helpers/{helper}', [HelperController::class, 'update'])->name('helpers.update');
+        Route::delete('/helpers/{helper}', [HelperController::class, 'destroy'])->name('helpers.destroy');
     });
 
     // SuperAdmin-only routes

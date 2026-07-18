@@ -181,5 +181,4 @@ class SettingController extends Controller
         return redirect()->route('settings')
             ->with('success', 'Type HP berhasil dihapus.');
     }
-
 }

@@ -6,8 +6,6 @@
 @section('content')
 <div x-data="{
     loading: null,
-    quickEditData: { id: null, teknisi: '' },
-    showQuickEdit: false,
     showConfirm: false,
     confirmData: { id: null, status: '', label: '', message: '' },
     csrf: {{ Js::from(csrf_token()) }},
@@ -37,18 +35,6 @@
             setTimeout(() => row.remove(), 300);
         }
     },
-    updateTeknisiBadge(id, teknisi) {
-        let cell = document.querySelector('td[data-teknisi-id="' + id + '"]');
-        if (cell) {
-            let label = teknisi === 'edi' ? 'E' : (teknisi === 'nur' ? 'N' : '');
-            let cls = teknisi === 'edi' ? 'bg-blue-100 text-blue-700 border-blue-200'
-                : (teknisi === 'nur' ? 'bg-purple-100 text-purple-700 border-purple-200'
-                : 'bg-gray-100 text-gray-600 border-gray-200');
-            cell.innerHTML = label
-                ? '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ' + cls + ' border">' + label + '</span>'
-                : '<span class="text-xs text-gray-400">-</span>';
-        }
-    },
     quickUpdate(id, s) {
         if (this.loading) return;
         this.loading = id;
@@ -59,25 +45,6 @@
         })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(d => { if (d.success) this.removeRow(id); else alert(d.message || 'Gagal memperbarui status.'); })
-        .catch(e => { console.error(e); alert('Terjadi kesalahan. Silakan coba lagi.'); })
-        .finally(() => { this.loading = null; });
-    },
-    openQuickEdit(svc) {
-        this.quickEditData = { id: svc.id, teknisi: svc.teknisi || '' };
-        this.showQuickEdit = true;
-    },
-    submitQuickEdit() {
-        if (this.loading) return;
-        this.loading = 'quick';
-        let id = this.quickEditData.id;
-        let teknisi = this.quickEditData.teknisi;
-        fetch('/services/' + id + '/quick-update', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': this.csrf },
-            body: JSON.stringify({ teknisi: teknisi })
-        })
-        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-        .then(d => { if (d.success) { this.showQuickEdit = false; this.updateTeknisiBadge(id, teknisi); } else alert(d.message || 'Gagal memperbarui teknisi.'); })
         .catch(e => { console.error(e); alert('Terjadi kesalahan. Silakan coba lagi.'); })
         .finally(() => { this.loading = null; });
     }
@@ -129,9 +96,9 @@
                         <th class="px-3 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left">Pelanggan</th>
                         <th class="px-3 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left">Type</th>
                         <th class="px-3 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left">Kerusakan</th>
+                        <th class="px-3 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Teknisi</th>
                         <th class="px-3 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Prioritas</th>
                         <th class="px-3 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Status</th>
-                        <th class="px-3 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Teknisi</th>
                         <th class="px-3 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Hari ke-</th>
                         <th class="px-3 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Estimasi</th>
                         <th class="px-3 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Aksi</th>
@@ -158,11 +125,14 @@
                         <td class="px-3 py-3 text-sm font-medium whitespace-nowrap">
                             <a href="{{ route('services.show', $service) }}" class="text-yellow-600 hover:text-yellow-700 hover:underline">{{ $service->service_number }}</a>
                         </td>
-                        <td class="px-3 py-3 text-sm text-gray-600 whitespace-nowrap">{{ $service->tanggal->format('d/m/Y') }}</td>
+                        <td class="px-3 py-3 text-sm text-gray-600 whitespace-nowrap">
+                            <a href="{{ route('services.show', $service) }}" class="text-gray-600 hover:text-yellow-600">{{ $service->tanggal->format('d/m/Y') }}</a>
+                        </td>
                         <td class="px-3 py-3 text-sm text-gray-700 whitespace-nowrap">
-                            {{ $service->customer?->nama ?? '-' }}
+                            <a href="{{ route('services.show', $service) }}" class="text-gray-700 hover:text-yellow-600 hover:underline">{{ $service->customer?->nama ?? '-' }}</a>
                         </td>
                         <td class="px-3 py-3 text-sm text-gray-600">
+                            <a href="{{ route('services.show', $service) }}" class="text-gray-600 hover:text-yellow-600">
                             @php $qTypes = $service->serviceItems->pluck('type_hp')->unique()->values(); @endphp
                             @if($qTypes->isNotEmpty())
                                 @foreach($qTypes as $qTipe)
@@ -171,23 +141,56 @@
                             @else
                                 <span class="text-gray-400">-</span>
                             @endif
+                            </a>
                         </td>
-                        <td class="px-3 py-3 text-sm text-gray-600 max-w-[160px]">
-                            @php $qItems = $service->serviceItems; @endphp
-                            @foreach($qItems as $qItem)
-                                @php $qKrList = is_array($qItem->kerusakan) ? $qItem->kerusakan : []; @endphp
-                                @foreach($qKrList as $qKr)
-                                    <div class="leading-relaxed truncate"><span class="text-gray-400">•</span> {{ $qKr }}</div>
-                                @endforeach
-                            @endforeach
-                            @if($qItems->isEmpty() && $service->kerusakan)
-                                @php $qKrList = is_array($service->kerusakan) ? $service->kerusakan : (json_decode($service->kerusakan, true) ?: []); @endphp
-                                @foreach($qKrList as $qKr)
-                                    <div class="leading-relaxed truncate"><span class="text-gray-400">•</span> {{ $qKr }}</div>
-                                @endforeach
-                            @elseif($qItems->isEmpty())
+                        @php
+                            $qMerger = collect();
+                            $qItems = $service->serviceItems;
+                            if ($qItems->isNotEmpty()) {
+                                foreach ($qItems as $qItem) {
+                                    $qKrList = is_array($qItem->kerusakan) ? $qItem->kerusakan : (json_decode($qItem->kerusakan, true) ?: []);
+                                    foreach ($qKrList as $qKr) {
+                                        $qMerger->push([
+                                            'nama' => is_array($qKr) ? ($qKr['nama'] ?? '') : $qKr,
+                                            'teknisi' => is_array($qKr) ? ($qKr['teknisi'] ?? '') : ($qItem->teknisi ?? $service->teknisi ?? ''),
+                                        ]);
+                                    }
+                                }
+                            } elseif ($service->kerusakan) {
+                                $qKrList = is_array($service->kerusakan) ? $service->kerusakan : (json_decode($service->kerusakan, true) ?: []);
+                                foreach ($qKrList as $qKr) {
+                                    $qMerger->push([
+                                        'nama' => is_array($qKr) ? ($qKr['nama'] ?? '') : $qKr,
+                                        'teknisi' => is_array($qKr) ? ($qKr['teknisi'] ?? '') : ($service->teknisi ?? ''),
+                                    ]);
+                                }
+                            }
+                        @endphp
+                        <td class="px-3 py-3 text-sm text-gray-600 max-w-[200px]">
+                            @forelse($qMerger as $qKr)
+                                <div class="leading-relaxed truncate">
+                                    <span class="text-gray-400">•</span>
+                                    <span class="truncate">{{ $qKr['nama'] }}</span>
+                                </div>
+                            @empty
                                 <span class="text-gray-400">-</span>
-                            @endif
+                            @endforelse
+                        </td>
+                        <td class="px-3 py-3 text-sm text-center whitespace-nowrap">
+                            @forelse($qMerger as $qKr)
+                                @php
+                                    $qKrTekHelper = $qKr['teknisi'] ? $helpers->first(fn($h) => strtolower($h->nama) === strtolower($qKr['teknisi'])) : null;
+                                @endphp
+                                <div class="leading-relaxed">
+                                    @if($qKr['teknisi'])
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium border {{ $qKrTekHelper?->warna ?? 'bg-gray-100 text-gray-600 border-gray-200' }}">{{ $qKrTekHelper?->nama ?? ucfirst($qKr['teknisi']) }}</span>
+                                    @else
+                                        <span class="text-gray-400">-</span>
+                                    @endif
+                                </div>
+                            @empty
+                                <span class="text-gray-400">-</span>
+                            @endforelse
                         </td>
                         <td class="px-3 py-3 text-center whitespace-nowrap">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $displayPrioClass }}">
@@ -203,15 +206,6 @@
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $service->getStatusClass() }}">
                                 {{ $service->getStatusLabel() }}
                             </span>
-                        </td>
-                        <td data-teknisi-id="{{ $service->id }}" class="px-3 py-3 text-center whitespace-nowrap">
-                            @if($service->teknisi === 'edi')
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700 border border-blue-200">E</span>
-                            @elseif($service->teknisi === 'nur')
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200">N</span>
-                            @else
-                                <span class="text-gray-300">-</span>
-                            @endif
                         </td>
                         <td class="px-3 py-3 text-sm text-center whitespace-nowrap {{ $hariKe > 5 ? 'text-red-600 font-bold' : ($hariKe > 3 ? 'text-red-600 font-semibold' : ($hariKe > 1 ? 'text-orange-600' : 'text-gray-600')) }}">
                             @if($hariKe > 5)
@@ -252,10 +246,6 @@
                                     <i class="fas fa-times"></i> Cancel
                                 </button>
                                 @endif
-                                <button type="button" @click="openQuickEdit({{ Js::from($service) }})"
-                                    class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg text-xs font-medium">
-                                    <i class="fas fa-edit"></i>
-                                </button>
                             </div>
                         </td>
                     </tr>
@@ -295,8 +285,8 @@
                         <th class="px-3 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left">No. Service</th>
                         <th class="px-3 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left">Pelanggan</th>
                         <th class="px-3 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left">Type HP</th>
-                        <th class="px-3 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left">Selesai</th>
                         <th class="px-3 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Teknisi</th>
+                        <th class="px-3 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left">Selesai</th>
                         <th class="px-3 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right">Total</th>
                         <th class="px-3 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Aksi</th>
                     </tr>
@@ -308,25 +298,38 @@
                         <td class="px-3 py-3 text-sm font-medium whitespace-nowrap">
                             <a href="{{ route('services.show', $service) }}" class="text-yellow-600 hover:text-yellow-700 hover:underline">{{ $service->service_number }}</a>
                         </td>
-                        <td class="px-3 py-3 text-sm text-gray-700 whitespace-nowrap">{{ $service->customer?->nama ?? '-' }}</td>
+                        <td class="px-3 py-3 text-sm text-gray-700 whitespace-nowrap">
+                            <a href="{{ route('services.show', $service) }}" class="text-gray-700 hover:text-yellow-600 hover:underline">{{ $service->customer?->nama ?? '-' }}</a>
+                        </td>
                         <td class="px-3 py-3 text-sm text-gray-600">
+                            <a href="{{ route('services.show', $service) }}" class="text-gray-600 hover:text-yellow-600">
                             @php $cTypes = $service->serviceItems->pluck('type_hp')->unique()->values(); @endphp
                             @if($cTypes->isNotEmpty())
                                 {{ $cTypes->implode(', ') }}
                             @else
                                 {{ $service->type_hp ?? '-' }}
                             @endif
+                            </a>
                         </td>
-                        <td class="px-3 py-3 text-sm text-gray-600 whitespace-nowrap">{{ $service->tanggal_selesai?->format('d/m/Y') ?? '-' }}</td>
                         <td class="px-3 py-3 text-center whitespace-nowrap">
-                            @if($service->teknisi === 'edi')
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700 border border-blue-200">E</span>
-                            @elseif($service->teknisi === 'nur')
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200">N</span>
-                            @else
-                                <span class="text-gray-300">-</span>
+                            @php
+                                $qDoneTeknisi = $service->serviceItems->flatMap(function($item) {
+                                    $krList = is_array($item->kerusakan) ? $item->kerusakan : (json_decode($item->kerusakan, true) ?: []);
+                                    return collect($krList)->pluck('teknisi')->filter();
+                                })->unique()->values();
+                                if ($qDoneTeknisi->isEmpty() && $service->teknisi) { $qDoneTeknisi = collect([$service->teknisi]); }
+                            @endphp
+                            @foreach($qDoneTeknisi as $t)
+                                @php $h = $helpers->first(fn($h) => strtolower($h->nama) === strtolower($t)); @endphp
+                                <div class="leading-relaxed">
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium border {{ $h?->warna ?? 'bg-gray-100 text-gray-600 border-gray-200' }}">{{ $h?->nama ?? ucfirst($t) }}</span>
+                                </div>
+                            @endforeach
+                            @if($qDoneTeknisi->isEmpty())
+                                <span class="text-gray-400">-</span>
                             @endif
                         </td>
+                        <td class="px-3 py-3 text-sm text-gray-600 whitespace-nowrap">{{ $service->tanggal_selesai?->format('d/m/Y') ?? '-' }}</td>
                         <td class="px-3 py-3 text-sm text-gray-700 text-right whitespace-nowrap">Rp {{ number_format($service->jasa, 0, ',', '.') }}</td>
                         <td class="px-3 py-3 text-center whitespace-nowrap">
                             <button type="button" @click="confirmAction({{ $service->id }}, 'diambil', 'selesai')" :disabled="loading === {{ $service->id }}"
@@ -389,42 +392,6 @@
         </div>
     </div>
 
-    {{-- Quick Edit Modal --}}
-    <div x-show="showQuickEdit" x-cloak
-        x-transition:enter="transition-opacity duration-100"
-        x-transition:enter-start="opacity-0"
-        x-transition:enter-end="opacity-100"
-        x-transition:leave="transition-opacity duration-75"
-        x-transition:leave-start="opacity-100"
-        x-transition:leave-end="opacity-0"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-        <div @click.stop class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm mx-4 border border-gray-200">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-base font-semibold text-gray-900">Edit Service</h3>
-                <button @click="showQuickEdit = false" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-xs font-medium text-gray-500 mb-1">Teknisi</label>
-                    <select x-model="quickEditData.teknisi"
-                        class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
-                        <option value="">Adit</option>
-                        <option value="edi">Edi (Karyawan 1)</option>
-                        <option value="nur">Nur (Karyawan 2)</option>
-                    </select>
-                </div>
-            </div>
-            <div class="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-gray-100">
-                <button @click="showQuickEdit = false"
-                    class="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm hover:bg-gray-200">Batal</button>
-                <button @click="submitQuickEdit()" :disabled="loading === 'quick'"
-                    class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm disabled:opacity-50">
-                    <i x-show="loading === 'quick'" class="fas fa-spinner fa-spin"></i>
-                    <i x-show="loading !== 'quick'" class="fas fa-save"></i>
-                    Simpan
-                </button>
-            </div>
-        </div>
-    </div>
+
 </div>
 @endsection

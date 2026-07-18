@@ -5,11 +5,7 @@ $notaTelepon = App\Models\Setting::getValue('nota_telepon', '');
 $notaRekening = App\Models\Setting::getValue('nota_rekening', '');
 $logo = App\Models\Setting::getValue('logo', '');
 
-$namaTeknisi = match($service->teknisi) {
-    'edi' => 'Edi',
-    'nur' => 'Nur',
-    default => 'Adit',
-};
+$allHelpers = App\Models\Helper::all()->keyBy(fn($h) => strtolower($h->nama));
 @endphp
 
 <div class="nota-content" style="padding: 2mm 3mm; font-family: 'Helvetica', 'Arial', sans-serif; font-size: 9px; color: #000; line-height: 1.2;">
@@ -53,18 +49,6 @@ $namaTeknisi = match($service->teknisi) {
             <td style="padding: 2px 3px; vertical-align: top;">{{ $service->customer->alamat }}</td>
         </tr>
         @endif
-        <tr>
-            <td style="font-weight: bold; color: #000; padding: 2px 3px; vertical-align: top;">Teknisi</td>
-            <td style="padding: 2px 3px; vertical-align: top;">:</td>
-            <td style="padding: 2px 3px; vertical-align: top;">{{ $namaTeknisi }}</td>
-        </tr>
-        @if($service->garansi)
-        <tr>
-            <td style="font-weight: bold; color: #000; padding: 2px 3px; vertical-align: top;">Garansi</td>
-            <td style="padding: 2px 3px; vertical-align: top;">:</td>
-            <td style="padding: 2px 3px; vertical-align: top;">{{ $service->garansi }}</td>
-        </tr>
-        @endif
         @if($service->keterangan)
         <tr>
             <td style="font-weight: bold; color: #000; padding: 2px 3px; vertical-align: top;">Ket.</td>
@@ -80,7 +64,10 @@ $namaTeknisi = match($service->teknisi) {
             $fallbackKerusakan = $service->kerusakan;
             if (is_string($fallbackKerusakan)) {
                 $decoded = json_decode($fallbackKerusakan, true);
-                if (is_array($decoded)) $fallbackKerusakan = implode(', ', $decoded);
+                if (is_array($decoded)) {
+                    $parts = array_map(fn($k) => is_array($k) ? ($k['nama'] ?? '') : $k, $decoded);
+                    $fallbackKerusakan = implode(', ', array_filter($parts));
+                }
             }
             $displayItems = collect([(object)[
                 'type_hp' => $service->type_hp,
@@ -107,7 +94,17 @@ $namaTeknisi = match($service->teknisi) {
                     @if($item->type_hp !== $prevTypeHp)
                     <span style="font-size: 8px; color: #000;">{{ $item->type_hp }}</span>
                     @endif
-                    <span style="font-size: 7px; color: #555; display: block; margin-top: 1px;">{{ is_array($item->kerusakan) ? implode(', ', $item->kerusakan) : $item->kerusakan }}</span>
+                    <span style="font-size: 7px; color: #555; display: block; margin-top: 1px;">
+                        @php
+                            $krArr = is_array($item->kerusakan) ? $item->kerusakan : [];
+                            $krParts = [];
+                            foreach ($krArr as $kr) {
+                                $krNama = is_array($kr) ? ($kr['nama'] ?? '') : $kr;
+                                $krParts[] = $krNama;
+                            }
+                        @endphp
+                        {{ !empty($krParts) ? implode(', ', $krParts) : (is_string($item->kerusakan) ? $item->kerusakan : '-') }}
+                    </span>
                 </td>
                 <td style="text-align: right; padding: 4px 4px; border-bottom: 1px solid #ddd;">Rp {{ number_format($item->jasa ?? 0, 0, ',', '.') }}</td>
             </tr>

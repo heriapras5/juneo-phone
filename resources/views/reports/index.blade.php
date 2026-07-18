@@ -80,9 +80,9 @@
                         <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Pelanggan</th>
                         <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left max-w-[200px]">Type HP</th>
                         <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left max-w-[220px]">Kerusakan</th>
+                        <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center min-w-[60px]">Teknisi</th>
                         <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right whitespace-nowrap">Pengeluaran</th>
                         <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right whitespace-nowrap">Jasa</th>
-                        <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center min-w-[60px]">Teknisi</th>
                         <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left max-w-[160px]">Keterangan</th>
                         <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right whitespace-nowrap">Keuntungan</th>
                     </tr>
@@ -115,39 +115,57 @@
                             <div class="truncate">• {{ $type }}</div>
                             @endforeach
                         </td>
-                        <td class="px-4 py-3 text-sm text-gray-600 max-w-[220px]" title="
-                            @php
-                                $krService = $service->kerusakan;
-                                $krDecoded = is_string($krService) ? (json_decode($krService, true) ?? [$krService]) : (array) $krService;
-                                $allKerusakan = collect($krDecoded)
-                                    ->concat($service->serviceItems->pluck('kerusakan')->flatten())
-                                    ->unique()
-                                    ->values();
-                            @endphp
-                            @foreach($allKerusakan as $kr)
-• {{ $kr }}
-                            @endforeach
-                        ">
-                            @php
-                                $krService = $service->kerusakan;
-                                $krDecoded = is_string($krService) ? (json_decode($krService, true) ?? [$krService]) : (array) $krService;
-                                $allKerusakan = collect($krDecoded)
-                                    ->concat($service->serviceItems->pluck('kerusakan')->flatten())
-                                    ->unique()
-                                    ->values();
-                            @endphp
-                            @foreach($allKerusakan as $kr)
-                            <div class="truncate">• {{ $kr }}</div>
-                            @endforeach
+                        @php
+                            $rMerger = collect();
+                            $rItems = $service->serviceItems;
+                            if ($rItems->isNotEmpty()) {
+                                foreach ($rItems as $rItem) {
+                                    $rKrList = is_array($rItem->kerusakan) ? $rItem->kerusakan : (json_decode($rItem->kerusakan, true) ?: []);
+                                    foreach ($rKrList as $rKr) {
+                                        $rMerger->push([
+                                            'nama' => is_array($rKr) ? ($rKr['nama'] ?? '') : $rKr,
+                                            'teknisi' => is_array($rKr) ? ($rKr['teknisi'] ?? '') : ($rItem->teknisi ?? $service->teknisi ?? ''),
+                                        ]);
+                                    }
+                                }
+                            } elseif ($service->kerusakan) {
+                                $rKrList = is_array($service->kerusakan) ? $service->kerusakan : (json_decode($service->kerusakan, true) ?: []);
+                                foreach ($rKrList as $rKr) {
+                                    $rMerger->push([
+                                        'nama' => is_array($rKr) ? ($rKr['nama'] ?? '') : $rKr,
+                                        'teknisi' => is_array($rKr) ? ($rKr['teknisi'] ?? '') : ($service->teknisi ?? ''),
+                                    ]);
+                                }
+                            }
+                        @endphp
+                        <td class="px-4 py-3 text-sm text-gray-600 max-w-[220px]">
+                            @forelse($rMerger as $rKr)
+                                <div class="truncate leading-relaxed">
+                                    <span class="text-gray-400">•</span>
+                                    <span>{{ $rKr['nama'] }}</span>
+                                </div>
+                            @empty
+                                <span class="text-gray-400">-</span>
+                            @endforelse
+                        </td>
+                        <td class="px-4 py-3 text-sm text-center whitespace-nowrap">
+                            @forelse($rMerger as $rKr)
+                                @php
+                                    $rKrHelper = $rKr['teknisi'] ? $helpers->first(fn($h) => strtolower($h->nama) === strtolower($rKr['teknisi'])) : null;
+                                @endphp
+                                <div class="leading-relaxed">
+                                    @if($rKr['teknisi'])
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium border {{ $rKrHelper?->warna ?? 'bg-gray-100 text-gray-600 border-gray-200' }}">{{ $rKrHelper?->nama ?? ucfirst($rKr['teknisi']) }}</span>
+                                    @else
+                                        <span class="text-gray-400">-</span>
+                                    @endif
+                                </div>
+                            @empty
+                                <span class="text-gray-400">-</span>
+                            @endforelse
                         </td>
                         <td class="px-4 py-3 text-sm text-gray-900 whitespace-nowrap tabular-nums text-right">Rp {{ number_format($service->pengeluaran, 0, ',', '.') }}</td>
                         <td class="px-4 py-3 text-sm text-gray-900 whitespace-nowrap tabular-nums text-right">Rp {{ number_format($service->jasa, 0, ',', '.') }}</td>
-                        <td class="px-4 py-3 text-sm text-center whitespace-nowrap">
-                            @if($service->teknisi === 'edi') <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700 border border-blue-200">E</span>
-                            @elseif($service->teknisi === 'nur') <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200">N</span>
-                            @else <span class="text-gray-300">-</span>
-                            @endif
-                        </td>
                         <td class="px-4 py-3 text-sm text-gray-600 max-w-[160px] overflow-hidden text-ellipsis whitespace-nowrap" title="{{ $service->keterangan ?? '' }}">{{ $service->keterangan ?? '' }}</td>
                         <td class="px-4 py-3 text-sm whitespace-nowrap tabular-nums text-right {{ $service->keuntungan >= 0 ? 'text-emerald-600' : 'text-red-600' }}">
                             Rp {{ number_format($service->keuntungan, 0, ',', '.') }}
@@ -221,7 +239,7 @@
                             </div>
                             <div class="min-w-0">
                                 <p class="text-[11px] text-gray-500 font-medium uppercase tracking-wider">Kebutuhan Pribadi</p>
-                                <p class="text-[10px] text-gray-400 truncate">Bank Jago + Gaji + Lainnya</p>
+                                <p class="text-[10px] text-gray-400 truncate">Bank Jago + Fee + Lainnya</p>
                             </div>
                         </div>
                         <p class="text-sm sm:text-lg font-bold text-orange-600 mt-1">Rp {{ number_format($kebutuhanPribadi, 0, ',', '.') }}</p>

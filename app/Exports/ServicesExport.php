@@ -46,9 +46,9 @@ class ServicesExport implements FromQuery, WithHeadings, WithMapping, WithStyles
             'Pelanggan',
             'Type HP',
             'Kerusakan',
+            'Teknisi',
             'Pengeluaran',
             'Jasa',
-            'Teknisi',
             'Keterangan',
             'Keuntungan',
             'Estimasi Selesai',
@@ -62,9 +62,9 @@ class ServicesExport implements FromQuery, WithHeadings, WithMapping, WithStyles
 
         $allTypesText = ServiceHelper::getAllTypesText($row);
 
-        $kerusakanText = ServiceHelper::getAllKerusakanText($row);
-
-        $teknisiLabel = match($row->teknisi) { 'edi' => 'Edi', 'nur' => 'Nur', default => '' };
+        $merger = ServiceHelper::getKerusakanTeknisiMerger($row);
+        $kerusakanText = $merger->map(fn($i) => '• ' . $i['nama'])->implode("\n");
+        $teknisiText = $merger->map(fn($i) => $i['teknisi'] ? ServiceHelper::getTeknisiLabel($i['teknisi']) : '-')->implode("\n");
 
         $statusLabels = ['menunggu' => 'Menunggu', 'dikerjakan' => 'Dikerjakan', 'selesai' => 'Selesai', 'diambil' => 'Diambil', 'batal' => 'Batal'];
 
@@ -75,9 +75,9 @@ class ServicesExport implements FromQuery, WithHeadings, WithMapping, WithStyles
             $row->customer->nama ?? '',
             $allTypesText,
             $kerusakanText,
+            $teknisiText,
             $row->pengeluaran,
             $row->jasa,
-            $teknisiLabel,
             $row->keterangan ?? '',
             $row->keuntungan,
             $row->estimasi_selesai ? $row->estimasi_selesai->format('d/m/Y') : '',
@@ -105,8 +105,9 @@ class ServicesExport implements FromQuery, WithHeadings, WithMapping, WithStyles
     {
         return [
             1 => ['font' => ['bold' => true]],
-            'G:G' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT], 'numberFormat' => ['formatCode' => '"Rp"#,##0']],
+            'E:G' => ['alignment' => ['wrapText' => true, 'vertical' => Alignment::VERTICAL_TOP]],
             'H:H' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT], 'numberFormat' => ['formatCode' => '"Rp"#,##0']],
+            'I:I' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT], 'numberFormat' => ['formatCode' => '"Rp"#,##0']],
             'K:K' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT], 'numberFormat' => ['formatCode' => '"Rp"#,##0']],
         ];
     }

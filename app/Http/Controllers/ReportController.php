@@ -9,6 +9,7 @@ use App\Imports\MultiSheetImport;
 use App\Imports\ServicesSheetImport;
 use App\Models\BiayaHarian;
 use App\Models\Customer;
+use App\Models\Helper;
 use App\Models\Service;
 use App\Models\Setting;
 use Illuminate\Http\Request;
@@ -61,6 +62,7 @@ class ReportController extends Controller
             ->sum('jumlah');
 
         $customers = Customer::orderBy('nama')->limit(200)->get(['id', 'nama', 'no_hp']);
+        $helpers = Helper::where('role', 'teknisi')->orderBy('id')->get();
 
         $tahunTersedia = Service::where('status', '!=', 'batal')
             ->select('tanggal')
@@ -73,7 +75,7 @@ class ReportController extends Controller
             ->toArray();
 
         return view('reports.index', compact(
-            'services', 'customers', 'tahun', 'tahunTersedia', 'from', 'to',
+            'services', 'customers', 'helpers', 'tahun', 'tahunTersedia', 'from', 'to',
             'totalPengeluaran', 'totalOmzet', 'kebutuhanPribadi'
         ));
     }

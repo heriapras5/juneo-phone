@@ -87,9 +87,44 @@ class DashboardService
             ->sum('jumlah');
 
         $bankJago = BiayaHarian::whereDate('tanggal', '>=', $fromDate)->whereDate('tanggal', '<=', $toDate)->where('kategori', 'bank_jago')->sum('jumlah');
-        $gajiEdi = (int) BiayaHarian::whereDate('tanggal', '>=', $fromDate)->whereDate('tanggal', '<=', $toDate)->where('kategori', 'fee_edi')->sum('jumlah');
-        $gajiNur = (int) BiayaHarian::whereDate('tanggal', '>=', $fromDate)->whereDate('tanggal', '<=', $toDate)->where('kategori', 'fee_nur')->sum('jumlah');
         $lainnya = (int) BiayaHarian::whereDate('tanggal', '>=', $fromDate)->whereDate('tanggal', '<=', $toDate)->where('kategori', 'lainnya')->sum('jumlah');
+
+        $fees = [];
+
+        $feeEdi = (int) BiayaHarian::whereDate('tanggal', '>=', $fromDate)->whereDate('tanggal', '<=', $toDate)->where('kategori', 'fee_edi')->sum('jumlah');
+        $feeEdiLabel = BiayaHarian::whereDate('tanggal', '>=', $fromDate)->whereDate('tanggal', '<=', $toDate)
+            ->where('kategori', 'fee_edi')->whereNotNull('nama')->latest()->value('nama') ?? 'Fee Edi';
+        $feeEdiKet = BiayaHarian::whereDate('tanggal', '>=', $fromDate)->whereDate('tanggal', '<=', $toDate)
+            ->where('kategori', 'fee_edi')->whereNotNull('keterangan')->latest('tanggal')->value('keterangan');
+        $fees[] = (object) [
+            'nama' => 'Edi', 'kategori' => 'fee_edi', 'total' => $feeEdi,
+            'label' => $feeEdiLabel, 'keterangan' => $feeEdiKet,
+            'warna' => 'bg-blue-100 text-blue-700 border-blue-200',
+        ];
+
+        $feeNur = (int) BiayaHarian::whereDate('tanggal', '>=', $fromDate)->whereDate('tanggal', '<=', $toDate)->where('kategori', 'fee_nur')->sum('jumlah');
+        $feeNurLabel = BiayaHarian::whereDate('tanggal', '>=', $fromDate)->whereDate('tanggal', '<=', $toDate)
+            ->where('kategori', 'fee_nur')->whereNotNull('nama')->latest()->value('nama') ?? 'Fee Nur';
+        $feeNurKet = BiayaHarian::whereDate('tanggal', '>=', $fromDate)->whereDate('tanggal', '<=', $toDate)
+            ->where('kategori', 'fee_nur')->whereNotNull('keterangan')->latest('tanggal')->value('keterangan');
+        $fees[] = (object) [
+            'nama' => 'Nur', 'kategori' => 'fee_nur', 'total' => $feeNur,
+            'label' => $feeNurLabel, 'keterangan' => $feeNurKet,
+            'warna' => 'bg-purple-100 text-purple-700 border-purple-200',
+        ];
+
+        $tambahanRows = BiayaHarian::whereDate('tanggal', '>=', $fromDate)->whereDate('tanggal', '<=', $toDate)
+            ->where('kategori', 'fee_tambahan')->get();
+        foreach ($tambahanRows as $row) {
+            $fees[] = (object) [
+                'nama' => $row->nama,
+                'kategori' => 'fee_tambahan',
+                'total' => (int) $row->jumlah,
+                'label' => $row->nama,
+                'keterangan' => $row->keterangan,
+                'warna' => 'bg-amber-100 text-amber-700 border-amber-200',
+            ];
+        }
 
         $omzet = $serviceQuery->sum('jasa');
         $pengeluaran = $serviceQuery->sum('pengeluaran');
@@ -105,9 +140,8 @@ class DashboardService
             'kebutuhan_pribadi' => $kebutuhanPribadi,
             'profit' => $profit,
             'bank_jago' => $bankJago,
-            'gaji_edi' => $gajiEdi,
-            'gaji_nur' => $gajiNur,
             'lainnya' => $lainnya,
+            'fees' => $fees,
         ];
     }
 

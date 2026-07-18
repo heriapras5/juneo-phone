@@ -27,23 +27,46 @@
         </div>
         <p class="text-xs text-gray-400 mb-4">{{ \Carbon\Carbon::parse($date)->format('d F Y') }}</p>
 
-        <form method="POST" action="{{ route('biaya-harian.update') }}" x-data="{ loading: false }" @submit="loading = true">
+        @php
+        $fixedKats = ['bank_jago', 'fee_edi', 'fee_nur'];
+        @endphp
+
+        <form method="POST" action="{{ route('biaya-harian.update') }}" x-data="{
+            loading: false,
+            _adding: false,
+            tambahanFees: {{ Js::from($tambahan->map(fn($t) => ['kategori' => 'fee_tambahan', 'nama' => $t->nama, 'jumlah' => number_format($t->jumlah, 0, ',', '.'), 'keterangan' => $t->keterangan ?? ''])->values()->toArray()) }},
+            addTambahan() { if (this._adding) return; this._adding = true; this.tambahanFees.push({ kategori: 'fee_tambahan', nama: '', jumlah: '', keterangan: '' }); this.$nextTick(() => { this._adding = false; }); },
+            removeTambahan(i) {
+                var self = this;
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Hapus Item?',
+                    text: 'Item tambahan ini akan dihapus saat data disimpan.',
+                    showCancelButton: true,
+                    confirmButtonColor: '#EF4444',
+                    cancelButtonColor: '#6B7280',
+                    confirmButtonText: 'Ya, Hapus!',
+                    cancelButtonText: 'Batal',
+                    reverseButtons: true,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        self.tambahanFees.splice(i, 1);
+                    }
+                });
+            }
+        }" @submit="loading = true">
             @csrf
             <input type="hidden" name="tanggal" value="{{ $date }}">
             <div class="space-y-3">
-                @foreach(['bank_jago', 'fee_edi', 'fee_nur', 'lainnya'] as $kat)
+                @foreach($fixedKats as $kat)
                 @php
                 $b = $biaya->get($kat);
-                $nama = $b->nama ?? ($kategoriLabels[$kat] ?? $kat);
                 $jumlah = $b && $b->jumlah > 0 ? $b->jumlah : ($defaults[$kat] ?? 0);
                 $keterangan = $b->keterangan ?? '';
                 @endphp
-                <div class="flex flex-wrap items-center gap-3 p-3 rounded-lg {{ $kat === 'lainnya' ? 'bg-orange-50/50' : 'bg-gray-50' }}">
+                <div class="flex flex-wrap items-center gap-3 p-3 rounded-lg bg-gray-50">
                     <div class="flex-1 min-w-[120px]">
-                        <label class="block text-xs font-medium text-gray-600">{{ $nama }}</label>
-                        @if($kat === 'lainnya')
-                        <p class="text-[10px] text-gray-400">Kebutuhan lainnya (makan, jajan, dll)</p>
-                        @endif
+                        <label class="block text-xs font-medium text-gray-600">{{ $kategoriLabels[$kat] ?? $kat }}</label>
                     </div>
                     <div class="w-36">
                         <input type="text" inputmode="numeric" name="items[{{ $kat }}][jumlah]"
@@ -59,8 +82,70 @@
                             class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 placeholder-gray-400 outline-none">
                     </div>
                     <input type="hidden" name="items[{{ $kat }}][kategori]" value="{{ $kat }}">
+                    <input type="hidden" name="items[{{ $kat }}][nama]" value="{{ $kategoriLabels[$kat] ?? $kat }}">
                 </div>
                 @endforeach
+
+                {{-- Lainnya --}}
+                @php
+                $bLain = $biaya->get('lainnya');
+                $jumlahLain = $bLain && $bLain->jumlah > 0 ? $bLain->jumlah : ($defaults['lainnya'] ?? 0);
+                $keteranganLain = $bLain->keterangan ?? '';
+                @endphp
+                <div class="flex flex-wrap items-center gap-3 p-3 rounded-lg bg-orange-50/50">
+                    <div class="flex-1 min-w-[120px]">
+                        <label class="block text-xs font-medium text-gray-600">Lainnya</label>
+                    </div>
+                    <div class="w-36">
+                        <input type="text" inputmode="numeric" name="items[lainnya][jumlah]"
+                            value="{{ $jumlahLain !== null ? number_format($jumlahLain, 0, ',', '.') : '' }}"
+                            placeholder="0"
+                            class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none text-right"
+                            oninput="this.value = this.value.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.')">
+                    </div>
+                    <div class="flex-1 min-w-[150px]">
+                        <input type="text" name="items[lainnya][keterangan]"
+                            value="{{ $keteranganLain }}"
+                            placeholder="Keterangan (opsional)"
+                            class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 placeholder-gray-400 outline-none">
+                    </div>
+                    <input type="hidden" name="items[lainnya][kategori]" value="lainnya">
+                </div>
+
+                {{-- Fee Tambahan --}}
+                <template x-for="(tf, i) in tambahanFees" :key="'tf-' + i">
+                    <div class="flex flex-wrap items-center gap-3 p-3 rounded-lg bg-gray-50">
+                        <div class="flex-1 min-w-[120px]">
+                            <input type="text" x-model="tf.nama" :name="'items[tambahan_' + i + '][nama]'"
+                                class="w-full px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-700 focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 outline-none">
+                        </div>
+                        <div class="w-36">
+                            <input type="text" inputmode="numeric" x-model="tf.jumlah" :name="'items[tambahan_' + i + '][jumlah]'"
+                                placeholder="0"
+                                class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none text-right"
+                                oninput="this.value = this.value.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.')">
+                        </div>
+                        <div class="flex-1 min-w-[150px]">
+                            <input type="text" x-model="tf.keterangan" :name="'items[tambahan_' + i + '][keterangan]'"
+                                placeholder="Keterangan (opsional)"
+                                class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 placeholder-gray-400 outline-none">
+                        </div>
+                        <input type="hidden" :name="'items[tambahan_' + i + '][kategori]'" value="fee_tambahan">
+                        <button type="button" @click.stop="removeTambahan(i)"
+                            class="text-red-400 hover:text-red-600 text-sm flex-shrink-0">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </template>
+
+                <button type="button" @click.stop.prevent="addTambahan()"
+                    class="flex flex-wrap items-center gap-3 p-3 rounded-lg bg-gray-50 border border-dashed border-gray-300 hover:bg-gray-100 hover:border-gray-400 transition-all w-full text-left">
+                    <div class="flex-1 min-w-[120px] flex items-center gap-2">
+                        <i class="fas fa-plus-circle text-xs text-gray-400"></i>
+                        <span class="text-xs font-medium text-gray-500">Tambah</span>
+                    </div>
+                </button>
+
             </div>
 
             <div class="mt-4 flex items-center justify-between">
@@ -71,7 +156,7 @@
                     class="px-5 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm disabled:opacity-50">
                     <i class="fas fa-spinner fa-spin" x-show="loading" x-cloak></i>
                     <i class="fas fa-save" x-show="!loading"></i>
-                    Simpan
+                    Save
                 </button>
             </div>
         </form>

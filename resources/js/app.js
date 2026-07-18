@@ -14,6 +14,10 @@ Alpine.data('servicePage', () => ({
     showModal: false,
     editingId: null,
     loading: false,
+    helpers: [],
+    addTeknisiIndex: null,
+    newTeknisiNama: '',
+    newTeknisiWarna: 'bg-gray-100 text-gray-600 border-gray-200',
     kerusakanOptions: [],
     typeHpOptions: [],
     statusUpdating: null,
@@ -23,10 +27,7 @@ Alpine.data('servicePage', () => ({
     customers: [],
     rowState: {},
     customerSearch: '',
-    showGaransiModal: false,
-    garansiPending: { serviceId: null, status: null, garansi: '' },
     customerDropdownOpen: false,
-    showAddCustomer: false,
     addCustomerForm: { nama: '', no_hp: '' },
     customerSaving: false,
     totalPengeluaran: 0,
@@ -41,12 +42,13 @@ Alpine.data('servicePage', () => ({
         teknisi: '',
         garansi: '',
         allowedStatuses: [],
-        items: [{ id: '', type_hp: '', kerusakanList: [], jasa: '', pengeluaran: '', keterangan: '', kerusakanSearch: '', kerusakanDropdownOpen: false, typeHpSearch: '', typeHpDropdownOpen: false }],
+        items: [{ id: '', type_hp: '', kerusakanList: [], keterangan: '', kerusakanSearch: '', kerusakanDropdownOpen: false, typeHpSearch: '', typeHpDropdownOpen: false }],
     },
     init() {
         var pd = window._pageData || {};
         this.kerusakanOptions = pd.kerusakanOptions || [];
         this.typeHpOptions = pd.typeHpOptions || [];
+        this.helpers = pd.helpers || [];
         this.statusCounts = pd.statusCounts || {};
         this.customers = pd.customers || [];
         this.formData.tanggal = pd.tanggal || this.todayLocal();
@@ -65,17 +67,23 @@ Alpine.data('servicePage', () => ({
             this.formData.estimasi_selesai = pd.old_estimasi_selesai || '';
             this.formData.teknisi = pd.old_teknisi || '';
             if (pd.old_items && pd.old_items.length > 0) {
+                var oldTeknisi = pd.old_teknisi || '';
                 this.formData.items = pd.old_items.map(function(item) {
                     var k = item.kerusakan;
-                    var kerusakanList = Array.isArray(k) ? k.slice() : (k ? [k] : []);
-                    var cleanJasa = item.jasa != null ? String(Math.round(parseFloat(item.jasa))) : '';
-                    var cleanPengeluaran = item.pengeluaran != null ? String(Math.round(parseFloat(item.pengeluaran))) : '';
+                    var raw = Array.isArray(k) ? k.slice() : (k ? [k] : []);
+                    var kerusakanList = raw.map(function(x, xi) {
+                        if (typeof x === 'object' && x !== null) {
+                            if (x.pengeluaran != null) x.pengeluaran = String(Math.round(parseFloat(x.pengeluaran)));
+                            if (x.jasa != null) x.jasa = String(Math.round(parseFloat(x.jasa)));
+                            if (!x.teknisi) x.teknisi = item.teknisi || oldTeknisi;
+                            return x;
+                        }
+                        return { nama: x, teknisi: item.teknisi || oldTeknisi, pengeluaran: xi === 0 && item.pengeluaran ? String(Math.round(parseFloat(item.pengeluaran))) : '', jasa: xi === 0 && item.jasa ? String(Math.round(parseFloat(item.jasa))) : '' };
+                    });
                     return {
                         id: item.id || '',
                         type_hp: item.type_hp || '',
                         kerusakanList: kerusakanList,
-                        jasa: cleanJasa,
-                        pengeluaran: cleanPengeluaran,
                         keterangan: item.keterangan || '',
                         kerusakanSearch: '',
                         kerusakanDropdownOpen: false,
@@ -113,8 +121,12 @@ Alpine.data('servicePage', () => ({
     recalculateTotals() {
         var totalJ = 0, totalP = 0;
         (this.formData.items || []).forEach(function(item) {
-            totalJ += parseFloat(item.jasa || '0') || 0;
-            totalP += parseFloat(item.pengeluaran || '0') || 0;
+            (item.kerusakanList || []).forEach(function(k) {
+                if (typeof k === 'object') {
+                    totalJ += parseFloat(k.jasa || '0') || 0;
+                    totalP += parseFloat(k.pengeluaran || '0') || 0;
+                }
+            });
         });
         this.totalJasa = totalJ;
         this.totalPengeluaran = totalP;
@@ -132,11 +144,34 @@ Alpine.data('servicePage', () => ({
         this.customerDropdownOpen = false;
         this.customerSearch = '';
     },
-    openAddCustomer() {
-        this.addCustomerForm = { nama: '', no_hp: '' };
-        this.showAddCustomer = true;
+    quickAddCustomer(name) {
+        if (this.customerSaving) return;
+        var n = (name || '').trim();
+        if (!n) return;
+        this.customerSaving = true;
+        var self = this;
+        var csrf = document.querySelector('meta[name="csrf-token"]');
+        fetch('/customers/quick', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf ? csrf.content : '' },
+            body: JSON.stringify({ nama: n, no_hp: '' })
+        })
+        .then(function(r) {
+            if (!r.ok) { return r.json().then(function(e) { throw new Error(e.message || 'Gagal simpan'); }); }
+            return r.json();
+        })
+        .then(function(data) {
+            if (data.success) {
+                self.customers.push(data.customer);
+                self.formData.customer_id = data.customer.id;
+                self.customerDropdownOpen = false;
+                self.customerSearch = '';
+            }
+        })
+        .catch(function(e) { console.error(e); alert('Gagal menyimpan pelanggan. Silakan coba lagi.'); })
+        .finally(function() { self.customerSaving = false; });
     },
-    saveNewCustomer() {
+    saveNewCustomerInline() {
         if (this.customerSaving) return;
         var name = this.addCustomerForm.nama.trim();
         if (!name) { alert('Nama pelanggan harus diisi.'); return; }
@@ -156,9 +191,9 @@ Alpine.data('servicePage', () => ({
             if (data.success) {
                 self.customers.push(data.customer);
                 self.formData.customer_id = data.customer.id;
-                self.showAddCustomer = false;
                 self.customerDropdownOpen = false;
                 self.customerSearch = '';
+                self.addCustomerForm = { nama: '', no_hp: '' };
             }
         })
         .catch(function(e) { console.error(e); alert('Gagal menyimpan pelanggan. Silakan coba lagi.'); })
@@ -177,8 +212,16 @@ Alpine.data('servicePage', () => ({
         var item = this.formData.items[index];
         if (!item) return;
         if (!item.kerusakanList) item.kerusakanList = [];
-        if (item.kerusakanList.indexOf(option) === -1) {
-            item.kerusakanList.push(option);
+        var exists = item.kerusakanList.some(function(x) {
+            return (typeof x === 'object' ? x.nama : x) === option;
+        });
+        if (!exists) {
+            var fallbackTeknisi = this.formData.teknisi || '';
+            if (!fallbackTeknisi && item.kerusakanList.length > 0) {
+                var first = item.kerusakanList[0];
+                fallbackTeknisi = (typeof first === 'object' && first !== null) ? (first.teknisi || '') : '';
+            }
+            item.kerusakanList.push({ nama: option, teknisi: fallbackTeknisi, pengeluaran: '', jasa: '' });
         }
         item.kerusakanDropdownOpen = false;
         item.kerusakanSearch = '';
@@ -195,6 +238,19 @@ Alpine.data('servicePage', () => ({
                 }).catch(function(e) { console.error('Gagal menyimpan Kategori Kerusakan:', e); });
             }
         }
+    },
+    removeKerusakan(index, ki) {
+        var item = this.formData.items[index];
+        if (!item || !item.kerusakanList) return;
+        item.kerusakanList.splice(ki, 1);
+    },
+    kerusakanNama(k) {
+        return (typeof k === 'object' && k !== null) ? (k.nama || '') : (k || '');
+    },
+    kerusakanTerpilih(list, option) {
+        return list.some(function(x) {
+            return (typeof x === 'object' ? x.nama : x) === option;
+        });
     },
     filteredTypeHpForItem(index) {
         var item = this.formData.items[index];
@@ -237,6 +293,14 @@ Alpine.data('servicePage', () => ({
         }
         this.recalculateTotals();
     },
+    formatCurrencyKerusakan(index, ki, field, event) {
+        var raw = event.target.value.replace(/\D/g, '');
+        var item = this.formData.items[index];
+        if (item && item.kerusakanList && item.kerusakanList[ki]) {
+            item.kerusakanList[ki][field] = raw === '0' ? '' : raw;
+        }
+        this.recalculateTotals();
+    },
     toggleStatus(id, event) {
         if (!this.rowState[id]) this.rowState[id] = { openStatus: false, openAction: false };
         if (!this.rowState[id].openStatus) {
@@ -261,7 +325,11 @@ Alpine.data('servicePage', () => ({
         var rect = btn.getBoundingClientRect();
         var key = type + 'Style';
         if (!this.rowState[id]) this.rowState[id] = {};
-        this.rowState[id][key] = 'position:fixed;left:' + (rect.left - 40) + 'px;top:' + (rect.bottom + 4) + 'px;';
+        if (type === 'action') {
+            this.rowState[id][key] = 'position:fixed;right:' + (window.innerWidth - rect.right + 8) + 'px;top:' + (rect.bottom + 4) + 'px;';
+        } else {
+            this.rowState[id][key] = 'position:fixed;left:' + (rect.left - 40) + 'px;top:' + (rect.bottom + 4) + 'px;';
+        }
     },
     closeRowDropdowns(id) {
         if (this.rowState[id]) {
@@ -281,7 +349,7 @@ Alpine.data('servicePage', () => ({
             teknisi: '',
             garansi: '',
             allowedStatuses: [],
-            items: [{ id: '', type_hp: '', kerusakanList: [], jasa: '', pengeluaran: '', keterangan: '', kerusakanSearch: '', kerusakanDropdownOpen: false, typeHpSearch: '', typeHpDropdownOpen: false }],
+            items: [{ id: '', type_hp: '', kerusakanList: [], keterangan: '', kerusakanSearch: '', kerusakanDropdownOpen: false, typeHpSearch: '', typeHpDropdownOpen: false }],
         };
         this.recalculateTotals();
         this.showModal = true;
@@ -296,6 +364,20 @@ Alpine.data('servicePage', () => ({
         this.formData.tanggal_selesai = String(data.tanggal_selesai || '').slice(0, 10);
         this.formData.estimasi_selesai = String(data.estimasi_selesai || '').slice(0, 10);
         this.formData.teknisi = data.teknisi || '';
+        if (!this.formData.teknisi && data.service_items) {
+            for (var si = 0; si < data.service_items.length; si++) {
+                var sk = data.service_items[si].kerusakan;
+                if (Array.isArray(sk)) {
+                    for (var skIdx = 0; skIdx < sk.length; skIdx++) {
+                        if (sk[skIdx] && sk[skIdx].teknisi) {
+                            this.formData.teknisi = sk[skIdx].teknisi;
+                            break;
+                        }
+                    }
+                }
+                if (this.formData.teknisi) break;
+            }
+        }
         this.formData.garansi = data.garansi || '';
         var transitions = (window._pageData?.allowedTransitions || {})[this.formData.status] || [];
         this.formData.allowedStatuses = [this.formData.status].concat(transitions);
@@ -311,16 +393,23 @@ Alpine.data('servicePage', () => ({
                 pengeluaran: data.pengeluaran,
             }];
         }
+        var dataTeknisi = data.teknisi || '';
         this.formData.items = srcItems.map(function(item) {
             var k = item.kerusakan;
-            var cleanJasa = item.jasa != null ? String(Math.round(parseFloat(item.jasa))) : '';
-            var cleanPengeluaran = item.pengeluaran != null ? String(Math.round(parseFloat(item.pengeluaran))) : '';
+            var raw = Array.isArray(k) ? k.slice() : (k ? [k] : []);
+            var kerusakanList = raw.map(function(x, xi) {
+                if (typeof x === 'object' && x !== null) {
+                    if (x.pengeluaran != null) x.pengeluaran = String(Math.round(parseFloat(x.pengeluaran)));
+                    if (x.jasa != null) x.jasa = String(Math.round(parseFloat(x.jasa)));
+                    if (!x.teknisi) x.teknisi = item.teknisi || dataTeknisi;
+                    return x;
+                }
+                return { nama: x, teknisi: item.teknisi || dataTeknisi, pengeluaran: xi === 0 && item.pengeluaran ? String(Math.round(parseFloat(item.pengeluaran))) : '', jasa: xi === 0 && item.jasa ? String(Math.round(parseFloat(item.jasa))) : '' };
+            });
             return {
                 id: item.id || '',
                 type_hp: item.type_hp || '',
-                kerusakanList: Array.isArray(k) ? k.slice() : (k ? [k] : []),
-                jasa: cleanJasa,
-                pengeluaran: cleanPengeluaran,
+                kerusakanList: kerusakanList,
                 keterangan: item.keterangan || '',
                 kerusakanSearch: '',
                 kerusakanDropdownOpen: false,
@@ -333,7 +422,7 @@ Alpine.data('servicePage', () => ({
         this.$nextTick(() => { if (this.$refs.firstField) this.$refs.firstField.focus(); });
     },
     addItem() {
-        this.formData.items.push({ id: '', type_hp: '', kerusakanList: [], jasa: '', pengeluaran: '', keterangan: '', kerusakanSearch: '', kerusakanDropdownOpen: false, typeHpSearch: '', typeHpDropdownOpen: false });
+        this.formData.items.push({ id: '', type_hp: '', kerusakanList: [], keterangan: '', kerusakanSearch: '', kerusakanDropdownOpen: false, typeHpSearch: '', typeHpDropdownOpen: false });
         this.recalculateTotals();
     },
     removeItem(index) {
@@ -341,27 +430,49 @@ Alpine.data('servicePage', () => ({
         this.formData.items.splice(index, 1);
         this.recalculateTotals();
     },
+    openAddTeknisi(index) {
+        this.addTeknisiIndex = index;
+        this.newTeknisiNama = '';
+        this.newTeknisiWarna = 'bg-gray-100 text-gray-600 border-gray-200';
+    },
+    saveNewTeknisi() {
+        var name = this.newTeknisiNama.trim();
+        if (!name) { alert('Nama teknisi harus diisi.'); return; }
+        var self = this;
+        var csrf = document.querySelector('meta[name="csrf-token"]');
+        var idx = this.addTeknisiIndex;
+        fetch('/helpers/quick', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf ? csrf.content : '' },
+            body: JSON.stringify({ nama: name, warna: this.newTeknisiWarna })
+        })
+        .then(function(r) {
+            if (!r.ok) { return r.json().then(function(e) { throw new Error(e.message || 'Gagal simpan'); }); }
+            return r.json();
+        })
+        .then(function(data) {
+            if (data.success) {
+                self.helpers.push(data.helper);
+                self.newTeknisiNama = '';
+                self.addTeknisiIndex = null;
+            }
+        })
+        .catch(function(e) { console.error(e); alert('Gagal menyimpan teknisi. Silakan coba lagi.'); });
+    },
     quickUpdateStatus(serviceId, newStatus) {
         if (this.statusUpdating) return;
-        if (newStatus === 'diambil') {
-            this.garansiPending = { serviceId: serviceId, status: newStatus, garansi: '' };
-            this.showGaransiModal = true;
-            return;
-        }
-        this.sendStatusUpdate(serviceId, newStatus, '');
+        this.sendStatusUpdate(serviceId, newStatus);
     },
-    sendStatusUpdate(serviceId, newStatus, garansi) {
+    sendStatusUpdate(serviceId, newStatus) {
         if (this.statusUpdating) return;
         this.statusUpdating = serviceId;
         var self = this;
         var csrf = document.querySelector('meta[name="csrf-token"]');
         if (!csrf) { alert('CSRF token tidak ditemukan.'); this.statusUpdating = null; return; }
-        var body = { status: newStatus };
-        if (garansi) { body.garansi = garansi; }
         fetch('/services/' + serviceId + '/status', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf.content },
-            body: JSON.stringify(body)
+            body: JSON.stringify({ status: newStatus })
         })
         .then(function(r) {
             return r.json().then(function(data) {
@@ -430,16 +541,6 @@ Alpine.data('servicePage', () => ({
         .catch(function(e) { console.error(e); alert(e.message || 'Terjadi kesalahan. Silakan coba lagi.'); })
         .finally(function() { self.statusUpdating = null; });
     },
-    confirmGaransi() {
-        this.showGaransiModal = false;
-        var p = this.garansiPending;
-        this.sendStatusUpdate(p.serviceId, p.status, p.garansi);
-    },
-    skipGaransi() {
-        this.showGaransiModal = false;
-        var p = this.garansiPending;
-        this.sendStatusUpdate(p.serviceId, p.status, '');
-    }
 }));
 
 Alpine.data('customerPage', () => ({
@@ -472,6 +573,92 @@ Alpine.data('customerPage', () => ({
         this.editingId = data.id;
         this.formData = { nama: data.nama, no_hp: data.no_hp || '', alamat: data.alamat || '' };
         this.showModal = true;
+    }
+}));
+
+Alpine.data('sparepartPage', () => ({
+    showModal: false,
+    editingId: null,
+    loading: false,
+    formData: {
+        nama_barang: '',
+        kategori: '',
+        type_hp: '',
+        stok: '',
+        harga_beli: '',
+        toko: '',
+        keterangan: '',
+    },
+    init() {
+        this.$watch('showModal', function(val) {
+            document.body.style.overflow = val ? 'hidden' : '';
+        });
+        this.$watch('showTokoModal', function(val) {
+            document.body.style.overflow = val ? 'hidden' : '';
+        });
+        this.initToko();
+        var pd = window._pageData || {};
+        if (pd.hasErrors && !pd.showTokoModal) {
+            this.showModal = true;
+            if (pd._method === 'PUT') {
+                this.editingId = pd.editing_id;
+            }
+            this.formData.nama_barang = pd.old_nama_barang || '';
+            this.formData.kategori = pd.old_kategori || '';
+            this.formData.type_hp = pd.old_type_hp || '';
+            this.formData.stok = pd.old_stok || '';
+            this.formData.harga_beli = pd.old_harga_beli || '';
+            this.formData.toko = pd.old_toko || '';
+            this.formData.keterangan = pd.old_keterangan || '';
+        }
+    },
+    openCreateModal() {
+        this.editingId = null;
+        this.formData = { nama_barang: '', kategori: '', type_hp: '', stok: '', harga_beli: '', toko: '', keterangan: '' };
+        this.showModal = true;
+        this.$nextTick(() => { if (this.$refs.firstField) this.$refs.firstField.focus(); });
+    },
+    openEditModal(data) {
+        this.editingId = data.id;
+        this.formData = {
+            nama_barang: data.nama_barang || '',
+            kategori: data.kategori || '',
+            type_hp: data.type_hp || '',
+            stok: '',
+            harga_beli: data.harga_beli ? String(Math.round(parseFloat(data.harga_beli))) : '',
+            toko: data.toko || '',
+            keterangan: data.keterangan || '',
+        };
+        this.showModal = true;
+        this.$nextTick(() => { if (this.$refs.firstField) this.$refs.firstField.focus(); });
+    },
+    closeModal() {
+        this.showModal = false;
+    },
+    // Toko management
+    showTokoModal: false,
+    tokoEditingId: null,
+    tokoNama: '',
+    initToko() {
+        var pd = window._pageData || {};
+        if (pd.showTokoModal) {
+            this.showTokoModal = true;
+            this.tokoEditingId = pd.toko_editing_id || null;
+            // tokoNama will be set by x-model if form has old value
+        }
+    },
+    openTokoModal() {
+        this.tokoEditingId = null;
+        this.tokoNama = '';
+        this.showTokoModal = true;
+    },
+    openTokoEditModal(data) {
+        this.tokoEditingId = data.id;
+        this.tokoNama = data.nama;
+        this.showTokoModal = true;
+    },
+    closeTokoModal() {
+        this.showTokoModal = false;
     }
 }));
 

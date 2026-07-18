@@ -73,30 +73,54 @@ $profitPositive = $periodTotals->profit >= 0;
 </div>
 
 {{-- Kebutuhan Pribadi --}}
+@php
+$regularFees = collect($periodTotals->fees)->whereIn('kategori', ['fee_edi', 'fee_nur'])->values();
+$tambahanFees = collect($periodTotals->fees)->where('kategori', 'fee_tambahan')->values();
+@endphp
 <div class="anm-card card-glow bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden group flex flex-col h-full">
     <div class="p-4 sm:p-5 flex-1 flex flex-col">
         <div class="flex items-start justify-between">
             <div class="flex-1 min-w-0">
                 <p class="text-xs text-gray-500 uppercase tracking-wider font-medium truncate">Kebutuhan Pribadi {{ $periodLabels[$period] }}</p>
-                <p class="text-[10px] text-gray-400 italic mt-1 hidden sm:block truncate">Bank Jago + Gaji Edi + Gaji Nur + Lainnya — total biaya kebutuhan harian</p>
+                <p class="text-[10px] text-gray-400 italic mt-1 hidden sm:block truncate">Bank Jago + {{ $regularFees->pluck('label')->implode(' + ') }} + Lainnya + {{ $tambahanFees->pluck('label')->implode(' + ') }} — total biaya kebutuhan harian</p>
                 <p class="text-base sm:text-xl lg:text-2xl font-bold mt-1 kpi-value text-orange-600" data-value="{{ $periodTotals->kebutuhan_pribadi }}">Rp {{ number_format($periodTotals->kebutuhan_pribadi, 0, ',', '.') }}</p>
                 {{-- Mobile: grid 2 kolom label : value --}}
                 <div class="grid grid-cols-2 gap-x-3 gap-y-0.5 mt-3 text-xs sm:hidden">
                     <span class="text-gray-400 truncate"><i class="fas fa-university text-[10px] text-blue-500 mr-1"></i>Bank Jago</span>
                     <span class="font-medium text-gray-900 tabular-nums text-right">Rp {{ number_format($periodTotals->bank_jago, 0, ',', '.') }}</span>
-                    <span class="text-gray-400 truncate"><i class="fas fa-user text-[10px] text-purple-500 mr-1"></i>Gaji Edi</span>
-                    <span class="font-medium text-gray-900 tabular-nums text-right">Rp {{ number_format($periodTotals->gaji_edi, 0, ',', '.') }}</span>
-                    <span class="text-gray-400 truncate"><i class="fas fa-user text-[10px] text-purple-500 mr-1"></i>Gaji Nur</span>
-                    <span class="font-medium text-gray-900 tabular-nums text-right">Rp {{ number_format($periodTotals->gaji_nur, 0, ',', '.') }}</span>
+                    @foreach($regularFees as $fee)
+                    <span class="text-gray-400 truncate"><i class="fas fa-user text-[10px] text-purple-500 mr-1"></i>{{ $fee->label }}</span>
+                    <span class="font-medium text-gray-900 tabular-nums text-right">Rp {{ number_format($fee->total, 0, ',', '.') }}</span>
+                    @if(!empty($fee->keterangan))
+                    <span class="text-[10px] text-gray-400 col-span-2 -mt-1 mb-1 pl-4 italic truncate">{{ $fee->keterangan }}</span>
+                    @endif
+                    @endforeach
                     <span class="text-gray-400 truncate"><i class="fas fa-box text-[10px] text-amber-500 mr-1"></i>Lainnya</span>
                     <span class="font-medium text-gray-900 tabular-nums text-right">Rp {{ number_format($periodTotals->lainnya ?? 0, 0, ',', '.') }}</span>
+                    @foreach($tambahanFees as $fee)
+                    <span class="text-gray-400 truncate"><i class="fas fa-plus-circle text-[10px] text-amber-500 mr-1"></i>{{ $fee->label }}</span>
+                    <span class="font-medium text-gray-900 tabular-nums text-right">Rp {{ number_format($fee->total, 0, ',', '.') }}</span>
+                    @if(!empty($fee->keterangan))
+                    <span class="text-[10px] text-gray-400 col-span-2 -mt-1 mb-1 pl-4 italic truncate">{{ $fee->keterangan }}</span>
+                    @endif
+                    @endforeach
                 </div>
                 {{-- Desktop: 1 kolom justify-between --}}
                 <div class="hidden sm:block space-y-0.5 mt-3 text-xs">
                     <div class="flex items-center justify-between gap-2"><span class="text-gray-400 truncate"><i class="fas fa-university text-[10px] text-blue-500 mr-1"></i>Bank Jago</span><span class="font-medium text-gray-900 tabular-nums">Rp {{ number_format($periodTotals->bank_jago, 0, ',', '.') }}</span></div>
-                    <div class="flex items-center justify-between gap-2"><span class="text-gray-400 truncate"><i class="fas fa-user text-[10px] text-purple-500 mr-1"></i>Gaji Edi</span><span class="font-medium text-gray-900 tabular-nums">Rp {{ number_format($periodTotals->gaji_edi, 0, ',', '.') }}</span></div>
-                    <div class="flex items-center justify-between gap-2"><span class="text-gray-400 truncate"><i class="fas fa-user text-[10px] text-purple-500 mr-1"></i>Gaji Nur</span><span class="font-medium text-gray-900 tabular-nums">Rp {{ number_format($periodTotals->gaji_nur, 0, ',', '.') }}</span></div>
+                    @foreach($regularFees as $fee)
+                    <div class="flex items-center justify-between gap-2"><span class="text-gray-400 truncate"><i class="fas fa-user text-[10px] text-purple-500 mr-1"></i>{{ $fee->label }}</span><span class="font-medium text-gray-900 tabular-nums">Rp {{ number_format($fee->total, 0, ',', '.') }}</span></div>
+                    @if(!empty($fee->keterangan))
+                    <div class="text-[10px] text-gray-400 italic truncate pl-4 -mt-0.5">{{ $fee->keterangan }}</div>
+                    @endif
+                    @endforeach
                     <div class="flex items-center justify-between gap-2"><span class="text-gray-400 truncate"><i class="fas fa-box text-[10px] text-amber-500 mr-1"></i>Lainnya</span><span class="font-medium text-gray-900 tabular-nums">Rp {{ number_format($periodTotals->lainnya ?? 0, 0, ',', '.') }}</span></div>
+                    @foreach($tambahanFees as $fee)
+                    <div class="flex items-center justify-between gap-2"><span class="text-gray-400 truncate"><i class="fas fa-plus-circle text-[10px] text-amber-500 mr-1"></i>{{ $fee->label }}</span><span class="font-medium text-gray-900 tabular-nums">Rp {{ number_format($fee->total, 0, ',', '.') }}</span></div>
+                    @if(!empty($fee->keterangan))
+                    <div class="text-[10px] text-gray-400 italic truncate pl-4 -mt-0.5">{{ $fee->keterangan }}</div>
+                    @endif
+                    @endforeach
                 </div>
                 @if($changeKebutuhan !== null)
                 <div class="flex items-center gap-1 mt-1">

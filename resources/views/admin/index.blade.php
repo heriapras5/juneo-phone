@@ -42,7 +42,7 @@
             <h3 class="text-sm font-semibold text-gray-700">Daftar Pengguna</h3>
             <button type="button" @click="openCreateModal()"
                 class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm">
-                <i class="fas fa-plus"></i> Tambah User
+                <i class="fas fa-plus"></i> Tambah
             </button>
         </div>
 

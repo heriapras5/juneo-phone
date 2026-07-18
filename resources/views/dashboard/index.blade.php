@@ -213,8 +213,11 @@ $hasCustomRange = request()->has('from') && request()->has('to');
                         </div>
                         <div class="min-w-0">
                             <p class="text-sm font-medium text-gray-900 truncate">{{ $service->customer?->nama ?? '-' }}</p>
-                            @php $kr = is_string($service->kerusakan) ? json_decode($service->kerusakan, true) : $service->kerusakan; @endphp
-                            <p class="text-xs text-gray-500 truncate">{{ $service->type_hp }} — {{ is_array($kr) ? implode(', ', $kr) : $service->kerusakan }}</p>
+                            @php
+                                $kr = is_string($service->kerusakan) ? json_decode($service->kerusakan, true) : $service->kerusakan;
+                                $krNames = is_array($kr) ? array_map(fn($k) => is_array($k) ? ($k['nama'] ?? '') : $k, $kr) : [];
+                            @endphp
+                            <p class="text-xs text-gray-500 truncate">{{ $service->type_hp }} — {{ is_array($kr) ? implode(', ', array_filter($krNames)) : $service->kerusakan }}</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-2 flex-shrink-0 ml-2">
@@ -262,6 +265,12 @@ function fmtRp(val) {
 
 function fmtPct(val) {
     return (val >= 0 ? '+' : '') + Number(val).toFixed(1) + '%';
+}
+
+function escHtml(str) {
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(str || ''));
+    return div.innerHTML;
 }
 
 function updateTabActive(period, hasCustom) {
@@ -329,7 +338,14 @@ function updateRecentServices(services) {
     var html = '';
     services.forEach(function(s) {
         var st = statusMap[s.status] || { cls: 'bg-gray-100 text-gray-600', label: s.status };
-        var kerusakan = Array.isArray(s.kerusakan) ? s.kerusakan.join(', ') : (s.kerusakan || '-');
+        var kerusakan = '-';
+        if (Array.isArray(s.kerusakan)) {
+            kerusakan = s.kerusakan.map(function(kr) {
+                return typeof kr === 'object' ? (kr.nama || '') : kr;
+            }).filter(Boolean).join(', ');
+        } else if (s.kerusakan) {
+            kerusakan = s.kerusakan;
+        }
                     html += '<div class="anm-row px-3 sm:px-5 py-2.5 sm:py-3 flex items-center justify-between hover:bg-gray-50/50">'
             + '<div class="flex items-center gap-2 sm:gap-3 min-w-0">'
             +   '<div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-yellow-50 to-amber-100 items-center justify-center flex-shrink-0 hidden sm:flex"><i class="fas fa-mobile-alt text-yellow-600 text-[10px] sm:text-xs"></i></div>'
@@ -426,22 +442,59 @@ function buildKpiCardsHTML(d, periodLabel) {
         }),
         kpiCardHTML({
             title: 'Kebutuhan Pribadi ' + periodLabel,
-            desc: 'Bank Jago + Gaji Edi + Gaji Nur + Lainnya — total biaya kebutuhan harian',
+            desc: (function() {
+                var regularFees = [], tambahanFees = [];
+                if (d.fees && d.fees.length) {
+                    d.fees.forEach(function(f) {
+                        if (f.kategori === 'fee_tambahan') { tambahanFees.push(f); }
+                        else { regularFees.push(f); }
+                    });
+                }
+                var desc = 'Bank Jago';
+                if (regularFees.length) { desc += ' + ' + regularFees.map(function(f){ return f.label; }).join(' + '); }
+                desc += ' + Lainnya';
+                if (tambahanFees.length) { desc += ' + ' + tambahanFees.map(function(f){ return f.label; }).join(' + '); }
+                return desc + ' — total biaya kebutuhan harian';
+            })(),
             value: d.kebutuhan_pribadi, valueCls: 'text-orange-600',
             icon: 'fa-wallet', iconBg: 'from-orange-50 to-amber-100', iconColor: 'orange-600',
             change: d.changeKebutuhan, upIsGood: false,
-            extra: '<div class="grid grid-cols-2 gap-x-3 gap-y-0.5 mt-3 text-xs sm:hidden">'
-                + '<span class="text-gray-400 truncate"><i class="fas fa-university text-[10px] text-blue-500 mr-1"></i>Bank Jago</span><span class="font-medium text-gray-900 tabular-nums text-right">' + fmtRp(d.bank_jago) + '</span>'
-                + '<span class="text-gray-400 truncate"><i class="fas fa-user text-[10px] text-purple-500 mr-1"></i>Gaji Edi</span><span class="font-medium text-gray-900 tabular-nums text-right">' + fmtRp(d.gaji_edi) + '</span>'
-                + '<span class="text-gray-400 truncate"><i class="fas fa-user text-[10px] text-purple-500 mr-1"></i>Gaji Nur</span><span class="font-medium text-gray-900 tabular-nums text-right">' + fmtRp(d.gaji_nur) + '</span>'
-                + '<span class="text-gray-400 truncate"><i class="fas fa-box text-[10px] text-amber-500 mr-1"></i>Lainnya</span><span class="font-medium text-gray-900 tabular-nums text-right">' + fmtRp(d.lainnya) + '</span>'
-                + '</div>'
-                + '<div class="hidden sm:block space-y-0.5 mt-3 text-xs">'
-                + '<div class="flex items-center justify-between gap-2"><span class="text-gray-400 truncate"><i class="fas fa-university text-[10px] text-blue-500 mr-1"></i>Bank Jago</span><span class="font-medium text-gray-900 tabular-nums">' + fmtRp(d.bank_jago) + '</span></div>'
-                + '<div class="flex items-center justify-between gap-2"><span class="text-gray-400 truncate"><i class="fas fa-user text-[10px] text-purple-500 mr-1"></i>Gaji Edi</span><span class="font-medium text-gray-900 tabular-nums">' + fmtRp(d.gaji_edi) + '</span></div>'
-                + '<div class="flex items-center justify-between gap-2"><span class="text-gray-400 truncate"><i class="fas fa-user text-[10px] text-purple-500 mr-1"></i>Gaji Nur</span><span class="font-medium text-gray-900 tabular-nums">' + fmtRp(d.gaji_nur) + '</span></div>'
-                + '<div class="flex items-center justify-between gap-2"><span class="text-gray-400 truncate"><i class="fas fa-box text-[10px] text-amber-500 mr-1"></i>Lainnya</span><span class="font-medium text-gray-900 tabular-nums">' + fmtRp(d.lainnya) + '</span></div>'
-                + '</div>',
+            extra: (function() {
+                var regularFees = [], tambahanFees = [];
+                if (d.fees && d.fees.length) {
+                    d.fees.forEach(function(f) {
+                        if (f.kategori === 'fee_tambahan') { tambahanFees.push(f); }
+                        else { regularFees.push(f); }
+                    });
+                }
+                function renderFeeMobile(f, icon, color) {
+                    return '<span class="text-gray-400 truncate"><i class="fas ' + icon + ' text-[10px] ' + color + ' mr-1"></i>' + escHtml(f.label) + '</span><span class="font-medium text-gray-900 tabular-nums text-right">' + fmtRp(f.total) + '</span>'
+                        + (f.keterangan ? '<span class="text-[10px] text-gray-400 col-span-2 -mt-1 mb-1 pl-4 italic truncate">' + escHtml(f.keterangan) + '</span>' : '');
+                }
+                function renderFeeDesktop(f, icon, color) {
+                    return '<div class="flex items-center justify-between gap-2"><span class="text-gray-400 truncate"><i class="fas ' + icon + ' text-[10px] ' + color + ' mr-1"></i>' + escHtml(f.label) + '</span><span class="font-medium text-gray-900 tabular-nums">' + fmtRp(f.total) + '</span></div>'
+                        + (f.keterangan ? '<div class="text-[10px] text-gray-400 italic truncate pl-4 -mt-0.5">' + escHtml(f.keterangan) + '</div>' : '');
+                }
+                var feeMobile = '', feeDesktop = '';
+                regularFees.forEach(function(f) {
+                    feeMobile += renderFeeMobile(f, 'fa-user', 'text-purple-500');
+                    feeDesktop += renderFeeDesktop(f, 'fa-user', 'text-purple-500');
+                });
+                feeMobile += '<span class="text-gray-400 truncate"><i class="fas fa-box text-[10px] text-amber-500 mr-1"></i>Lainnya</span><span class="font-medium text-gray-900 tabular-nums text-right">' + fmtRp(d.lainnya) + '</span>';
+                feeDesktop += '<div class="flex items-center justify-between gap-2"><span class="text-gray-400 truncate"><i class="fas fa-box text-[10px] text-amber-500 mr-1"></i>Lainnya</span><span class="font-medium text-gray-900 tabular-nums">' + fmtRp(d.lainnya) + '</span></div>';
+                tambahanFees.forEach(function(f) {
+                    feeMobile += renderFeeMobile(f, 'fa-plus-circle', 'text-amber-500');
+                    feeDesktop += renderFeeDesktop(f, 'fa-plus-circle', 'text-amber-500');
+                });
+                return '<div class="grid grid-cols-2 gap-x-3 gap-y-0.5 mt-3 text-xs sm:hidden">'
+                    + '<span class="text-gray-400 truncate"><i class="fas fa-university text-[10px] text-blue-500 mr-1"></i>Bank Jago</span><span class="font-medium text-gray-900 tabular-nums text-right">' + fmtRp(d.bank_jago) + '</span>'
+                    + feeMobile
+                    + '</div>'
+                    + '<div class="hidden sm:block space-y-0.5 mt-3 text-xs">'
+                    + '<div class="flex items-center justify-between gap-2"><span class="text-gray-400 truncate"><i class="fas fa-university text-[10px] text-blue-500 mr-1"></i>Bank Jago</span><span class="font-medium text-gray-900 tabular-nums">' + fmtRp(d.bank_jago) + '</span></div>'
+                    + feeDesktop
+                    + '</div>';
+            })(),
             sparkPath: 'M0,25 Q20,20 40,22 T80,15 T120,18 T160,8 T200,10',
             sparkStroke: '#F59E0B', sparkFill: 'url(#sparkAmber)',
             barCls: 'bg-orange-500'

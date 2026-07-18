@@ -59,15 +59,6 @@
                         <p class="text-sm font-medium text-gray-900">{{ $service->tanggal_selesai->format('d F Y') }}</p>
                     </div>
                     @endif
-                    <div>
-                        <p class="text-xs text-gray-500 uppercase tracking-wider">Teknisi</p>
-                        <p class="text-sm font-medium text-gray-900">
-                            @if($service->teknisi === 'edi') Edi (Karyawan 1) <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700 border border-blue-200 ml-1">E</span>
-                            @elseif($service->teknisi === 'nur') Nur (Karyawan 2) <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200 ml-1">N</span>
-                            @else Adit
-                            @endif
-                        </p>
-                    </div>
                 </div>
             </div>
 
@@ -99,70 +90,118 @@
         @endif
     </div>
 
-    @php
-        $itemsTotalJasa = $service->serviceItems->sum('jasa');
-        $itemsTotalModal = $service->serviceItems->sum('pengeluaran');
-    @endphp
     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
         <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <i class="fas fa-mobile-alt text-yellow-500"></i>
             Item Service &amp; Biaya
         </h3>
-        @if($service->serviceItems->isNotEmpty())
+        @php
+            $detailMerger = collect();
+            $detailTotalPengeluaran = 0;
+            $detailTotalJasa = 0;
+
+            foreach ($service->serviceItems as $item) {
+                $dkrList = is_array($item->kerusakan) ? $item->kerusakan : (json_decode($item->kerusakan, true) ?: []);
+                foreach ($dkrList as $i => $dkr) {
+                    $dnama = is_array($dkr) ? ($dkr['nama'] ?? '') : $dkr;
+                    $dtek  = is_array($dkr) ? ($dkr['teknisi'] ?? '') : ($item->teknisi ?? '');
+                    if (is_array($dkr)) {
+                        $dpeng = (int) ($dkr['pengeluaran'] ?? 0);
+                        $djasa = (int) ($dkr['jasa'] ?? 0);
+                    } else {
+                        $dpeng = $i === 0 ? (int) $item->pengeluaran : 0;
+                        $djasa = $i === 0 ? (int) $item->jasa : 0;
+                    }
+                    $detailMerger->push([
+                        'type_hp' => $item->type_hp,
+                        'nama' => $dnama,
+                        'teknisi' => $dtek,
+                        'pengeluaran' => $dpeng,
+                        'jasa' => $djasa,
+                    ]);
+                    $detailTotalPengeluaran += $dpeng;
+                    $detailTotalJasa += $djasa;
+                }
+            }
+
+            if ($detailMerger->isEmpty() && $service->kerusakan) {
+                $dkrList = is_array($service->kerusakan) ? $service->kerusakan : (json_decode($service->kerusakan, true) ?: []);
+                foreach ($dkrList as $i => $dkr) {
+                    $dnama = is_array($dkr) ? ($dkr['nama'] ?? '') : $dkr;
+                    $dtek  = is_array($dkr) ? ($dkr['teknisi'] ?? '') : ($service->teknisi ?? '');
+                    $dpeng = is_array($dkr) ? ((int) ($dkr['pengeluaran'] ?? 0)) : 0;
+                    $djasa = is_array($dkr) ? ((int) ($dkr['jasa'] ?? 0)) : 0;
+                    $detailMerger->push([
+                        'type_hp' => $service->type_hp ?? '',
+                        'nama' => $dnama,
+                        'teknisi' => $dtek,
+                        'pengeluaran' => $dpeng,
+                        'jasa' => $djasa,
+                    ]);
+                    $detailTotalPengeluaran += $dpeng;
+                    $detailTotalJasa += $djasa;
+                }
+            }
+
+            if ($detailTotalPengeluaran === 0 && $detailTotalJasa === 0) {
+                $detailTotalPengeluaran = (int) $service->pengeluaran;
+                $detailTotalJasa = (int) $service->jasa;
+            }
+        @endphp
+        @if($detailMerger->isNotEmpty())
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
                     <tr class="border-b border-gray-100">
                         <th class="text-left py-2 px-2 text-xs text-gray-500 uppercase tracking-wider">Type HP</th>
                         <th class="text-left py-2 px-2 text-xs text-gray-500 uppercase tracking-wider">Kerusakan</th>
+                        <th class="text-center py-2 px-2 text-xs text-gray-500 uppercase tracking-wider">Teknisi</th>
                         <th class="text-right py-2 px-2 text-xs text-gray-500 uppercase tracking-wider">Pengeluaran</th>
                         <th class="text-right py-2 px-2 text-xs text-gray-500 uppercase tracking-wider">Jasa</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">
-                    @foreach($service->serviceItems as $item)
+                    @php $prevType = ''; @endphp
+                    @foreach($detailMerger as $d)
                     <tr>
-                        <td class="py-2 px-2 text-gray-900 font-medium">{{ $item->type_hp }}</td>
+                        <td class="py-2 px-2 text-gray-900 font-medium">
+                            @if($d['type_hp'] !== $prevType)
+                                {{ $d['type_hp'] }}
+                            @endif
+                        </td>
                         <td class="py-2 px-2 text-gray-600">
-                            @php $krList = is_array($item->kerusakan) ? $item->kerusakan : (json_decode($item->kerusakan, true) ?: []); @endphp
-                            @foreach($krList as $kr)
-                                <div class="leading-relaxed whitespace-nowrap"><span class="text-gray-400">•</span> {{ $kr }}</div>
-                            @endforeach
-                            @if(empty($krList))
+                            <span class="text-gray-400">•</span>
+                            <span>{{ $d['nama'] }}</span>
+                        </td>
+                        <td class="py-2 px-2 text-center text-gray-600">
+                            @if($d['teknisi'])
+                                @php
+                                    $dh = $helpers->first(fn($h) => strtolower($h->nama) === strtolower($d['teknisi']));
+                                @endphp
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium border {{ $dh?->warna ?? 'bg-gray-100 text-gray-600 border-gray-200' }}">{{ $dh?->nama ?? ucfirst($d['teknisi']) }}</span>
+                            @else
                                 <span class="text-gray-400">-</span>
                             @endif
                         </td>
-                        <td class="py-2 px-2 text-right text-gray-600">Rp {{ number_format($item->pengeluaran, 0, ',', '.') }}</td>
-                        <td class="py-2 px-2 text-right text-yellow-600 font-semibold">Rp {{ number_format($item->jasa, 0, ',', '.') }}</td>
+                        <td class="py-2 px-2 text-right text-gray-600">Rp {{ number_format($d['pengeluaran'], 0, ',', '.') }}</td>
+                        <td class="py-2 px-2 text-right text-yellow-600 font-semibold">Rp {{ number_format($d['jasa'], 0, ',', '.') }}</td>
                     </tr>
+                    @php $prevType = $d['type_hp']; @endphp
                     @endforeach
                 </tbody>
                 <tfoot>
                     <tr class="border-t-2 border-gray-200 font-semibold">
-                        <td colspan="2" class="py-2 px-2 text-gray-900">Total</td>
-                        <td class="py-2 px-2 text-right text-gray-900">Rp {{ number_format($itemsTotalModal, 0, ',', '.') }}</td>
-                        <td class="py-2 px-2 text-right text-yellow-600">Rp {{ number_format($itemsTotalJasa, 0, ',', '.') }}</td>
+                        <td colspan="3" class="py-2 px-2 text-gray-900">Total</td>
+                        <td class="py-2 px-2 text-right text-gray-900">Rp {{ number_format($detailTotalPengeluaran, 0, ',', '.') }}</td>
+                        <td class="py-2 px-2 text-right text-yellow-600">Rp {{ number_format($detailTotalJasa, 0, ',', '.') }}</td>
                     </tr>
                 </tfoot>
             </table>
         </div>
+        @else
+        <p class="text-sm text-gray-400">Tidak ada item service.</p>
         @endif
 
-        {{-- Garansi --}}
-        <div class="mt-4 pt-4 border-t border-gray-200">
-            <h4 class="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <i class="fas fa-shield text-yellow-500"></i> Garansi
-            </h4>
-            <form method="POST" action="{{ route('services.garansi', $service) }}" class="flex items-center gap-2">
-                @csrf
-                @method('PUT')
-                <input type="text" name="garansi" value="{{ old('garansi', $service->garansi) }}" placeholder="Isi keterangan garansi..."
-                    class="flex-1 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 placeholder-gray-400 outline-none">
-                <button type="submit" class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm whitespace-nowrap">
-                    <i class="fas fa-save"></i> Simpan
-                </button>
-            </form>
-        </div>
     </div>
 
     {{-- Timeline Riwayat Status --}}
