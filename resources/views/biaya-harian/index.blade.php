@@ -35,25 +35,10 @@
             loading: false,
             _adding: false,
             tambahanFees: {{ Js::from($tambahan->map(fn($t) => ['kategori' => 'fee_tambahan', 'nama' => $t->nama, 'jumlah' => number_format($t->jumlah, 0, ',', '.'), 'keterangan' => $t->keterangan ?? ''])->values()->toArray()) }},
+            confirmRemoveIndex: null,
             addTambahan() { if (this._adding) return; this._adding = true; this.tambahanFees.push({ kategori: 'fee_tambahan', nama: '', jumlah: '', keterangan: '' }); this.$nextTick(() => { this._adding = false; }); },
-            removeTambahan(i) {
-                var self = this;
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Hapus Item?',
-                    text: 'Item tambahan ini akan dihapus saat data disimpan.',
-                    showCancelButton: true,
-                    confirmButtonColor: '#EF4444',
-                    cancelButtonColor: '#6B7280',
-                    confirmButtonText: 'Ya, Hapus!',
-                    cancelButtonText: 'Batal',
-                    reverseButtons: true,
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        self.tambahanFees.splice(i, 1);
-                    }
-                });
-            }
+            confirmRemoveItem(i) { this.confirmRemoveIndex = i; },
+            executeRemove() { if (this.confirmRemoveIndex !== null) { this.tambahanFees.splice(this.confirmRemoveIndex, 1); this.confirmRemoveIndex = null; } }
         }" @submit="loading = true">
             @csrf
             <input type="hidden" name="tanggal" value="{{ $date }}">
@@ -92,24 +77,31 @@
                 $jumlahLain = $bLain && $bLain->jumlah > 0 ? $bLain->jumlah : ($defaults['lainnya'] ?? 0);
                 $keteranganLain = $bLain->keterangan ?? '';
                 @endphp
-                <div class="flex flex-wrap items-center gap-3 p-3 rounded-lg bg-orange-50/50">
-                    <div class="flex-1 min-w-[120px]">
-                        <label class="block text-xs font-medium text-gray-600">Lainnya</label>
+                <div class="p-3 rounded-lg bg-orange-50/50">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <div class="flex-1 min-w-[120px]">
+                            <label class="block text-xs font-medium text-gray-600">Lainnya</label>
+                        </div>
+                        <div class="w-36">
+                            <input type="text" inputmode="numeric" name="items[lainnya][jumlah]"
+                                value="{{ $jumlahLain !== null ? number_format($jumlahLain, 0, ',', '.') : '' }}"
+                                placeholder="0"
+                                class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none text-right"
+                                oninput="this.value = this.value.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.')">
+                        </div>
+                        <div class="flex-1 min-w-[150px]">
+                            <input type="text" name="items[lainnya][keterangan]"
+                                value="{{ $keteranganLain }}"
+                                placeholder="Keterangan (opsional)"
+                                class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 placeholder-gray-400 outline-none">
+                        </div>
+                        <input type="hidden" name="items[lainnya][kategori]" value="lainnya">
                     </div>
-                    <div class="w-36">
-                        <input type="text" inputmode="numeric" name="items[lainnya][jumlah]"
-                            value="{{ $jumlahLain !== null ? number_format($jumlahLain, 0, ',', '.') : '' }}"
-                            placeholder="0"
-                            class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none text-right"
-                            oninput="this.value = this.value.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.')">
-                    </div>
-                    <div class="flex-1 min-w-[150px]">
-                        <input type="text" name="items[lainnya][keterangan]"
-                            value="{{ $keteranganLain }}"
-                            placeholder="Keterangan (opsional)"
-                            class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 placeholder-gray-400 outline-none">
-                    </div>
-                    <input type="hidden" name="items[lainnya][kategori]" value="lainnya">
+                    <button type="button" @click.stop.prevent="addTambahan()"
+                        class="text-xs text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-1 mt-1">
+                        <i class="fas fa-plus-circle text-[10px]"></i>
+                        Tambah
+                    </button>
                 </div>
 
                 {{-- Fee Tambahan --}}
@@ -131,20 +123,12 @@
                                 class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 placeholder-gray-400 outline-none">
                         </div>
                         <input type="hidden" :name="'items[tambahan_' + i + '][kategori]'" value="fee_tambahan">
-                        <button type="button" @click.stop="removeTambahan(i)"
+                        <button type="button" @click.stop="confirmRemoveItem(i)"
                             class="text-red-400 hover:text-red-600 text-sm flex-shrink-0">
                             <i class="fas fa-trash-alt"></i>
                         </button>
                     </div>
                 </template>
-
-                <button type="button" @click.stop.prevent="addTambahan()"
-                    class="flex flex-wrap items-center gap-3 p-3 rounded-lg bg-gray-50 border border-dashed border-gray-300 hover:bg-gray-100 hover:border-gray-400 transition-all w-full text-left">
-                    <div class="flex-1 min-w-[120px] flex items-center gap-2">
-                        <i class="fas fa-plus-circle text-xs text-gray-400"></i>
-                        <span class="text-xs font-medium text-gray-500">Tambah</span>
-                    </div>
-                </button>
 
             </div>
 
@@ -158,6 +142,39 @@
                     <i class="fas fa-save" x-show="!loading"></i>
                     Save
                 </button>
+            </div>
+
+            {{-- Confirm Hapus Item Tambahan --}}
+            <div x-show="confirmRemoveIndex !== null" x-cloak
+                x-transition:enter="transition-opacity duration-100"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="transition-opacity duration-75"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+                <div @click.stop class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4 border border-gray-200">
+                    <div class="text-center">
+                        <div class="flex items-center justify-end mb-2">
+                            <button type="button" @click="confirmRemoveIndex = null" title="Tutup" class="text-gray-400 hover:text-gray-600 -mr-2"><i class="fas fa-times"></i></button>
+                        </div>
+                        <div class="mx-auto w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4">
+                            <i class="fas fa-trash text-red-500 text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">Konfirmasi Hapus</h3>
+                        <p class="text-sm text-gray-600 mb-6">Item tambahan ini akan dihapus saat data disimpan.</p>
+                        <div class="flex gap-3 justify-center">
+                            <button type="button" @click="confirmRemoveIndex = null"
+                                class="px-5 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl">
+                                Batal
+                            </button>
+                            <button type="button" @click="executeRemove()"
+                                class="px-5 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-xl">
+                                Ya, Hapus
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </form>
     </div>
@@ -211,7 +228,3 @@
     </div>
 </div>
 @endsection
-
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-@endpush

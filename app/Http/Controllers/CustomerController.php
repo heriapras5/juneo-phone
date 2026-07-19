@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\Helper;
 use Illuminate\Http\Request;
 
 class CustomerController extends Controller
@@ -43,7 +44,8 @@ class CustomerController extends Controller
     public function show(Customer $customer)
     {
         $customer->load('services');
-        return view('customers.show', compact('customer'));
+        $helpers = Helper::where('role', 'teknisi')->orderBy('id')->get();
+        return view('customers.show', compact('customer', 'helpers'));
     }
 
     public function edit(Customer $customer)
