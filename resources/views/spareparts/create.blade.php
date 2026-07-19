@@ -10,15 +10,60 @@
             @csrf
             <div class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
+                    <div x-data="{
+                        kategoriSearch: '',
+                        kategoriDropdownOpen: false,
+                        kategori: '{{ old('kategori') }}',
+                        kategoriOptions: {{ Js::from($kategoriOptions) }},
+                        get filteredKategori() {
+                            var q = (this.kategoriSearch || '').toLowerCase();
+                            if (!q) return this.kategoriOptions;
+                            return this.kategoriOptions.filter(function(o) { return (o || '').toLowerCase().indexOf(q) !== -1; });
+                        },
+                        selectKategori(name) { this.kategori = name; this.kategoriDropdownOpen = false; this.kategoriSearch = ''; },
+                        quickAddKategori() {
+                            var name = (this.kategoriSearch || '').trim(); if (!name) { alert('Nama kategori harus diisi.'); return; }
+                            var self = this; var csrf = document.querySelector('meta[name=\'csrf-token\']'); if (!csrf) return;
+                            fetch('/spareparts/kategori/quick', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf.content }, body: JSON.stringify({ name: name }) })
+                            .then(function(r) { return r.json(); })
+                            .then(function(data) { if (data.success) { self.kategoriOptions.push(data.kategori.name); self.kategori = data.kategori.name; self.kategoriDropdownOpen = false; self.kategoriSearch = ''; } else { alert(data.message || 'Gagal menyimpan kategori.'); } })
+                            .catch(function(e) { console.error(e); alert('Gagal menyimpan kategori.'); });
+                        }
+                    }">
                         <label class="block text-xs font-medium text-gray-500 mb-1.5">Kategori <span class="text-red-500">*</span></label>
-                        <select name="kategori" required
-                            class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
-                            <option value="">-- Pilih Kategori --</option>
-                            @foreach($kategoriLabels as $key => $label)
-                            <option value="{{ $key }}" {{ old('kategori') === $key ? 'selected' : '' }}>{{ $label }}</option>
-                            @endforeach
-                        </select>
+                        <div class="relative" @click.outside="kategoriDropdownOpen = false">
+                            <button type="button" @click="kategoriDropdownOpen = !kategoriDropdownOpen; $nextTick(() => { if(kategoriDropdownOpen) { $refs.kSearchInput?.focus(); } })"
+                                class="w-full flex items-center justify-between px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none cursor-pointer text-left"
+                                :class="{ 'border-yellow-500 ring-2 ring-yellow-500/30': kategoriDropdownOpen }">
+                                <span class="truncate" x-text="kategori || '-- Pilih Kategori --'"></span>
+                                <i class="fas fa-chevron-down text-gray-400 text-xs flex-shrink-0 ml-1" :class="{ 'rotate-180': kategoriDropdownOpen }"></i>
+                            </button>
+                            <div x-show="kategoriDropdownOpen" x-cloak
+                                class="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+                                <div class="p-2 border-b border-gray-100">
+                                    <input type="text" x-ref="kSearchInput" x-model="kategoriSearch" placeholder="Cari kategori..." @click.stop
+                                        class="w-full px-3 py-1.5 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 placeholder-gray-400 outline-none">
+                                </div>
+                                <div class="max-h-40 overflow-y-auto">
+                                    <template x-for="o in filteredKategori" :key="o">
+                                        <button type="button" @click="selectKategori(o)"
+                                            class="w-full text-left px-3 py-2 text-sm hover:bg-yellow-50 flex items-center justify-between"
+                                            :class="{ 'bg-yellow-50 text-yellow-700 font-medium': kategori === o }">
+                                            <span x-text="o"></span>
+                                            <i x-show="kategori === o" class="fas fa-check text-yellow-500 text-xs"></i>
+                                        </button>
+                                    </template>
+                                    <div x-show="kategoriSearch.trim() !== '' && filteredKategori.length === 0" class="px-3 py-2 border-t border-gray-100">
+                                        <button type="button" @click="quickAddKategori()"
+                                            class="w-full text-left text-sm text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
+                                            <i class="fas fa-plus text-xs"></i>
+                                            <span>Tambah: "</span><span x-text="kategoriSearch"></span><span>"</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" name="kategori" :value="kategori">
                         @error('kategori') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>

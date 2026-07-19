@@ -172,7 +172,8 @@
                     class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
             </div>
         </div>
-        <div class="overflow-x-auto">
+        <div x-data="scrollSync">
+            <div class="overflow-x-auto" x-ref="table" @scroll="syncFromTable">
             <table class="w-full">
                 <thead>
                     <tr class="bg-gray-50">
@@ -183,35 +184,16 @@
                 </thead>
                 <tbody class="divide-y divide-gray-100">
                     @forelse($riwayat as $r)
-                    @php $cleanTanggal = \Carbon\Carbon::parse($r->tanggal)->format('Y-m-d'); $formId = 'delete-form-' . str_replace('-', '', $cleanTanggal); @endphp
+                    @php $cleanTanggal = \Carbon\Carbon::parse($r->tanggal)->format('Y-m-d'); @endphp
                     <tr class="hover:bg-gray-50/50">
                         <td class="px-4 py-3 text-sm text-yellow-600 hover:text-yellow-700 font-medium cursor-pointer" onclick="window.location.href='?date={{ $cleanTanggal }}&bulan={{ $bulan }}'">{{ \Carbon\Carbon::parse($r->tanggal)->format('d F Y') }}</td>
                         <td class="px-4 py-3 text-sm text-right font-medium text-gray-900 cursor-pointer" onclick="window.location.href='?date={{ $cleanTanggal }}&bulan={{ $bulan }}'">Rp {{ number_format($r->total, 0, ',', '.') }}</td>
                         <td class="px-4 py-3 text-center">
                             <button type="button"
-                                @click="Swal.fire({
-                                    icon: 'warning',
-                                    title: 'Hapus Data?',
-                                    text: 'Semua biaya untuk tanggal {{ \Carbon\Carbon::parse($cleanTanggal)->format('d/m/Y') }} akan dihapus.',
-                                    showCancelButton: true,
-                                    confirmButtonColor: '#EF4444',
-                                    cancelButtonColor: '#6B7280',
-                                    confirmButtonText: 'Ya, Hapus!',
-                                    cancelButtonText: 'Batal',
-                                    reverseButtons: true,
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        document.getElementById('{{ $formId }}').submit();
-                                    }
-                                })"
+                                @click="confirmDelete = { url: '{{ route('biaya-harian.destroy', $cleanTanggal) . '?bulan=' . $bulan }}', message: 'Semua biaya untuk tanggal {{ \Carbon\Carbon::parse($cleanTanggal)->format('d/m/Y') }} akan dihapus.' }"
                                 class="text-red-500 hover:text-red-700" title="Hapus">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
-                            <form id="{{ $formId }}" method="POST" action="{{ route('biaya-harian.destroy', $cleanTanggal) }}" class="hidden">
-                                @csrf
-                                @method('DELETE')
-                                <input type="hidden" name="bulan" value="{{ $bulan }}">
-                            </form>
                         </td>
                     </tr>
                     @empty
@@ -221,6 +203,10 @@
                     @endforelse
                 </tbody>
             </table>
+            </div>
+            <div class="sticky bottom-0 z-20 overflow-x-auto h-4 bg-white border-t border-gray-200" x-ref="mirror" @scroll="syncFromMirror">
+                <div :style="{ width: ($refs.table?.scrollWidth||0)+'px', height:'1px' }"></div>
+            </div>
         </div>
     </div>
 </div>

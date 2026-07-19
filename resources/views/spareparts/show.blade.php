@@ -11,7 +11,7 @@
                 <h3 class="text-xl font-semibold text-gray-900">{{ $sparepart->nama_barang }}</h3>
                 <div class="flex items-center gap-2 mt-1">
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
-                        {{ $kategoriLabels[$sparepart->kategori] ?? $sparepart->kategori }}
+                        {{ $sparepart->kategori }}
                     </span>
                     <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold
                         {{ $sparepart->stok > 10 ? 'bg-emerald-500 text-white' : ($sparepart->stok > 0 ? 'bg-yellow-500 text-white' : 'bg-red-500 text-white') }}">
@@ -63,7 +63,8 @@
         </h3>
 
         @if($sparepart->mutasi->isNotEmpty())
-        <div class="overflow-x-auto">
+        <div x-data="scrollSync">
+            <div class="overflow-x-auto" x-ref="table" @scroll="syncFromTable">
             <table class="w-full text-sm">
                 <thead>
                     <tr class="border-b border-gray-100">
@@ -102,6 +103,10 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
+            <div class="sticky bottom-0 z-20 overflow-x-auto h-4 bg-white border-t border-gray-200" x-ref="mirror" @scroll="syncFromMirror">
+                <div :style="{ width: ($refs.table?.scrollWidth||0)+'px', height:'1px' }"></div>
+            </div>
         </div>
         @else
         <div class="text-center py-8 text-gray-400">

@@ -21,7 +21,7 @@ class ServiceController extends Controller
     {
         $services = Service::with(['customer', 'serviceItems'])
             ->queue()
-            ->paginate(20)
+            ->paginate(10)
             ->withQueryString();
 
         $completedServices = Service::with(['customer', 'serviceItems'])

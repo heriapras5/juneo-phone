@@ -56,6 +56,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/services/{service}/status', [ServiceController::class, 'updateStatus'])->name('services.update-status');
         Route::put('/services/{service}/quick-update', [ServiceController::class, 'quickUpdate'])->name('services.quick-update');
 
+        Route::post('/spareparts/kategori/quick', [SparepartController::class, 'quickStoreKategori'])->name('spareparts.kategori.quick');
         Route::get('/spareparts/export-excel', [SparepartController::class, 'exportExcel'])->name('spareparts.export-excel');
         Route::get('/spareparts/export-pdf', [SparepartController::class, 'exportPdf'])->name('spareparts.export-pdf');
         Route::resource('spareparts', SparepartController::class);

@@ -70,7 +70,8 @@
     </div>
 
     <div class="bg-white border border-gray-200 rounded-xl shadow-sm">
-        <div class="overflow-x-auto rounded-xl">
+        <div class="rounded-xl" x-data="scrollSync">
+            <div class="overflow-x-auto" x-ref="table" @scroll="syncFromTable">
             <table class="w-full">
                 <thead>
                     <tr class="bg-gray-50">
@@ -186,6 +187,10 @@
                     @endforelse
                 </tbody>
             </table>
+            </div>
+            <div class="sticky bottom-0 z-20 overflow-x-auto h-4 bg-white border-t border-gray-200" x-ref="mirror" @scroll="syncFromMirror">
+                <div :style="{ width: ($refs.table?.scrollWidth||0)+'px', height:'1px' }"></div>
+            </div>
         </div>
         <div class="p-5 border-t border-gray-100">
             {{ $services->links() }}

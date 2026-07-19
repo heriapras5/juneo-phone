@@ -86,7 +86,8 @@
     </div>
 
     <div class="bg-white border border-gray-200 rounded-xl shadow-sm">
-        <div class="overflow-x-auto">
+        <div x-data="scrollSync">
+            <div class="overflow-x-auto" x-ref="table" @scroll="syncFromTable">
             <table class="w-full min-w-[1000px]">
                 <thead>
                     <tr class="bg-gray-50">
@@ -259,6 +260,10 @@
                     @endforelse
                 </tbody>
             </table>
+            </div>
+            <div class="sticky bottom-0 z-20 overflow-x-auto h-4 bg-white border-t border-gray-200" x-ref="mirror" @scroll="syncFromMirror">
+                <div :style="{ width: ($refs.table?.scrollWidth||0)+'px', height:'1px' }"></div>
+            </div>
         </div>
         @if($services->hasPages())
         <div class="px-5 py-3 border-t border-gray-100">
@@ -277,7 +282,8 @@
                 <span class="text-xs font-normal text-gray-400">({{ $completedServices->total() }})</span>
             </h3>
         </div>
-        <div class="overflow-x-auto">
+        <div x-data="scrollSync">
+            <div class="overflow-x-auto" x-ref="table" @scroll="syncFromTable">
             <table class="w-full min-w-[800px]">
                 <thead>
                     <tr class="bg-gray-50">
@@ -350,6 +356,10 @@
                     @endforelse
                 </tbody>
             </table>
+            </div>
+            <div class="sticky bottom-0 z-20 overflow-x-auto h-4 bg-white border-t border-gray-200" x-ref="mirror" @scroll="syncFromMirror">
+                <div :style="{ width: ($refs.table?.scrollWidth||0)+'px', height:'1px' }"></div>
+            </div>
         </div>
         @if($completedServices->hasPages())
         <div class="px-5 py-3 border-t border-gray-100">

@@ -46,7 +46,7 @@
             @forelse($spareparts as $sparepart)
             <tr>
                 <td class="text-center">{{ $loop->iteration }}</td>
-                <td>{{ $kategoriLabels[$sparepart->kategori] ?? $sparepart->kategori }}</td>
+                <td>{{ $sparepart->kategori }}</td>
                 <td>{{ $sparepart->nama_barang }}</td>
                 <td>{{ $sparepart->type_hp ?? '-' }}</td>
                 <td class="text-center">{{ $sparepart->stok }}</td>

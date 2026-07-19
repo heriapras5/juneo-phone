@@ -23,8 +23,8 @@
                         <select name="kategori"
                             class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
                             <option value="">Semua Kategori</option>
-                            @foreach($kategoriLabels as $key => $label)
-                            <option value="{{ $key }}" {{ request('kategori') === $key ? 'selected' : '' }}>{{ $label }}</option>
+                            @foreach($kategoriOptions as $opt)
+                            <option value="{{ $opt }}" {{ request('kategori') === $opt ? 'selected' : '' }}>{{ $opt }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -81,7 +81,8 @@
         </div>
 
         <div class="bg-white border border-gray-200 rounded-xl shadow-sm">
-            <div class="overflow-x-auto rounded-xl">
+            <div class="rounded-xl" x-data="scrollSync">
+                <div class="overflow-x-auto" x-ref="table" @scroll="syncFromTable">
                 <table class="w-full min-w-[1000px]">
                     <thead>
                         <tr class="bg-gray-50">
@@ -101,7 +102,7 @@
                             <td class="px-5 py-3 text-sm text-gray-500 text-center whitespace-nowrap">{{ $loop->iteration + ($spareparts->currentPage() - 1) * $spareparts->perPage() }}</td>
                             <td class="px-5 py-3 text-sm text-gray-600 whitespace-nowrap">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
-                                    {{ $kategoriLabels[$sparepart->kategori] ?? $sparepart->kategori }}
+                                    {{ $sparepart->kategori }}
                                 </span>
                             </td>
                             <td class="px-5 py-3 text-sm font-medium text-gray-900 whitespace-nowrap">
@@ -118,15 +119,7 @@
                             <td class="px-5 py-3 text-sm text-gray-900 font-semibold text-right whitespace-nowrap tabular-nums">
                                 {{ $sparepart->harga_beli ? 'Rp ' . number_format($sparepart->harga_beli, 0, ',', '.') : '-' }}
                             </td>
-                            <td class="px-5 py-3 text-sm text-gray-600 whitespace-nowrap">
-                                @if($sparepart->toko)
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 border border-blue-200">
-                                    {{ $sparepart->toko }}
-                                </span>
-                                @else
-                                <span class="text-gray-400">-</span>
-                                @endif
-                            </td>
+                            <td class="px-5 py-3 text-sm text-gray-600 whitespace-nowrap">{{ $sparepart->toko ?? '-' }}</td>
                             <td class="px-5 py-3 text-center whitespace-nowrap">
                                 <div class="flex items-center justify-center gap-1">
                                     <a href="{{ route('spareparts.mutasi-create', $sparepart) }}"
@@ -161,6 +154,10 @@
                     </tbody>
                 </table>
             </div>
+            <div class="sticky bottom-0 z-20 overflow-x-auto h-4 bg-white border-t border-gray-200" x-ref="mirror" @scroll="syncFromMirror">
+                <div :style="{ width: ($refs.table?.scrollWidth||0)+'px', height:'1px' }"></div>
+            </div>
+            </div>
             @if($spareparts->hasPages())
             <div class="px-5 py-3 border-t border-gray-100">
                 {{ $spareparts->links() }}
@@ -193,13 +190,41 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-medium text-gray-500 mb-1.5">Kategori <span class="text-red-500">*</span></label>
-                            <select name="kategori" required x-model="formData.kategori"
-                                class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
-                                <option value="">-- Pilih Kategori --</option>
-                                @foreach($kategoriLabels as $key => $label)
-                                <option value="{{ $key }}">{{ $label }}</option>
-                                @endforeach
-                            </select>
+                            <div class="relative" @click.outside="kategoriDropdownOpen = false">
+                                <button type="button" @click="kategoriDropdownOpen = !kategoriDropdownOpen; $nextTick(() => { if(kategoriDropdownOpen) { const el = $refs.kategoriSearchInput; if(el) setTimeout(() => el.focus(), 50); } })"
+                                    class="w-full flex items-center justify-between px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none cursor-pointer text-left"
+                                    :class="{ 'border-yellow-500 ring-2 ring-yellow-500/30': kategoriDropdownOpen }">
+                                    <span class="truncate" x-text="formData.kategori || '-- Pilih Kategori --'"></span>
+                                    <i class="fas fa-chevron-down text-gray-400 text-xs flex-shrink-0 ml-1" :class="{ 'rotate-180': kategoriDropdownOpen }"></i>
+                                </button>
+                                <div x-show="kategoriDropdownOpen" x-cloak
+                                    class="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+                                    <div class="p-2 border-b border-gray-100">
+                                        <input type="text" x-ref="kategoriSearchInput" x-model="kategoriSearch"
+                                            placeholder="Cari kategori..."
+                                            @click.stop
+                                            class="w-full px-3 py-1.5 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 placeholder-gray-400 outline-none">
+                                    </div>
+                                    <div class="max-h-40 overflow-y-auto">
+                                        <template x-for="o in filteredKategori" :key="o">
+                                            <button type="button" @click="selectKategori(o)"
+                                                class="w-full text-left px-3 py-2 text-sm hover:bg-yellow-50 flex items-center justify-between"
+                                                :class="{ 'bg-yellow-50 text-yellow-700 font-medium': formData.kategori === o }">
+                                                <span x-text="o"></span>
+                                                <i x-show="formData.kategori === o" class="fas fa-check text-yellow-500 text-xs"></i>
+                                            </button>
+                                        </template>
+                                        <div x-show="kategoriSearch.trim() !== '' && filteredKategori.length === 0" class="px-3 py-2 border-t border-gray-100">
+                                            <button type="button" @click="quickAddKategori()"
+                                                class="w-full text-left text-sm text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
+                                                <i class="fas fa-plus text-xs"></i>
+                                                <span>Tambah: "</span><span x-text="kategoriSearch"></span><span>"</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" name="kategori" :value="formData.kategori">
                             @error('kategori') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                         </div>
                         <div>

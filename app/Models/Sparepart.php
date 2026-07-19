@@ -42,20 +42,6 @@ class Sparepart extends Model
             });
     }
 
-    public static function kategoriLabels(): array
-    {
-        return [
-            'lcd' => 'LCD',
-            'baterai' => 'Baterai',
-            'pcb' => 'PCB / Papan Cas',
-            'fleksibot' => 'Fleksibot',
-            'flex_on_off' => 'Flex On/Off',
-            'flex_volume' => 'Flex Volume',
-            'keypad' => 'Keypad',
-            'lainnya' => 'Lainnya',
-        ];
-    }
-
     public static function tokoOptions(): array
     {
         return Toko::pluck('nama')->toArray();

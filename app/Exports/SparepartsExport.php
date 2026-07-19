@@ -16,12 +16,10 @@ class SparepartsExport implements FromQuery, WithHeadings, WithMapping, WithStyl
 {
     private array $filters;
     private int $no = 0;
-    private array $kategoriLabels;
 
     public function __construct(array $filters = [])
     {
         $this->filters = $filters;
-        $this->kategoriLabels = Sparepart::kategoriLabels();
     }
 
     public function query()
@@ -50,7 +48,7 @@ class SparepartsExport implements FromQuery, WithHeadings, WithMapping, WithStyl
         $this->no++;
         return [
             $this->no,
-            $this->kategoriLabels[$row->kategori] ?? $row->kategori,
+            $row->kategori,
             $row->nama_barang,
             $row->type_hp ?? '',
             $row->stok,

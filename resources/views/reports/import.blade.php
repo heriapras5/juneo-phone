@@ -61,7 +61,8 @@
     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
         <h3 class="font-semibold text-gray-900 mb-2">Format File Import</h3>
         <p class="text-sm text-gray-500 mb-4">File harus memiliki header kolom berikut (urutan bebas):</p>
-        <div class="overflow-x-auto">
+        <div x-data="scrollSync">
+            <div class="overflow-x-auto" x-ref="table" @scroll="syncFromTable">
             <table class="w-full text-sm">
                 <thead>
                     <tr class="bg-gray-50">
@@ -81,6 +82,10 @@
                     <tr><td class="px-3 py-2 text-gray-700">Keterangan</td><td class="px-3 py-2 text-gray-500">Catatan tambahan</td><td class="px-3 py-2 text-gray-400">Opsional</td></tr>
                 </tbody>
             </table>
+            </div>
+            <div class="sticky bottom-0 z-20 overflow-x-auto h-4 bg-white border-t border-gray-200" x-ref="mirror" @scroll="syncFromMirror">
+                <div :style="{ width: ($refs.table?.scrollWidth||0)+'px', height:'1px' }"></div>
+            </div>
         </div>
     </div>
 </div>

@@ -149,7 +149,8 @@
             }
         @endphp
         @if($detailMerger->isNotEmpty())
-        <div class="overflow-x-auto">
+        <div x-data="scrollSync">
+            <div class="overflow-x-auto" x-ref="table" @scroll="syncFromTable">
             <table class="w-full text-sm">
                 <thead>
                     <tr class="border-b border-gray-100">
@@ -197,6 +198,10 @@
                     </tr>
                 </tfoot>
             </table>
+            </div>
+            <div class="sticky bottom-0 z-20 overflow-x-auto h-4 bg-white border-t border-gray-200" x-ref="mirror" @scroll="syncFromMirror">
+                <div :style="{ width: ($refs.table?.scrollWidth||0)+'px', height:'1px' }"></div>
+            </div>
         </div>
         @else
         <p class="text-sm text-gray-400">Tidak ada item service.</p>

@@ -46,7 +46,8 @@
             </button>
         </div>
 
-        <div class="overflow-x-auto">
+        <div x-data="scrollSync">
+            <div class="overflow-x-auto" x-ref="table" @scroll="syncFromTable">
             <table class="w-full">
                 <thead>
                     <tr class="bg-gray-50">
@@ -95,8 +96,13 @@
                     @endforelse
                 </tbody>
             </table>
+            </div>
+            <div class="sticky bottom-0 z-20 overflow-x-auto h-4 bg-white border-t border-gray-200" x-ref="mirror" @scroll="syncFromMirror">
+                <div :style="{ width: ($refs.table?.scrollWidth||0)+'px', height:'1px' }"></div>
+            </div>
         </div>
     </div>
+</div>
 
     {{-- Modal Form Admin/Owner --}}
     <div x-show="showModal" x-cloak

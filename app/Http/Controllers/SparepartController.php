@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Sparepart;
+use App\Models\SparepartKategori;
 use App\Models\StokMutasi;
 use App\Models\Toko;
 use App\Models\Setting;
@@ -21,10 +22,10 @@ class SparepartController extends Controller
         $spareparts = Sparepart::filter($request->only(['kategori', 'toko', 'search']))
             ->orderBy('kategori')
             ->orderBy('nama_barang')
-            ->paginate(20)
+            ->paginate(10)
             ->withQueryString();
 
-        $kategoriLabels = Sparepart::kategoriLabels();
+        $kategoriOptions = SparepartKategori::active()->ordered()->pluck('name')->toArray();
         $tokoOptions = Sparepart::tokoOptions();
         $tokos = Toko::orderBy('nama')->get();
 
@@ -53,27 +54,31 @@ class SparepartController extends Controller
             ];
         }
 
+        $pageData = array_merge($pageData ?? [], [
+            'kategoriOptions' => $kategoriOptions,
+        ]);
+
         if ($editSparepart) {
-            $pageData = array_merge($pageData ?? [], [
+            $pageData = array_merge($pageData, [
                 'editSparepart' => $editSparepart->only(['id', 'nama_barang', 'kategori', 'type_hp', 'harga_beli', 'toko', 'keterangan']),
             ]);
         }
 
-        return view('spareparts.index', compact('spareparts', 'kategoriLabels', 'tokoOptions', 'tokos', 'pageData'));
+        return view('spareparts.index', compact('spareparts', 'kategoriOptions', 'tokoOptions', 'tokos', 'pageData'));
     }
 
     public function create()
     {
-        $kategoriLabels = Sparepart::kategoriLabels();
+        $kategoriOptions = SparepartKategori::active()->ordered()->pluck('name')->toArray();
         $tokoOptions = Sparepart::tokoOptions();
-        return view('spareparts.create', compact('kategoriLabels', 'tokoOptions'));
+        return view('spareparts.create', compact('kategoriOptions', 'tokoOptions'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'nama_barang' => 'required|string|max:255',
-            'kategori' => 'required|string|in:' . implode(',', array_keys(Sparepart::kategoriLabels())),
+            'kategori' => 'required|string',
             'type_hp' => 'nullable|string|max:255',
             'stok' => 'required|integer|min:0',
             'harga_beli' => 'nullable|numeric|min:0',
@@ -101,22 +106,21 @@ class SparepartController extends Controller
     public function show(Sparepart $sparepart)
     {
         $sparepart->load(['mutasi.user']);
-        $kategoriLabels = Sparepart::kategoriLabels();
-        return view('spareparts.show', compact('sparepart', 'kategoriLabels'));
+        return view('spareparts.show', compact('sparepart'));
     }
 
     public function edit(Sparepart $sparepart)
     {
-        $kategoriLabels = Sparepart::kategoriLabels();
+        $kategoriOptions = SparepartKategori::active()->ordered()->pluck('name')->toArray();
         $tokoOptions = Sparepart::tokoOptions();
-        return view('spareparts.edit', compact('sparepart', 'kategoriLabels', 'tokoOptions'));
+        return view('spareparts.edit', compact('sparepart', 'kategoriOptions', 'tokoOptions'));
     }
 
     public function update(Request $request, Sparepart $sparepart)
     {
         $validated = $request->validate([
             'nama_barang' => 'required|string|max:255',
-            'kategori' => 'required|string|in:' . implode(',', array_keys(Sparepart::kategoriLabels())),
+            'kategori' => 'required|string',
             'type_hp' => 'nullable|string|max:255',
             'harga_beli' => 'nullable|numeric|min:0',
             'toko' => 'nullable|string|in:' . implode(',', Sparepart::tokoOptions()) . ',',
@@ -186,6 +190,26 @@ class SparepartController extends Controller
             ->with('success', 'Mutasi stok berhasil dicatat.');
     }
 
+    public function quickStoreKategori(Request $request)
+    {
+        $request->validate(['name' => 'required|string|max:100']);
+
+        $name = trim($request->name);
+        $existing = SparepartKategori::where('name', $name)->first();
+
+        if ($existing) {
+            return response()->json(['success' => false, 'message' => 'Kategori sudah ada.']);
+        }
+
+        $maxSort = SparepartKategori::max('sort_order') ?? 0;
+        $kategori = SparepartKategori::create([
+            'name' => $name,
+            'sort_order' => $maxSort + 1,
+        ]);
+
+        return response()->json(['success' => true, 'kategori' => $kategori]);
+    }
+
     public function exportExcel()
     {
         $sparepartNama = str_replace(' ', '-', Setting::getValue('nama_toko', 'Juneo-Phone'));
@@ -201,9 +225,8 @@ class SparepartController extends Controller
             ->orderBy('kategori')
             ->orderBy('nama_barang')
             ->get();
-        $kategoriLabels = Sparepart::kategoriLabels();
         $namaToko = Setting::getValue('nama_toko', 'Juneo Phone');
-        $pdf = Pdf::loadView('exports.pdf-spareparts', compact('spareparts', 'kategoriLabels', 'namaToko'));
+        $pdf = Pdf::loadView('exports.pdf-spareparts', compact('spareparts', 'namaToko'));
         $pdf->setPaper('A4', 'landscape');
         $pdf->setOption('isRemoteEnabled', true);
 

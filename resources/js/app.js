@@ -580,6 +580,8 @@ Alpine.data('sparepartPage', () => ({
     showModal: false,
     editingId: null,
     loading: false,
+    kategoriSearch: '',
+    kategoriDropdownOpen: false,
     formData: {
         nama_barang: '',
         kategori: '',
@@ -588,6 +590,48 @@ Alpine.data('sparepartPage', () => ({
         harga_beli: '',
         toko: '',
         keterangan: '',
+    },
+    get filteredKategori() {
+        var q = (this.kategoriSearch || '').toLowerCase();
+        var pd = window._pageData || {};
+        var options = pd.kategoriOptions || [];
+        if (!q) return options;
+        return options.filter(function(o) {
+            return (o || '').toLowerCase().indexOf(q) !== -1;
+        });
+    },
+    selectKategori(name) {
+        this.formData.kategori = name;
+        this.kategoriDropdownOpen = false;
+        this.kategoriSearch = '';
+    },
+    quickAddKategori() {
+        var name = (this.kategoriSearch || '').trim();
+        if (!name) { alert('Nama kategori harus diisi.'); return; }
+        var self = this;
+        var csrf = document.querySelector('meta[name="csrf-token"]');
+        if (!csrf) return;
+        fetch('/spareparts/kategori/quick', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf.content },
+            body: JSON.stringify({ name: name })
+        })
+        .then(function(r) {
+            if (!r.ok) { return r.json().then(function(e) { throw new Error(e.message || 'Gagal simpan'); }); }
+            return r.json();
+        })
+        .then(function(data) {
+            if (data.success) {
+                var pd = window._pageData || {};
+                if (pd.kategoriOptions) pd.kategoriOptions.push(data.kategori.name);
+                self.formData.kategori = data.kategori.name;
+                self.kategoriDropdownOpen = false;
+                self.kategoriSearch = '';
+            } else {
+                alert(data.message || 'Gagal menyimpan kategori.');
+            }
+        })
+        .catch(function(e) { console.error(e); alert('Gagal menyimpan kategori. Silakan coba lagi.'); });
     },
     init() {
         this.$watch('showModal', function(val) {
@@ -660,6 +704,17 @@ Alpine.data('sparepartPage', () => ({
     closeTokoModal() {
         this.showTokoModal = false;
     }
+}));
+
+Alpine.data('scrollSync', () => ({
+    syncFromTable(el) {
+        const mirror = this.$refs.mirror;
+        if (mirror) mirror.scrollLeft = el.scrollLeft;
+    },
+    syncFromMirror(el) {
+        const table = this.$refs.table;
+        if (table) table.scrollLeft = el.scrollLeft;
+    },
 }));
 
 window.Alpine = Alpine;
