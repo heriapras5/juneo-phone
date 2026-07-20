@@ -33,7 +33,7 @@ class SparepartsExport implements FromQuery, WithHeadings, WithMapping, WithStyl
     {
         return [
             'No',
-            'Kategori Brand',
+            'Brand',
             'Kategori',
             'Nama Barang',
             'Type',

@@ -119,8 +119,6 @@
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700">
                                     {{ $sparepart->brand }}
                                 </span>
-                                @else
-                                <span class="text-sm text-gray-400">-</span>
                                 @endif
                             </td>
                             <td class="px-5 py-3 text-sm text-gray-600 whitespace-nowrap">
@@ -131,7 +129,7 @@
                             <td class="px-5 py-3 text-sm font-medium text-gray-900 whitespace-nowrap">
                                 <a href="{{ route('spareparts.show', $sparepart) }}" class="text-yellow-600 hover:text-yellow-700 hover:underline">{{ $sparepart->nama_barang }}</a>
                             </td>
-                            <td class="px-5 py-3 text-sm text-gray-500 whitespace-nowrap">{{ $sparepart->type_hp ?? '-' }}</td>
+                            <td class="px-5 py-3 text-sm text-gray-500 whitespace-nowrap">{{ $sparepart->type_hp ?? '' }}</td>
                             <td class="px-5 py-3 text-sm text-center whitespace-nowrap">
                                 <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold
                                     {{ $sparepart->stok > 10 ? 'bg-emerald-500 text-white' : ($sparepart->stok > 0 ? 'bg-yellow-500 text-white' : 'bg-red-500 text-white') }}">
@@ -140,14 +138,16 @@
                                 </span>
                             </td>
                             <td class="px-5 py-3 text-sm text-gray-900 font-semibold text-right whitespace-nowrap tabular-nums">
-                                {{ $sparepart->harga_beli ? 'Rp ' . number_format($sparepart->harga_beli, 0, ',', '.') : '-' }}
+                                {{ $sparepart->harga_beli ? 'Rp ' . number_format($sparepart->harga_beli, 0, ',', '.') : '' }}
                             </td>
                             <td class="px-5 py-3 whitespace-nowrap">
+                                @if($sparepart->toko)
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
-                                    {{ $sparepart->toko ?? '-' }}
+                                    {{ $sparepart->toko }}
                                 </span>
+                                @endif
                             </td>
-                            <td class="px-5 py-3 text-sm text-gray-500 whitespace-nowrap max-w-[200px] truncate">{{ $sparepart->keterangan ?? '-' }}</td>
+                            <td class="px-5 py-3 text-sm text-gray-500 whitespace-nowrap max-w-[200px] truncate">{{ $sparepart->keterangan ?? '' }}</td>
                             <td class="px-5 py-3 text-center whitespace-nowrap sticky right-0 z-10 bg-white hover:bg-gray-100">
                                 <div class="flex items-center justify-center gap-1">
                                     <a href="{{ route('spareparts.mutasi-create', $sparepart) }}"

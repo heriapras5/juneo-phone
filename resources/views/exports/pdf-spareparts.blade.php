@@ -33,7 +33,7 @@
         <thead>
             <tr>
                 <th style="width:4%; text-align:center;">No</th>
-                <th style="width:12%;">Kategori Brand</th>
+                <th style="width:12%;">Brand</th>
                 <th style="width:12%;">Kategori</th>
                 <th style="width:20%;">Nama Barang</th>
                 <th style="width:18%;">Type</th>
@@ -47,14 +47,14 @@
             @forelse($spareparts as $sparepart)
             <tr>
                 <td class="text-center">{{ $loop->iteration }}</td>
-                <td>{{ $sparepart->brand ?? '-' }}</td>
+                <td>{{ $sparepart->brand ?? '' }}</td>
                 <td>{{ $sparepart->kategori }}</td>
                 <td>{{ $sparepart->nama_barang }}</td>
-                <td>{{ $sparepart->type_hp ?? '-' }}</td>
+                <td>{{ $sparepart->type_hp ?? '' }}</td>
                 <td class="text-center">{{ $sparepart->stok }}</td>
-                <td class="text-right">{{ $sparepart->harga_beli ? 'Rp '.number_format($sparepart->harga_beli, 0, ',', '.') : '-' }}</td>
-                <td>{{ $sparepart->toko ?? '-' }}</td>
-                <td>{{ $sparepart->keterangan ?? '-' }}</td>
+                <td class="text-right">{{ $sparepart->harga_beli ? 'Rp '.number_format($sparepart->harga_beli, 0, ',', '.') : '' }}</td>
+                <td>{{ $sparepart->toko ?? '' }}</td>
+                <td>{{ $sparepart->keterangan ?? '' }}</td>
             </tr>
             @empty
             <tr>

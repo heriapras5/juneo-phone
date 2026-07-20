@@ -64,8 +64,8 @@ window._pageData = {
                                 {{ $customer->nama }}
                             </a>
                         </td>
-                        <td class="px-3 sm:px-5 py-3 text-sm text-gray-600 whitespace-nowrap">{{ $customer->no_hp ?? '-' }}</td>
-                        <td class="px-3 sm:px-5 py-3 text-sm text-gray-600 whitespace-nowrap">{{ $customer->alamat ?? '-' }}</td>
+                        <td class="px-3 sm:px-5 py-3 text-sm text-gray-600 whitespace-nowrap">{{ $customer->no_hp ?? '' }}</td>
+                        <td class="px-3 sm:px-5 py-3 text-sm text-gray-600 whitespace-nowrap">{{ $customer->alamat ?? '' }}</td>
                         <td class="px-3 sm:px-5 py-3 text-sm text-gray-600 text-center whitespace-nowrap">{{ $customer->services_count }}</td>
                         <td class="px-3 sm:px-5 py-3 text-right whitespace-nowrap">
                             <div class="flex items-center justify-end gap-1">

@@ -47,11 +47,11 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
                 <p class="text-xs text-gray-500 uppercase tracking-wider">Type</p>
-                <p class="text-sm font-medium text-gray-900">{{ $sparepart->type_hp ?? '-' }}</p>
+                <p class="text-sm font-medium text-gray-900">{{ $sparepart->type_hp ?? '' }}</p>
             </div>
             <div>
                 <p class="text-xs text-gray-500 uppercase tracking-wider">Harga Beli</p>
-                <p class="text-sm font-medium text-gray-900">{{ $sparepart->harga_beli ? 'Rp ' . number_format($sparepart->harga_beli, 0, ',', '.') : '-' }}</p>
+                <p class="text-sm font-medium text-gray-900">{{ $sparepart->harga_beli ? 'Rp ' . number_format($sparepart->harga_beli, 0, ',', '.') : '' }}</p>
             </div>
         </div>
         @if($sparepart->keterangan)
