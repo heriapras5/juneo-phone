@@ -33,8 +33,9 @@
         <thead>
             <tr>
                 <th style="width:4%; text-align:center;">No</th>
+                <th style="width:12%;">Kategori Brand</th>
                 <th style="width:12%;">Kategori</th>
-                <th style="width:22%;">Nama Barang</th>
+                <th style="width:20%;">Nama Barang</th>
                 <th style="width:18%;">Type</th>
                 <th style="width:6%; text-align:center;">Stok</th>
                 <th style="width:12%; text-align:right;">Harga Beli</th>
@@ -46,6 +47,7 @@
             @forelse($spareparts as $sparepart)
             <tr>
                 <td class="text-center">{{ $loop->iteration }}</td>
+                <td>{{ $sparepart->brand ?? '-' }}</td>
                 <td>{{ $sparepart->kategori }}</td>
                 <td>{{ $sparepart->nama_barang }}</td>
                 <td>{{ $sparepart->type_hp ?? '-' }}</td>
@@ -56,7 +58,7 @@
             </tr>
             @empty
             <tr>
-                <td colspan="8" style="text-align:center; padding:20px; color:#999;">Tidak ada data sparepart.</td>
+                <td colspan="9" style="text-align:center; padding:20px; color:#999;">Tidak ada data sparepart.</td>
             </tr>
             @endforelse
         </tbody>

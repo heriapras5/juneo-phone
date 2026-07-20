@@ -11,12 +11,12 @@
     <div class="space-y-4">
         <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
             <div class="flex flex-wrap items-end gap-3">
-                <form method="GET" class="flex flex-wrap items-end gap-3 flex-1">
+                <form method="GET" class="flex flex-wrap items-end gap-3">
                     <div>
                         <label class="block text-xs font-medium text-gray-500 mb-1">Cari</label>
                         <input type="text" name="search" value="{{ request('search') }}"
-                            placeholder="Nama barang, type HP..."
-                            class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 placeholder-gray-400 outline-none w-56">
+                            placeholder="Nama barang, type, brand..."
+                            class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 placeholder-gray-400 outline-none w-44">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-500 mb-1">Kategori</label>
@@ -24,7 +24,17 @@
                             class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
                             <option value="">Semua Kategori</option>
                             @foreach($kategoriOptions as $opt)
-                            <option value="{{ $opt }}" {{ request('kategori') === $opt ? 'selected' : '' }}>{{ $opt }}</option>
+                            <option value="{{ $opt['name'] }}" {{ request('kategori') === $opt['name'] ? 'selected' : '' }}>{{ $opt['name'] }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">Brand</label>
+                        <select name="brand"
+                            class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
+                            <option value="">Semua Brand</option>
+                            @foreach($brandOptions as $opt)
+                            <option value="{{ $opt['name'] }}" {{ request('brand') === $opt['name'] ? 'selected' : '' }}>{{ $opt['name'] }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -34,7 +44,7 @@
                             class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
                             <option value="">Semua Toko</option>
                             @foreach($tokoOptions as $toko)
-                            <option value="{{ $toko }}" {{ request('toko') === $toko ? 'selected' : '' }}>{{ $toko }}</option>
+                            <option value="{{ $toko['nama'] }}" {{ request('toko') === $toko['nama'] ? 'selected' : '' }}>{{ $toko['nama'] }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -42,64 +52,77 @@
                         class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 text-white rounded-lg text-sm font-medium hover:from-yellow-400 hover:to-amber-400 shadow-sm">
                         <i class="fas fa-search"></i> Filter
                     </button>
-                    @if(request()->anyFilled(['search', 'kategori', 'toko']))
+                    @if(request()->anyFilled(['search', 'kategori', 'brand', 'toko']))
                     <a href="{{ route('spareparts.index') }}"
                         class="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm hover:bg-gray-200">
                         <i class="fas fa-times"></i> Reset
                     </a>
                     @endif
                 </form>
-                <button type="button" @click="openTokoModal()"
-                    class="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm flex-shrink-0">
-                    <i class="fas fa-store"></i> Kelola Toko
-                </button>
-                <div class="relative" x-data="{ open: false }" @click.outside="open = false">
-                    <button @click="open = !open" type="button"
-                        class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm flex-shrink-0">
-                        <i class="fas fa-download"></i> Export
-                        <i class="fas fa-chevron-down text-xs" :class="{ 'rotate-180': open }"></i>
-                    </button>
-                    <div x-show="open" x-cloak
-                        class="absolute right-0 mt-1 w-36 bg-white border border-gray-200 rounded-lg shadow-lg z-20 overflow-hidden">
-                        <a href="{{ route('spareparts.export-excel', request()->only(['kategori', 'toko', 'search'])) }}"
-                            target="_blank"
-                            class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                            <i class="fas fa-file-excel text-emerald-600"></i> Excel
-                        </a>
-                        <a href="{{ route('spareparts.export-pdf', request()->only(['kategori', 'toko', 'search'])) }}"
-                            target="_blank"
-                            class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                            <i class="fas fa-file-pdf text-red-600"></i> PDF
-                        </a>
+                <div class="flex flex-wrap items-end gap-2 ml-auto">
+                    <div class="relative" x-data="{ open: false }" @click.outside="open = false">
+                        <button @click="open = !open" type="button"
+                            class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm flex-shrink-0">
+                            <i class="fas fa-download"></i> Export
+                            <i class="fas fa-chevron-down text-xs" :class="{ 'rotate-180': open }"></i>
+                        </button>
+                        <div x-show="open" x-cloak
+                            class="absolute right-0 mt-1 w-36 bg-white border border-gray-200 rounded-lg shadow-lg z-20 overflow-hidden">
+                            <a href="{{ route('spareparts.export-excel', request()->only(['kategori', 'brand', 'toko', 'search'])) }}"
+                                target="_blank"
+                                class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                <i class="fas fa-file-excel text-emerald-600"></i> Excel
+                            </a>
+                            <a href="{{ route('spareparts.export-pdf', request()->only(['kategori', 'brand', 'toko', 'search'])) }}"
+                                target="_blank"
+                                class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                <i class="fas fa-file-pdf text-red-600"></i> PDF
+                            </a>
+                        </div>
                     </div>
+                    <button type="button" @click="openTokoModal()"
+                        class="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm flex-shrink-0">
+                        <i class="fas fa-store"></i> Toko
+                    </button>
+                    <button type="button" @click="openCreateModal()"
+                        class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm flex-shrink-0">
+                        <i class="fas fa-plus"></i> Tambah
+                    </button>
                 </div>
-                <button type="button" @click="openCreateModal()"
-                    class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm flex-shrink-0">
-                    <i class="fas fa-plus"></i> Tambah
-                </button>
             </div>
         </div>
 
         <div class="bg-white border border-gray-200 rounded-xl shadow-sm">
             <div class="rounded-xl" x-data="scrollSync">
                 <div class="overflow-x-auto" x-ref="table" @scroll="syncFromTable">
-                <table class="w-full min-w-[1000px]">
+                <table class="w-full min-w-[1300px]">
                     <thead>
-                        <tr class="bg-gray-50">
-                            <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center w-10">No</th>
-                            <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left">Kategori</th>
-                            <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left">Nama Barang</th>
-                            <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left">Type</th>
-                            <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Stok</th>
-                            <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right">Harga Beli</th>
-                            <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left">Toko</th>
-                            <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">Aksi</th>
+                        <tr class="bg-gray-50 border-b border-gray-200">
+                            <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap w-10">No</th>
+                            <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap w-32">Brand</th>
+                            <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Kategori</th>
+                            <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Nama Barang</th>
+                            <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Type</th>
+                            <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap">Stok</th>
+                            <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right whitespace-nowrap">Harga Beli</th>
+                            <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Toko</th>
+                            <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Keterangan</th>
+                            <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap w-16 sticky right-0 z-10 bg-gray-50">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         @forelse($spareparts as $sparepart)
                         <tr class="hover:bg-gray-50/50">
                             <td class="px-5 py-3 text-sm text-gray-500 text-center whitespace-nowrap">{{ $loop->iteration + ($spareparts->currentPage() - 1) * $spareparts->perPage() }}</td>
+                            <td class="px-5 py-3 whitespace-nowrap">
+                                @if($sparepart->brand)
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700">
+                                    {{ $sparepart->brand }}
+                                </span>
+                                @else
+                                <span class="text-sm text-gray-400">-</span>
+                                @endif
+                            </td>
                             <td class="px-5 py-3 text-sm text-gray-600 whitespace-nowrap">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
                                     {{ $sparepart->kategori }}
@@ -119,14 +142,19 @@
                             <td class="px-5 py-3 text-sm text-gray-900 font-semibold text-right whitespace-nowrap tabular-nums">
                                 {{ $sparepart->harga_beli ? 'Rp ' . number_format($sparepart->harga_beli, 0, ',', '.') : '-' }}
                             </td>
-                            <td class="px-5 py-3 text-sm text-gray-600 whitespace-nowrap">{{ $sparepart->toko ?? '-' }}</td>
-                            <td class="px-5 py-3 text-center whitespace-nowrap">
+                            <td class="px-5 py-3 whitespace-nowrap">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                                    {{ $sparepart->toko ?? '-' }}
+                                </span>
+                            </td>
+                            <td class="px-5 py-3 text-sm text-gray-500 whitespace-nowrap max-w-[200px] truncate">{{ $sparepart->keterangan ?? '-' }}</td>
+                            <td class="px-5 py-3 text-center whitespace-nowrap sticky right-0 z-10 bg-white hover:bg-gray-100">
                                 <div class="flex items-center justify-center gap-1">
                                     <a href="{{ route('spareparts.mutasi-create', $sparepart) }}"
                                         class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg" title="Tambah/Kurang Stok">
                                         <i class="fas fa-exchange-alt"></i>
                                     </a>
-                                    <button type="button" @click="openEditModal({{ Js::from($sparepart->only(['id', 'nama_barang', 'kategori', 'type_hp', 'harga_beli', 'toko', 'keterangan'])) }})"
+                                    <button type="button" @click="openEditModal({{ Js::from($sparepart->only(['id', 'nama_barang', 'kategori', 'brand', 'type_hp', 'harga_beli', 'toko', 'keterangan'])) }})"
                                         class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </button>
@@ -140,8 +168,8 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="8" class="px-5 py-12 text-center text-gray-400">
-                                @if(request()->anyFilled(['search', 'kategori', 'toko']))
+                            <td colspan="10" class="px-5 py-12 text-center text-gray-400">
+                    @if(request()->anyFilled(['search', 'kategori', 'brand', 'toko']))
                                 <i class="fas fa-search text-3xl mb-2 block"></i>
                                 Data tidak ditemukan
                                 @else
@@ -189,13 +217,56 @@
                 <div class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1.5">Brand</label>
+                            <div class="relative" @click.outside="brandDropdownOpen = false">
+                                <button type="button" @click="brandDropdownOpen = !brandDropdownOpen; $nextTick(() => { if(brandDropdownOpen) { const el = $refs.brandSearchInput; if(el) setTimeout(() => el.focus(), 50); } })"
+                                    class="w-full flex items-center justify-between px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none cursor-pointer text-left"
+                                    :class="{ 'border-yellow-500 ring-2 ring-yellow-500/30': brandDropdownOpen }">
+                                    <span class="truncate" x-text="formData.brand || '-- Pilih Brand --'"></span>
+                                    <span class="flex items-center gap-1.5">
+                                        <i class="fas fa-chevron-down text-gray-400 text-xs flex-shrink-0" :class="{ 'rotate-180': brandDropdownOpen }"></i>
+                                    </span>
+                                </button>
+                                <div x-show="brandDropdownOpen" x-cloak
+                                    class="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+                                    <div class="p-2 border-b border-gray-100">
+                                        <input type="text" x-ref="brandSearchInput" x-model="brandSearch"
+                                            placeholder="Cari brand..."
+                                            @click.stop
+                                            class="w-full px-3 py-1.5 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 placeholder-gray-400 outline-none">
+                                    </div>
+                                    <div class="max-h-40 overflow-y-auto">
+                                        <template x-for="o in filteredBrand" :key="o.id">
+                                            <button type="button" @click="selectBrand(o.name)"
+                                                class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-700 transition-colors flex items-center justify-between"
+                                                :class="{ 'bg-yellow-50 text-yellow-700 font-medium': formData.brand === o.name }">
+                                                <span x-text="o.name"></span>
+                                                <i x-show="formData.brand === o.name" class="fas fa-check text-yellow-500 text-xs"></i>
+                                            </button>
+                                        </template>
+                                        <div x-show="brandSearch.trim() !== '' && filteredBrand.length === 0" class="px-3 py-2 border-t border-gray-100">
+                                            <button type="button" @click="quickAddBrand()"
+                                                class="w-full text-left text-sm text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
+                                                <i class="fas fa-plus text-xs"></i>
+                                                <span>Tambah: "</span><span x-text="brandSearch"></span><span>"</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" name="brand" :value="formData.brand">
+                            @error('brand') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
                             <label class="block text-xs font-medium text-gray-500 mb-1.5">Kategori <span class="text-red-500">*</span></label>
                             <div class="relative" @click.outside="kategoriDropdownOpen = false">
                                 <button type="button" @click="kategoriDropdownOpen = !kategoriDropdownOpen; $nextTick(() => { if(kategoriDropdownOpen) { const el = $refs.kategoriSearchInput; if(el) setTimeout(() => el.focus(), 50); } })"
                                     class="w-full flex items-center justify-between px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none cursor-pointer text-left"
                                     :class="{ 'border-yellow-500 ring-2 ring-yellow-500/30': kategoriDropdownOpen }">
                                     <span class="truncate" x-text="formData.kategori || '-- Pilih Kategori --'"></span>
-                                    <i class="fas fa-chevron-down text-gray-400 text-xs flex-shrink-0 ml-1" :class="{ 'rotate-180': kategoriDropdownOpen }"></i>
+                                    <span class="flex items-center gap-1.5">
+                                        <i class="fas fa-chevron-down text-gray-400 text-xs flex-shrink-0" :class="{ 'rotate-180': kategoriDropdownOpen }"></i>
+                                    </span>
                                 </button>
                                 <div x-show="kategoriDropdownOpen" x-cloak
                                     class="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
@@ -206,12 +277,12 @@
                                             class="w-full px-3 py-1.5 bg-gray-50 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 placeholder-gray-400 outline-none">
                                     </div>
                                     <div class="max-h-40 overflow-y-auto">
-                                        <template x-for="o in filteredKategori" :key="o">
-                                            <button type="button" @click="selectKategori(o)"
-                                                class="w-full text-left px-3 py-2 text-sm hover:bg-yellow-50 flex items-center justify-between"
-                                                :class="{ 'bg-yellow-50 text-yellow-700 font-medium': formData.kategori === o }">
-                                                <span x-text="o"></span>
-                                                <i x-show="formData.kategori === o" class="fas fa-check text-yellow-500 text-xs"></i>
+                                        <template x-for="o in filteredKategori" :key="o.id">
+                                            <button type="button" @click="selectKategori(o.name)"
+                                                class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-700 transition-colors flex items-center justify-between"
+                                                :class="{ 'bg-yellow-50 text-yellow-700 font-medium': formData.kategori === o.name }">
+                                                <span x-text="o.name"></span>
+                                                <i x-show="formData.kategori === o.name" class="fas fa-check text-yellow-500 text-xs"></i>
                                             </button>
                                         </template>
                                         <div x-show="kategoriSearch.trim() !== '' && filteredKategori.length === 0" class="px-3 py-2 border-t border-gray-100">
@@ -256,13 +327,42 @@
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-gray-500 mb-1.5">Toko</label>
-                            <select name="toko" x-model="formData.toko"
-                                class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
-                                <option value="">-- Pilih Toko --</option>
-                                @foreach($tokoOptions as $toko)
-                                <option value="{{ $toko }}">{{ $toko }}</option>
-                                @endforeach
-                            </select>
+                            <div class="relative" @click.outside="tokoDropdownOpen = false">
+                                <button type="button" @click="tokoDropdownOpen = !tokoDropdownOpen"
+                                    class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none flex items-center justify-between gap-2 text-left">
+                                    <span x-text="formData.toko || '-- Pilih Toko --'" :class="{'text-gray-400': !formData.toko}"></span>
+                                    <span class="flex items-center gap-1.5">
+                                        <i class="fas fa-chevron-down text-xs text-gray-400" :class="{'rotate-180': tokoDropdownOpen}"></i>
+                                    </span>
+                                </button>
+                                <div x-show="tokoDropdownOpen" x-cloak
+                                    class="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-hidden">
+                                    <div class="p-1.5 border-b border-gray-100">
+                                        <input type="text" x-model="tokoSearch" x-ref="tokoSearchInput"
+                                            placeholder="Cari toko..." @keydown.escape="tokoDropdownOpen = false"
+                                            class="w-full px-2.5 py-1.5 bg-gray-50 border border-gray-200 rounded-md text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 outline-none">
+                                    </div>
+                                    <div class="overflow-y-auto max-h-36">
+                                        <template x-for="(o, idx) in filteredToko" :key="o.id">
+                                            <button type="button" @click="selectToko(o.nama)"
+                                                class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-700 transition-colors flex items-center justify-between"
+                                                :class="{'bg-yellow-50 text-yellow-700 font-medium': formData.toko === o.nama}">
+                                                <span x-text="o.nama"></span>
+                                                <i x-show="formData.toko === o.nama" class="fas fa-check text-yellow-500 text-xs"></i>
+                                            </button>
+                                        </template>
+                                        <div x-show="filteredToko.length === 0 && !tokoSearch" class="px-3 py-2 text-sm text-gray-400">Tidak ada toko</div>
+                                        <div x-show="tokoSearch.trim() !== '' && filteredToko.length === 0" class="px-3 py-2 border-t border-gray-100">
+                                            <button type="button" @click="quickAddToko()"
+                                                class="w-full text-left text-sm text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
+                                                <i class="fas fa-plus text-xs"></i>
+                                                <span>Tambah: "</span><span x-text="tokoSearch"></span><span>"</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" name="toko" :value="formData.toko">
                             @error('toko') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                         </div>
                     </div>
@@ -297,13 +397,13 @@
         x-transition:leave-end="opacity-0"
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
         <div @click.stop class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4 border border-gray-200 relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 via-blue-500 to-blue-400"></div>
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-400"></div>
             <div class="flex items-center justify-between mb-4 mt-2">
                 <h3 class="text-lg font-semibold text-gray-900">Kelola Toko</h3>
                 <button @click="closeTokoModal()" title="Tutup" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
             </div>
 
-            <form :action="tokoEditingId ? '{{ url('tokos') }}/' + tokoEditingId : '{{ route('tokos.store') }}'" method="POST" class="mb-5">
+            <form x-ref="tokoForm" :action="tokoEditingId ? '{{ url('tokos') }}/' + tokoEditingId : '{{ route('tokos.store') }}'" method="POST" class="mb-5">
                 @csrf
                 <input type="hidden" name="_method" :value="tokoEditingId ? 'PUT' : 'POST'">
                 <input type="hidden" name="_toko_form" value="1">

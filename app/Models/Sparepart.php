@@ -9,6 +9,7 @@ class Sparepart extends Model
     protected $fillable = [
         'nama_barang',
         'kategori',
+        'brand',
         'type_hp',
         'stok',
         'harga_beli',
@@ -32,11 +33,13 @@ class Sparepart extends Model
     {
         return $query
             ->when($filters['kategori'] ?? null, fn($q, $v) => $q->where('kategori', $v))
+            ->when($filters['brand'] ?? null, fn($q, $v) => $q->where('brand', $v))
             ->when($filters['toko'] ?? null, fn($q, $v) => $q->where('toko', $v))
             ->when($filters['search'] ?? null, function ($q, $v) {
                 $q->where(function ($q) use ($v) {
                     $q->where('nama_barang', 'like', "%{$v}%")
                       ->orWhere('type_hp', 'like', "%{$v}%")
+                      ->orWhere('brand', 'like', "%{$v}%")
                       ->orWhere('keterangan', 'like', "%{$v}%");
                 });
             });

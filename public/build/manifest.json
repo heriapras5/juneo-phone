@@ -8,7 +8,7 @@
     "src": "node_modules/@fontsource-variable/instrument-sans/files/instrument-sans-latin-wght-normal.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-BewvSie6.css",
+    "file": "assets/app-GyMlr8Qd.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -17,7 +17,7 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-Cq8Zp3ys.js",
+    "file": "assets/app-DxnCjdou.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,

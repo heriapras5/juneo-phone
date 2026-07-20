@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Sparepart;
+use App\Models\SparepartBrand;
 use App\Models\SparepartKategori;
 use App\Models\StokMutasi;
 use App\Models\Toko;
@@ -19,14 +20,15 @@ class SparepartController extends Controller
 {
     public function index(Request $request)
     {
-        $spareparts = Sparepart::filter($request->only(['kategori', 'toko', 'search']))
+        $spareparts = Sparepart::filter($request->only(['kategori', 'brand', 'toko', 'search']))
             ->orderBy('kategori')
             ->orderBy('nama_barang')
             ->paginate(10)
             ->withQueryString();
 
-        $kategoriOptions = SparepartKategori::active()->ordered()->pluck('name')->toArray();
-        $tokoOptions = Sparepart::tokoOptions();
+        $kategoriOptions = SparepartKategori::active()->ordered()->get(['id', 'name'])->toArray();
+        $brandOptions = SparepartBrand::orderBy('name')->get(['id', 'name'])->toArray();
+        $tokoOptions = Toko::orderBy('nama')->get(['id', 'nama'])->toArray();
         $tokos = Toko::orderBy('nama')->get();
 
         $editSparepart = null;
@@ -43,6 +45,7 @@ class SparepartController extends Controller
                 'showTokoModal' => $isTokoForm,
                 'old_nama_barang' => $isTokoForm ? '' : old('nama_barang', ''),
                 'old_kategori' => $isTokoForm ? '' : old('kategori', ''),
+                'old_brand' => $isTokoForm ? '' : old('brand', ''),
                 'old_type_hp' => $isTokoForm ? '' : old('type_hp', ''),
                 'old_stok' => $isTokoForm ? '' : old('stok', ''),
                 'old_harga_beli' => $isTokoForm ? '' : old('harga_beli', ''),
@@ -56,22 +59,25 @@ class SparepartController extends Controller
 
         $pageData = array_merge($pageData ?? [], [
             'kategoriOptions' => $kategoriOptions,
+            'brandOptions' => $brandOptions,
+            'tokoOptions' => $tokoOptions,
         ]);
 
         if ($editSparepart) {
             $pageData = array_merge($pageData, [
-                'editSparepart' => $editSparepart->only(['id', 'nama_barang', 'kategori', 'type_hp', 'harga_beli', 'toko', 'keterangan']),
+                'editSparepart' => $editSparepart->only(['id', 'nama_barang', 'kategori', 'brand', 'type_hp', 'harga_beli', 'toko', 'keterangan']),
             ]);
         }
 
-        return view('spareparts.index', compact('spareparts', 'kategoriOptions', 'tokoOptions', 'tokos', 'pageData'));
+        return view('spareparts.index', compact('spareparts', 'kategoriOptions', 'brandOptions', 'tokoOptions', 'tokos', 'pageData'));
     }
 
     public function create()
     {
-        $kategoriOptions = SparepartKategori::active()->ordered()->pluck('name')->toArray();
-        $tokoOptions = Sparepart::tokoOptions();
-        return view('spareparts.create', compact('kategoriOptions', 'tokoOptions'));
+        $kategoriOptions = SparepartKategori::active()->ordered()->get(['id', 'name'])->toArray();
+        $brandOptions = SparepartBrand::orderBy('name')->get(['id', 'name'])->toArray();
+        $tokoOptions = Toko::orderBy('nama')->get(['id', 'nama'])->toArray();
+        return view('spareparts.create', compact('kategoriOptions', 'brandOptions', 'tokoOptions'));
     }
 
     public function store(Request $request)
@@ -79,10 +85,11 @@ class SparepartController extends Controller
         $validated = $request->validate([
             'nama_barang' => 'required|string|max:255',
             'kategori' => 'required|string',
+            'brand' => 'nullable|string|max:255',
             'type_hp' => 'nullable|string|max:255',
             'stok' => 'required|integer|min:0',
             'harga_beli' => 'nullable|numeric|min:0',
-            'toko' => 'nullable|string|in:' . implode(',', Sparepart::tokoOptions()) . ',',
+            'toko' => 'nullable|string|max:255',
             'keterangan' => 'nullable|string|max:1000',
         ]);
 
@@ -106,14 +113,16 @@ class SparepartController extends Controller
     public function show(Sparepart $sparepart)
     {
         $sparepart->load(['mutasi.user']);
-        return view('spareparts.show', compact('sparepart'));
+        $brandOptions = SparepartBrand::orderBy('name')->get(['id', 'name'])->toArray();
+        return view('spareparts.show', compact('sparepart', 'brandOptions'));
     }
 
     public function edit(Sparepart $sparepart)
     {
-        $kategoriOptions = SparepartKategori::active()->ordered()->pluck('name')->toArray();
-        $tokoOptions = Sparepart::tokoOptions();
-        return view('spareparts.edit', compact('sparepart', 'kategoriOptions', 'tokoOptions'));
+        $kategoriOptions = SparepartKategori::active()->ordered()->get(['id', 'name'])->toArray();
+        $brandOptions = SparepartBrand::orderBy('name')->get(['id', 'name'])->toArray();
+        $tokoOptions = Toko::orderBy('nama')->get(['id', 'nama'])->toArray();
+        return view('spareparts.edit', compact('sparepart', 'kategoriOptions', 'brandOptions', 'tokoOptions'));
     }
 
     public function update(Request $request, Sparepart $sparepart)
@@ -121,9 +130,10 @@ class SparepartController extends Controller
         $validated = $request->validate([
             'nama_barang' => 'required|string|max:255',
             'kategori' => 'required|string',
+            'brand' => 'nullable|string|max:255',
             'type_hp' => 'nullable|string|max:255',
             'harga_beli' => 'nullable|numeric|min:0',
-            'toko' => 'nullable|string|in:' . implode(',', Sparepart::tokoOptions()) . ',',
+            'toko' => 'nullable|string|max:255',
             'keterangan' => 'nullable|string|max:1000',
         ]);
 
@@ -210,18 +220,78 @@ class SparepartController extends Controller
         return response()->json(['success' => true, 'kategori' => $kategori]);
     }
 
+    public function quickStoreBrand(Request $request)
+    {
+        $request->validate(['name' => 'required|string|max:100']);
+
+        $name = trim($request->name);
+        $existing = SparepartBrand::where('name', $name)->first();
+
+        if ($existing) {
+            return response()->json(['success' => false, 'message' => 'Brand sudah ada.']);
+        }
+
+        $brand = SparepartBrand::create(['name' => $name]);
+
+        return response()->json(['success' => true, 'brand' => $brand]);
+    }
+
+    public function updateBrand(Request $request, $id)
+    {
+        $request->validate(['name' => 'required|string|max:100']);
+        $name = trim($request->name);
+        $existing = SparepartBrand::where('name', $name)->where('id', '!=', $id)->first();
+        if ($existing) {
+            return response()->json(['success' => false, 'message' => 'Brand sudah ada.']);
+        }
+        $brand = SparepartBrand::findOrFail($id);
+        Sparepart::where('brand', $brand->name)->update(['brand' => $name]);
+        $brand->update(['name' => $name]);
+        return response()->json(['success' => true, 'brand' => $brand->fresh()]);
+    }
+
+    public function destroyBrand($id)
+    {
+        $brand = SparepartBrand::findOrFail($id);
+        Sparepart::where('brand', $brand->name)->update(['brand' => null]);
+        $brand->delete();
+        return response()->json(['success' => true]);
+    }
+
+    public function updateKategori(Request $request, $id)
+    {
+        $request->validate(['name' => 'required|string|max:100']);
+        $name = trim($request->name);
+        $existing = SparepartKategori::where('name', $name)->where('id', '!=', $id)->first();
+        if ($existing) {
+            return response()->json(['success' => false, 'message' => 'Kategori sudah ada.']);
+        }
+        $kategori = SparepartKategori::findOrFail($id);
+        Sparepart::where('kategori', $kategori->name)->update(['kategori' => $name]);
+        $kategori->update(['name' => $name]);
+        return response()->json(['success' => true, 'kategori' => $kategori->fresh()]);
+    }
+
+    public function destroyKategori($id)
+    {
+        $kategori = SparepartKategori::findOrFail($id);
+        Sparepart::where('kategori', $kategori->name)->update(['kategori' => null]);
+        $kategori->delete();
+        return response()->json(['success' => true]);
+    }
+
     public function exportExcel()
     {
         $sparepartNama = str_replace(' ', '-', Setting::getValue('nama_toko', 'Juneo-Phone'));
         return Excel::download(
-            new SparepartsExport(request()->only(['kategori', 'toko', 'search'])),
+            new SparepartsExport(request()->only(['kategori', 'brand', 'toko', 'search'])),
             'Data-Sparepart-' . $sparepartNama . '.xlsx'
         );
     }
 
     public function exportPdf()
     {
-        $spareparts = Sparepart::filter(request()->only(['kategori', 'toko', 'search']))
+        $spareparts = Sparepart::filter(request()->only(['kategori', 'brand', 'toko', 'search']))
             ->orderBy('kategori')
             ->orderBy('nama_barang')
             ->get();

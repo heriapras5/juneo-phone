@@ -57,11 +57,17 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/services/{service}/quick-update', [ServiceController::class, 'quickUpdate'])->name('services.quick-update');
 
         Route::post('/spareparts/kategori/quick', [SparepartController::class, 'quickStoreKategori'])->name('spareparts.kategori.quick');
+        Route::put('/spareparts/kategori/{kategori}', [SparepartController::class, 'updateKategori'])->name('spareparts.kategori.update');
+        Route::delete('/spareparts/kategori/{kategori}', [SparepartController::class, 'destroyKategori'])->name('spareparts.kategori.destroy');
+        Route::post('/spareparts/brand/quick', [SparepartController::class, 'quickStoreBrand'])->name('spareparts.brand.quick');
+        Route::put('/spareparts/brand/{brand}', [SparepartController::class, 'updateBrand'])->name('spareparts.brand.update');
+        Route::delete('/spareparts/brand/{brand}', [SparepartController::class, 'destroyBrand'])->name('spareparts.brand.destroy');
         Route::get('/spareparts/export-excel', [SparepartController::class, 'exportExcel'])->name('spareparts.export-excel');
         Route::get('/spareparts/export-pdf', [SparepartController::class, 'exportPdf'])->name('spareparts.export-pdf');
         Route::resource('spareparts', SparepartController::class);
         Route::get('/spareparts/{sparepart}/mutasi', [SparepartController::class, 'mutasiCreate'])->name('spareparts.mutasi-create');
         Route::post('/spareparts/{sparepart}/mutasi', [SparepartController::class, 'mutasiStore'])->name('spareparts.mutasi-store');
+        Route::post('/tokos/quick', [TokoController::class, 'quickStore'])->name('tokos.quick');
         Route::post('/tokos', [TokoController::class, 'store'])->name('tokos.store');
         Route::put('/tokos/{toko}', [TokoController::class, 'update'])->name('tokos.update');
         Route::delete('/tokos/{toko}', [TokoController::class, 'destroy'])->name('tokos.destroy');

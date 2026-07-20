@@ -51,7 +51,8 @@
     scrollLock: 0,
     pageLoaded: false,
     setScrollLock(v) { this.scrollLock = Math.max(0, this.scrollLock + (v ? 1 : -1)); if (this.scrollLock > 0) { document.body.style.overflow = 'hidden'; } else { document.body.style.overflow = ''; } }
-}" x-init="
+}"
+x-init="
     $watch('sidebarOpen', val => localStorage.setItem('sidebarOpen', val));
     $watch('sidebarMobileOpen', (val, old) => { if (val !== old) setScrollLock(val); });
     $watch('confirmDelete', (val, old) => { if (!!val !== !!old) setScrollLock(!!val); });
@@ -462,10 +463,12 @@
                 <div class="flex items-center justify-end mb-2">
                     <button @click="confirmDelete = null" title="Tutup" class="text-gray-400 hover:text-gray-600 -mr-2"><i class="fas fa-times"></i></button>
                 </div>
-                <div class="mx-auto w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4">
-                    <i class="fas fa-trash text-red-500 text-xl"></i>
+                <div class="mx-auto w-12 h-12 rounded-full flex items-center justify-center mb-4"
+                    :class="confirmDelete?.method === 'DELETE' || !confirmDelete?.method ? 'bg-red-100' : 'bg-blue-100'">
+                    <i class="text-xl"
+                        :class="confirmDelete?.method === 'DELETE' || !confirmDelete?.method ? 'fas fa-trash text-red-500' : (confirmDelete?.icon || 'fas fa-save text-blue-500')"></i>
                 </div>
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">Konfirmasi Hapus</h3>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2" x-text="confirmDelete?.title || 'Konfirmasi Hapus'"></h3>
                 <p class="text-sm text-gray-600 mb-6" x-text="confirmDelete?.message"></p>
                 <div class="flex gap-3 justify-center">
                     <button @click="confirmDelete = null"
@@ -474,10 +477,11 @@
                     </button>
                     <form :action="confirmDelete?.url" method="POST">
                         @csrf
-                        @method('DELETE')
+                        <input type="hidden" name="_method" :value="confirmDelete?.method || 'DELETE'">
                         <button type="submit"
-                            class="px-5 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-xl">
-                            Ya, Hapus
+                            class="px-5 py-2 text-sm font-medium text-white rounded-xl"
+                            :class="confirmDelete?.method === 'DELETE' || !confirmDelete?.method ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'">
+                            <span x-text="confirmDelete?.confirmText || 'Ya, Hapus'"></span>
                         </button>
                     </form>
                 </div>

@@ -33,6 +33,7 @@ class SparepartsExport implements FromQuery, WithHeadings, WithMapping, WithStyl
     {
         return [
             'No',
+            'Kategori Brand',
             'Kategori',
             'Nama Barang',
             'Type',
@@ -48,6 +49,7 @@ class SparepartsExport implements FromQuery, WithHeadings, WithMapping, WithStyl
         $this->no++;
         return [
             $this->no,
+            $row->brand ?? '',
             $row->kategori,
             $row->nama_barang,
             $row->type_hp ?? '',
@@ -66,10 +68,10 @@ class SparepartsExport implements FromQuery, WithHeadings, WithMapping, WithStyl
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
             'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
         ];
-        $sheet->getStyle('A1:H1')->applyFromArray($header);
+        $sheet->getStyle('A1:I1')->applyFromArray($header);
 
         $lastRow = $sheet->getHighestRow();
-        $bodyRange = 'A2:H' . $lastRow;
+        $bodyRange = 'A2:I' . $lastRow;
         $sheet->getStyle($bodyRange)->applyFromArray([
             'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
             'vertical' => Alignment::VERTICAL_CENTER,
@@ -77,11 +79,11 @@ class SparepartsExport implements FromQuery, WithHeadings, WithMapping, WithStyl
 
         $sheet->getStyle('A2:A' . $lastRow)
             ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('E2:E' . $lastRow)
+        $sheet->getStyle('F2:F' . $lastRow)
             ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('F2:F' . $lastRow)
+        $sheet->getStyle('G2:G' . $lastRow)
             ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-        $sheet->getStyle('F2:F' . $lastRow)
+        $sheet->getStyle('G2:G' . $lastRow)
             ->getNumberFormat()->setFormatCode('#,##0');
 
         return [];

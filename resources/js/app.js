@@ -2,6 +2,7 @@ import './bootstrap';
 import '@fontsource-variable/instrument-sans';
 import Alpine from 'alpinejs';
 
+
 Alpine.data('servicePage', () => ({
     todayLocal() {
         // Selalu pakai tanggal lokal (WIB), bukan UTC dari toISOString()
@@ -243,6 +244,7 @@ Alpine.data('servicePage', () => ({
         var item = this.formData.items[index];
         if (!item || !item.kerusakanList) return;
         item.kerusakanList.splice(ki, 1);
+        this.recalculateTotals();
     },
     kerusakanNama(k) {
         return (typeof k === 'object' && k !== null) ? (k.nama || '') : (k || '');
@@ -582,9 +584,14 @@ Alpine.data('sparepartPage', () => ({
     loading: false,
     kategoriSearch: '',
     kategoriDropdownOpen: false,
+    brandSearch: '',
+    brandDropdownOpen: false,
+    tokoSearch: '',
+    tokoDropdownOpen: false,
     formData: {
         nama_barang: '',
         kategori: '',
+        brand: '',
         type_hp: '',
         stok: '',
         harga_beli: '',
@@ -597,7 +604,16 @@ Alpine.data('sparepartPage', () => ({
         var options = pd.kategoriOptions || [];
         if (!q) return options;
         return options.filter(function(o) {
-            return (o || '').toLowerCase().indexOf(q) !== -1;
+            return (o.name || '').toLowerCase().indexOf(q) !== -1;
+        });
+    },
+    get filteredBrand() {
+        var q = (this.brandSearch || '').toLowerCase();
+        var pd = window._pageData || {};
+        var options = pd.brandOptions || [];
+        if (!q) return options;
+        return options.filter(function(o) {
+            return (o.name || '').toLowerCase().indexOf(q) !== -1;
         });
     },
     selectKategori(name) {
@@ -623,7 +639,7 @@ Alpine.data('sparepartPage', () => ({
         .then(function(data) {
             if (data.success) {
                 var pd = window._pageData || {};
-                if (pd.kategoriOptions) pd.kategoriOptions.push(data.kategori.name);
+                if (pd.kategoriOptions) pd.kategoriOptions.push({ id: data.kategori.id, name: data.kategori.name });
                 self.formData.kategori = data.kategori.name;
                 self.kategoriDropdownOpen = false;
                 self.kategoriSearch = '';
@@ -632,6 +648,81 @@ Alpine.data('sparepartPage', () => ({
             }
         })
         .catch(function(e) { console.error(e); alert('Gagal menyimpan kategori. Silakan coba lagi.'); });
+    },
+    selectBrand(name) {
+        this.formData.brand = name;
+        this.brandDropdownOpen = false;
+        this.brandSearch = '';
+    },
+    get filteredToko() {
+        var q = (this.tokoSearch || '').toLowerCase();
+        var pd = window._pageData || {};
+        var options = pd.tokoOptions || [];
+        if (!q) return options;
+        return options.filter(function(o) {
+            return (o.nama || '').toLowerCase().indexOf(q) !== -1;
+        });
+    },
+    selectToko(name) {
+        this.formData.toko = name;
+        this.tokoDropdownOpen = false;
+        this.tokoSearch = '';
+    },
+    quickAddToko() {
+        var name = (this.tokoSearch || '').trim();
+        if (!name) { alert('Nama toko harus diisi.'); return; }
+        var self = this;
+        var csrf = document.querySelector('meta[name="csrf-token"]');
+        if (!csrf) return;
+        fetch('/tokos/quick', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf.content },
+            body: JSON.stringify({ name: name })
+        })
+        .then(function(r) {
+            if (!r.ok) { return r.json().then(function(e) { throw new Error(e.message || 'Gagal simpan'); }); }
+            return r.json();
+        })
+        .then(function(data) {
+            if (data.success) {
+                var pd = window._pageData || {};
+                if (pd.tokoOptions) pd.tokoOptions.push({ id: data.toko.id, nama: data.toko.name });
+                self.formData.toko = data.toko.name;
+                self.tokoDropdownOpen = false;
+                self.tokoSearch = '';
+            } else {
+                alert(data.message || 'Gagal menyimpan toko.');
+            }
+        })
+        .catch(function(e) { console.error(e); alert('Gagal menyimpan toko. Silakan coba lagi.'); });
+    },
+    quickAddBrand() {
+        var name = (this.brandSearch || '').trim();
+        if (!name) { alert('Nama brand harus diisi.'); return; }
+        var self = this;
+        var csrf = document.querySelector('meta[name="csrf-token"]');
+        if (!csrf) return;
+        fetch('/spareparts/brand/quick', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf.content },
+            body: JSON.stringify({ name: name })
+        })
+        .then(function(r) {
+            if (!r.ok) { return r.json().then(function(e) { throw new Error(e.message || 'Gagal simpan'); }); }
+            return r.json();
+        })
+        .then(function(data) {
+            if (data.success) {
+                var pd = window._pageData || {};
+                if (pd.brandOptions) pd.brandOptions.push({ id: data.brand.id, name: data.brand.name });
+                self.formData.brand = data.brand.name;
+                self.brandDropdownOpen = false;
+                self.brandSearch = '';
+            } else {
+                alert(data.message || 'Gagal menyimpan brand.');
+            }
+        })
+        .catch(function(e) { console.error(e); alert('Gagal menyimpan brand. Silakan coba lagi.'); });
     },
     init() {
         this.$watch('showModal', function(val) {
@@ -649,6 +740,7 @@ Alpine.data('sparepartPage', () => ({
             }
             this.formData.nama_barang = pd.old_nama_barang || '';
             this.formData.kategori = pd.old_kategori || '';
+            this.formData.brand = pd.old_brand || '';
             this.formData.type_hp = pd.old_type_hp || '';
             this.formData.stok = pd.old_stok || '';
             this.formData.harga_beli = pd.old_harga_beli || '';
@@ -658,7 +750,7 @@ Alpine.data('sparepartPage', () => ({
     },
     openCreateModal() {
         this.editingId = null;
-        this.formData = { nama_barang: '', kategori: '', type_hp: '', stok: '', harga_beli: '', toko: '', keterangan: '' };
+        this.formData = { nama_barang: '', kategori: '', brand: '', type_hp: '', stok: '', harga_beli: '', toko: '', keterangan: '' };
         this.showModal = true;
         this.$nextTick(() => { if (this.$refs.firstField) this.$refs.firstField.focus(); });
     },
@@ -667,6 +759,7 @@ Alpine.data('sparepartPage', () => ({
         this.formData = {
             nama_barang: data.nama_barang || '',
             kategori: data.kategori || '',
+            brand: data.brand || '',
             type_hp: data.type_hp || '',
             stok: '',
             harga_beli: data.harga_beli ? String(Math.round(parseFloat(data.harga_beli))) : '',

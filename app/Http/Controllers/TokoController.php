@@ -7,6 +7,20 @@ use Illuminate\Http\Request;
 
 class TokoController extends Controller
 {
+    public function quickStore(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255|unique:tokos,nama',
+        ]);
+
+        $toko = Toko::create(['nama' => $validated['name']]);
+
+        return response()->json([
+            'success' => true,
+            'toko' => ['id' => $toko->id, 'name' => $toko->nama],
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -15,7 +29,7 @@ class TokoController extends Controller
 
         Toko::create($validated);
 
-        return redirect()->route('spareparts.index')->with('success_toko', 'Toko berhasil ditambahkan.');
+        return redirect()->route('spareparts.index')->with('success', 'Toko berhasil ditambahkan.');
     }
 
     public function update(Request $request, Toko $toko)
@@ -26,13 +40,21 @@ class TokoController extends Controller
 
         $toko->update($validated);
 
-        return redirect()->route('spareparts.index')->with('success_toko', 'Toko berhasil diperbarui.');
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'toko' => $toko->fresh()]);
+        }
+
+        return redirect()->route('spareparts.index')->with('success', 'Toko berhasil diperbarui.');
     }
 
     public function destroy(Toko $toko)
     {
         $toko->delete();
 
-        return redirect()->route('spareparts.index')->with('success_toko', 'Toko berhasil dihapus.');
+        if (request()->wantsJson()) {
+            return response()->json(['success' => true]);
+        }
+
+        return redirect()->route('spareparts.index')->with('success', 'Toko berhasil dihapus.');
     }
 }

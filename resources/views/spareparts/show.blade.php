@@ -6,13 +6,23 @@
 @section('content')
 <div class="max-w-4xl mx-auto space-y-6">
     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-        <div class="flex items-start justify-between mb-6">
+        <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-4 mb-6">
             <div>
                 <h3 class="text-xl font-semibold text-gray-900">{{ $sparepart->nama_barang }}</h3>
-                <div class="flex items-center gap-2 mt-1">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
-                        {{ $sparepart->kategori }}
+                <div class="flex flex-wrap items-center gap-2 mt-2">
+                    @if($sparepart->brand)
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700">
+                        <i class="fas fa-tag text-[10px] mr-1"></i> {{ $sparepart->brand }}
                     </span>
+                    @endif
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                        <i class="fas fa-layer-group text-[10px] mr-1"></i> {{ $sparepart->kategori }}
+                    </span>
+                    @if($sparepart->toko)
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                        <i class="fas fa-store text-[10px] mr-1"></i> {{ $sparepart->toko }}
+                    </span>
+                    @endif
                     <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold
                         {{ $sparepart->stok > 10 ? 'bg-emerald-500 text-white' : ($sparepart->stok > 0 ? 'bg-yellow-500 text-white' : 'bg-red-500 text-white') }}">
                         <i class="fas {{ $sparepart->stok > 0 ? 'fa-check-circle' : 'fa-exclamation-circle' }} text-[10px]"></i>
@@ -20,7 +30,7 @@
                     </span>
                 </div>
             </div>
-            <div class="flex gap-2">
+            <div class="flex items-center gap-2 flex-shrink-0">
                 <a href="{{ route('spareparts.mutasi-create', $sparepart) }}"
                     class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm">
                     <i class="fas fa-exchange-alt"></i> Mutasi Stok
@@ -34,18 +44,14 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-                <p class="text-xs text-gray-500 uppercase tracking-wider">Type HP</p>
+                <p class="text-xs text-gray-500 uppercase tracking-wider">Type</p>
                 <p class="text-sm font-medium text-gray-900">{{ $sparepart->type_hp ?? '-' }}</p>
             </div>
             <div>
                 <p class="text-xs text-gray-500 uppercase tracking-wider">Harga Beli</p>
                 <p class="text-sm font-medium text-gray-900">{{ $sparepart->harga_beli ? 'Rp ' . number_format($sparepart->harga_beli, 0, ',', '.') : '-' }}</p>
-            </div>
-            <div>
-                <p class="text-xs text-gray-500 uppercase tracking-wider">Toko</p>
-                <p class="text-sm font-medium text-gray-900">{{ $sparepart->toko ?? '-' }}</p>
             </div>
         </div>
         @if($sparepart->keterangan)
