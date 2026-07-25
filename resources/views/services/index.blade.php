@@ -118,7 +118,7 @@ window._pageData = {
                             <a href="{{ route('services.show', $service) }}" class="text-gray-600 hover:text-yellow-600">{{ \Carbon\Carbon::parse($service->tanggal)->format('d/m/Y') }}</a>
                         </td>
                         <td class="px-5 py-3 text-sm text-gray-700 whitespace-nowrap">
-                            <a href="{{ route('services.show', $service) }}" class="text-gray-700 hover:text-yellow-600 hover:underline">{{ $service->customer?->nama ?? '-' }}</a>
+                            <a href="{{ route('services.show', $service) }}" class="text-gray-700 hover:text-yellow-600 hover:underline">{{ $service->customer?->nama ?? '' }}</a>
                         <td class="px-5 py-3 text-center whitespace-nowrap">
                             <div class="inline-flex flex-col items-center">
                                 <button data-status-badge @click="toggleStatus({{ $service->id }}, $event)"
@@ -234,7 +234,7 @@ window._pageData = {
                                 <span class="text-gray-300">-</span>
                             @endif
                         </td>
-                        <td class="px-5 py-3 text-sm text-gray-600 whitespace-nowrap text-center">{{ $service->tanggal_selesai?->format('d/m/Y') ?? '-' }}</td>
+                        <td class="px-5 py-3 text-sm text-gray-600 whitespace-nowrap text-center">{{ $service->tanggal_selesai?->format('d/m/Y') ?? '' }}</td>
                         <td class="px-5 py-3 text-center whitespace-nowrap sticky right-0 bg-white z-10">
                             <div class="inline-flex flex-col items-center">
                                 <button @click="toggleAction({{ $service->id }}, $event)"
@@ -445,31 +445,74 @@ window._pageData = {
                                     <label class="block text-xs font-medium text-gray-500 mb-1.5">Kerusakan</label>
                                     <div class="space-y-1.5 mb-2">
                                         <template x-for="(k, ki) in (item.kerusakanList || [])" :key="ki">
-                                            <div class="flex items-center gap-3 px-3 py-1.5 bg-indigo-50 border border-indigo-100 rounded-lg text-xs">
-                                                <span class="flex-1 text-indigo-700 font-medium min-w-[80px]" x-text="kerusakanNama(k)"></span>
-                                                <input type="text" inputmode="numeric" placeholder="Pengeluaran"
-                                                    :value="displayNumber(k.pengeluaran)"
-                                                    @input="formatCurrencyKerusakan(index, ki, 'pengeluaran', $event)"
-                                                    class="w-32 px-2 py-1 bg-white border border-gray-200 rounded text-xs text-right outline-none focus:ring-1 focus:ring-yellow-500/30 text-gray-900">
-                                                <input type="text" inputmode="numeric" placeholder="Jasa"
-                                                    :value="displayNumber(k.jasa)"
-                                                    @input="formatCurrencyKerusakan(index, ki, 'jasa', $event)"
-                                                    class="w-32 px-2 py-1 bg-white border border-gray-200 rounded text-xs text-right outline-none focus:ring-1 focus:ring-yellow-500/30 text-gray-900">
-                                                <select x-model="k.teknisi"
-                                                    class="w-36 px-1 py-1 bg-white border border-indigo-200 rounded text-xs outline-none focus:ring-1 focus:ring-yellow-500/30 text-gray-700">
-                                                    <option value="">Teknisi</option>
-                                                    <template x-for="h in helpers" :key="h.id">
-                                                        <option :value="h.nama.toLowerCase()" x-text="h.nama"></option>
-                                                    </template>
-                                                </select>
-                                                <button type="button" @click="openAddTeknisi(index)"
-                                                    class="flex-shrink-0 text-indigo-300 hover:text-indigo-600" title="Tambah teknisi">
-                                                    <i class="fas fa-plus text-[10px]"></i>
-                                                </button>
-                                                <button type="button" @click="removeKerusakan(index, ki)"
-                                                    class="flex-shrink-0 text-indigo-300 hover:text-red-500">
-                                                    <i class="fas fa-times text-[10px]"></i>
-                                                </button>
+                                            <div>
+                                                <div class="hidden md:flex items-center gap-3 px-3 py-1.5 bg-indigo-50 border border-indigo-100 rounded-lg text-xs">
+                                                    <span class="flex-1 text-indigo-700 font-medium min-w-[80px]" x-text="kerusakanNama(k)"></span>
+                                                    <input type="text" inputmode="numeric" placeholder="Pengeluaran"
+                                                        :value="displayNumber(k.pengeluaran)"
+                                                        @input="formatCurrencyKerusakan(index, ki, 'pengeluaran', $event)"
+                                                        class="w-32 px-2 py-1 bg-white border border-gray-200 rounded text-xs text-right outline-none focus:ring-1 focus:ring-yellow-500/30 text-gray-900">
+                                                    <input type="text" inputmode="numeric" placeholder="Jasa"
+                                                        :value="displayNumber(k.jasa)"
+                                                        @input="formatCurrencyKerusakan(index, ki, 'jasa', $event)"
+                                                        class="w-32 px-2 py-1 bg-white border border-gray-200 rounded text-xs text-right outline-none focus:ring-1 focus:ring-yellow-500/30 text-gray-900">
+                                                    <select x-model="k.teknisi"
+                                                        class="w-36 px-1 py-1 bg-white border border-indigo-200 rounded text-xs outline-none focus:ring-1 focus:ring-yellow-500/30 text-gray-700">
+                                                        <option value="">Teknisi</option>
+                                                        <template x-for="h in helpers" :key="h.id">
+                                                            <option :value="h.nama.toLowerCase()" x-text="h.nama"></option>
+                                                        </template>
+                                                    </select>
+                                                    <button type="button" @click="openAddTeknisi(index)"
+                                                        class="flex-shrink-0 text-indigo-300 hover:text-indigo-600" title="Tambah teknisi">
+                                                        <i class="fas fa-plus text-[10px]"></i>
+                                                    </button>
+                                                    <button type="button" @click="removeKerusakan(index, ki)"
+                                                        class="flex-shrink-0 text-indigo-300 hover:text-red-500">
+                                                        <i class="fas fa-times text-[10px]"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="flex md:hidden flex-col gap-2 p-3 bg-indigo-50 border border-indigo-100 rounded-lg">
+                                                    <div class="flex items-center justify-between">
+                                                        <span class="text-xs font-semibold text-indigo-700" x-text="kerusakanNama(k)"></span>
+                                                        <div class="flex items-center gap-1">
+                                                            <button type="button" @click="openAddTeknisi(index)" title="Tambah teknisi"
+                                                                class="text-indigo-300 hover:text-indigo-600 p-1">
+                                                                <i class="fas fa-plus text-[10px]"></i>
+                                                            </button>
+                                                            <button type="button" @click="removeKerusakan(index, ki)"
+                                                                class="text-indigo-300 hover:text-red-500 p-1">
+                                                                <i class="fas fa-times text-[10px]"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] font-medium text-gray-400 mb-0.5">Pengeluaran</label>
+                                                        <input type="text" inputmode="numeric" placeholder="Rp 0"
+                                                            :value="displayNumber(k.pengeluaran)"
+                                                            @input="formatCurrencyKerusakan(index, ki, 'pengeluaran', $event)"
+                                                            class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-right outline-none focus:ring-1 focus:ring-yellow-500/30 text-gray-900">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] font-medium text-gray-400 mb-0.5">Jasa Service</label>
+                                                        <input type="text" inputmode="numeric" placeholder="Rp 0"
+                                                            :value="displayNumber(k.jasa)"
+                                                            @input="formatCurrencyKerusakan(index, ki, 'jasa', $event)"
+                                                            class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-right outline-none focus:ring-1 focus:ring-yellow-500/30 text-gray-900">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[10px] font-medium text-gray-400 mb-0.5">Teknisi</label>
+                                                        <div class="flex items-center gap-2">
+                                                            <select x-model="k.teknisi"
+                                                                class="flex-1 px-3 py-2 bg-white border border-indigo-200 rounded-lg text-sm outline-none focus:ring-1 focus:ring-yellow-500/30 text-gray-700">
+                                                                <option value="">Pilih Teknisi</option>
+                                                                <template x-for="h in helpers" :key="h.id">
+                                                                    <option :value="h.nama.toLowerCase()" x-text="h.nama"></option>
+                                                                </template>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </template>
                                     </div>

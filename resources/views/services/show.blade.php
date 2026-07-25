@@ -41,7 +41,7 @@
                     </div>
                     <div>
                         <p class="text-xs text-gray-500 uppercase tracking-wider">Pelanggan</p>
-                        <p class="text-sm font-medium text-gray-900">{{ $service->customer?->nama ?? '-' }}</p>
+                        <p class="text-sm font-medium text-gray-900">{{ $service->customer?->nama ?? '' }}</p>
                         @if($service->customer?->no_hp)
                             <p class="text-xs text-gray-500">{{ $service->customer->no_hp }}</p>
                         @endif

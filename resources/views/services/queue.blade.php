@@ -130,7 +130,7 @@
                             <a href="{{ route('services.show', $service) }}" class="text-gray-600 hover:text-yellow-600">{{ $service->tanggal->format('d/m/Y') }}</a>
                         </td>
                         <td class="px-3 py-3 text-sm text-gray-700 whitespace-nowrap">
-                            <a href="{{ route('services.show', $service) }}" class="text-gray-700 hover:text-yellow-600 hover:underline">{{ $service->customer?->nama ?? '-' }}</a>
+                            <a href="{{ route('services.show', $service) }}" class="text-gray-700 hover:text-yellow-600 hover:underline">{{ $service->customer?->nama ?? '' }}</a>
                         </td>
                         <td class="px-3 py-3 text-sm text-gray-600">
                             <a href="{{ route('services.show', $service) }}" class="text-gray-600 hover:text-yellow-600">
@@ -220,7 +220,7 @@
                             @if($isOverdue)
                             <i class="fas fa-exclamation-triangle mr-1"></i>
                             @endif
-                            {{ $service->estimasi_selesai ? $service->estimasi_selesai->format('d/m/Y') : '-' }}
+                            {{ $service->estimasi_selesai ? $service->estimasi_selesai->format('d/m/Y') : '' }}
                         </td>
                         <td class="px-3 py-3 text-center whitespace-nowrap">
                             <div class="flex items-center justify-center gap-1">
@@ -305,7 +305,7 @@
                             <a href="{{ route('services.show', $service) }}" class="text-yellow-600 hover:text-yellow-700 hover:underline">{{ $service->service_number }}</a>
                         </td>
                         <td class="px-3 py-3 text-sm text-gray-700 whitespace-nowrap">
-                            <a href="{{ route('services.show', $service) }}" class="text-gray-700 hover:text-yellow-600 hover:underline">{{ $service->customer?->nama ?? '-' }}</a>
+                            <a href="{{ route('services.show', $service) }}" class="text-gray-700 hover:text-yellow-600 hover:underline">{{ $service->customer?->nama ?? '' }}</a>
                         </td>
                         <td class="px-3 py-3 text-sm text-gray-600">
                             <a href="{{ route('services.show', $service) }}" class="text-gray-600 hover:text-yellow-600">
@@ -313,7 +313,7 @@
                             @if($cTypes->isNotEmpty())
                                 {{ $cTypes->implode(', ') }}
                             @else
-                                {{ $service->type_hp ?? '-' }}
+                                {{ $service->type_hp ?? '' }}
                             @endif
                             </a>
                         </td>
@@ -335,7 +335,7 @@
                                 <span class="text-gray-400">-</span>
                             @endif
                         </td>
-                        <td class="px-3 py-3 text-sm text-gray-600 whitespace-nowrap">{{ $service->tanggal_selesai?->format('d/m/Y') ?? '-' }}</td>
+                        <td class="px-3 py-3 text-sm text-gray-600 whitespace-nowrap">{{ $service->tanggal_selesai?->format('d/m/Y') ?? '' }}</td>
                         <td class="px-3 py-3 text-sm text-gray-700 text-right whitespace-nowrap">Rp {{ number_format($service->jasa, 0, ',', '.') }}</td>
                         <td class="px-3 py-3 text-center whitespace-nowrap">
                             <button type="button" @click="confirmAction({{ $service->id }}, 'diambil', 'selesai')" :disabled="loading === {{ $service->id }}"
