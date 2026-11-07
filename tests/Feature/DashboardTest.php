@@ -34,4 +34,38 @@ class DashboardTest extends TestCase
 
         $response->assertStatus(200);
     }
+
+    public function test_dashboard_data_includes_pickup_summary(): void
+    {
+        $customer = Customer::create(['nama' => 'Pelanggan Test']);
+        $tanggal = now()->toDateString();
+
+        $makeService = function (string $status, float $jasa, float $pengeluaran) use ($customer, $tanggal) {
+            return Service::create([
+                'customer_id' => $customer->id,
+                'type_hp' => 'iPhone 12',
+                'kerusakan' => 'LCD',
+                'tanggal' => $tanggal,
+                'status' => $status,
+                'jasa' => $jasa,
+                'pengeluaran' => $pengeluaran,
+            ]);
+        };
+
+        $makeService('menunggu', 100000, 40000);
+        $makeService('diambil', 200000, 50000);
+        $makeService('selesai', 150000, 50000);
+        $makeService('batal', 300000, 100000);
+
+        $response = $this->getJson('/dashboard/data?period=daily');
+
+        $response->assertOk();
+
+        $summary = $response->json('pickupSummary');
+
+        $this->assertEquals(1, $summary['taken_count']);
+        $this->assertEquals(150000, $summary['taken_profit']);
+        $this->assertEquals(2, $summary['pending_count']);
+        $this->assertEquals(160000, $summary['pending_profit']);
+    }
 }

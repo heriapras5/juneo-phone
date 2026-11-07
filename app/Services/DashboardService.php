@@ -145,6 +145,23 @@ class DashboardService
         ];
     }
 
+    public function getPickupSummary(Carbon $fromDate, Carbon $toDate): object
+    {
+        $baseQuery = Service::where('status', '!=', 'batal')
+            ->whereDate('tanggal', '>=', $fromDate)
+            ->whereDate('tanggal', '<=', $toDate);
+
+        $takenQuery = (clone $baseQuery)->where('status', 'diambil');
+        $pendingQuery = (clone $baseQuery)->whereIn('status', ['menunggu', 'dikerjakan', 'selesai']);
+
+        return (object) [
+            'taken_count' => $takenQuery->count(),
+            'taken_profit' => (float) $takenQuery->sum('keuntungan'),
+            'pending_count' => $pendingQuery->count(),
+            'pending_profit' => (float) $pendingQuery->sum('keuntungan'),
+        ];
+    }
+
     public function getPreviousPeriodTotals(Carbon $fromDate, Carbon $toDate): object
     {
         $duration = $fromDate->diffInDays($toDate) + 1;

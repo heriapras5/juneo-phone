@@ -7,7 +7,7 @@ $profitPositive = $periodTotals->profit >= 0;
     <div class="p-4 sm:p-5 flex-1 flex flex-col">
         <div class="flex items-start justify-between">
             <div class="flex-1 min-w-0">
-                <p class="text-xs text-gray-500 uppercase tracking-wider font-medium truncate">Pengeluaran {{ $periodLabels[$period] }}</p>
+                <p class="text-xs text-gray-500 uppercase tracking-wider font-medium truncate">Pengeluaran {{ $periodLabels[$period] ?? 'Rentang Kustom' }}</p>
                 <p class="text-[10px] text-gray-400 italic mt-1 hidden sm:block truncate">Modal sparepart — total biaya beli komponen service</p>
                 <p class="text-base sm:text-xl lg:text-2xl font-bold mt-1 kpi-value text-red-500" data-value="{{ $periodTotals->pengeluaran }}">Rp {{ number_format($periodTotals->pengeluaran, 0, ',', '.') }}</p>
                 @if($changePengeluaran !== null)
@@ -42,7 +42,7 @@ $profitPositive = $periodTotals->profit >= 0;
     <div class="p-4 sm:p-5 flex-1 flex flex-col">
         <div class="flex items-start justify-between">
             <div class="flex-1 min-w-0">
-                <p class="text-xs text-gray-500 uppercase tracking-wider font-medium truncate">Omzet {{ $periodLabels[$period] }}</p>
+                <p class="text-xs text-gray-500 uppercase tracking-wider font-medium truncate">Omzet {{ $periodLabels[$period] ?? 'Rentang Kustom' }}</p>
                 <p class="text-[10px] text-gray-400 italic mt-1 hidden sm:block truncate">Total tagihan jasa service ke pelanggan — belum dipotong biaya apapun</p>
                 <p class="text-base sm:text-xl lg:text-2xl font-bold mt-1 kpi-value text-gray-900" data-value="{{ $periodTotals->omzet }}">Rp {{ number_format($periodTotals->omzet, 0, ',', '.') }}</p>
                 @if($changeOmzet !== null)
@@ -81,7 +81,7 @@ $tambahanFees = collect($periodTotals->fees)->where('kategori', 'fee_tambahan')-
     <div class="p-4 sm:p-5 flex-1 flex flex-col">
         <div class="flex items-start justify-between">
             <div class="flex-1 min-w-0">
-                <p class="text-xs text-gray-500 uppercase tracking-wider font-medium truncate">Kebutuhan Pribadi {{ $periodLabels[$period] }}</p>
+                <p class="text-xs text-gray-500 uppercase tracking-wider font-medium truncate">Kebutuhan Pribadi {{ $periodLabels[$period] ?? 'Rentang Kustom' }}</p>
                 <p class="text-[10px] text-gray-400 italic mt-1 hidden sm:block truncate">Bank Jago + {{ $regularFees->pluck('label')->implode(' + ') }} + Lainnya + {{ $tambahanFees->pluck('label')->implode(' + ') }} — total biaya kebutuhan harian</p>
                 <p class="text-base sm:text-xl lg:text-2xl font-bold mt-1 kpi-value text-orange-600" data-value="{{ $periodTotals->kebutuhan_pribadi }}">Rp {{ number_format($periodTotals->kebutuhan_pribadi, 0, ',', '.') }}</p>
                 {{-- Mobile: grid 2 kolom label : value --}}
@@ -153,7 +153,7 @@ $tambahanFees = collect($periodTotals->fees)->where('kategori', 'fee_tambahan')-
     <div class="p-4 sm:p-5 flex-1 flex flex-col">
         <div class="flex items-start justify-between">
             <div class="flex-1 min-w-0">
-                <p class="text-xs text-gray-500 uppercase tracking-wider font-medium truncate">Profit {{ $periodLabels[$period] }}</p>
+                <p class="text-xs text-gray-500 uppercase tracking-wider font-medium truncate">Profit {{ $periodLabels[$period] ?? 'Rentang Kustom' }}</p>
                 <p class="text-[10px] text-gray-400 italic mt-1 hidden sm:block truncate">Sisa keuntungan setelah dikurangi seluruh Kebutuhan Pribadi</p>
                 <p class="text-base sm:text-xl lg:text-2xl font-bold mt-1 kpi-value {{ $profitPositive ? 'text-emerald-600' : 'text-red-600' }}" data-value="{{ $periodTotals->profit }}">
                     Rp {{ number_format($periodTotals->profit, 0, ',', '.') }}

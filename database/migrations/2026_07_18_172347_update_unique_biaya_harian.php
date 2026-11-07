@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -9,16 +8,14 @@ return new class extends Migration
     public function up(): void
     {
         $indexName = 'biaya_harian_tanggal_kategori_unique';
-        $exists = DB::select("SHOW INDEX FROM biaya_harian WHERE Key_name = ?", [$indexName]);
-        if (!empty($exists)) {
+        if (Schema::hasIndex('biaya_harian', $indexName)) {
             Schema::table('biaya_harian', function ($table) use ($indexName) {
                 $table->dropIndex($indexName);
             });
         }
 
         $newIndex = 'biaya_harian_tanggal_kategori_index';
-        $existsNew = DB::select("SHOW INDEX FROM biaya_harian WHERE Key_name = ?", [$newIndex]);
-        if (empty($existsNew)) {
+        if (!Schema::hasIndex('biaya_harian', $newIndex)) {
             Schema::table('biaya_harian', function ($table) {
                 $table->index(['tanggal', 'kategori']);
             });

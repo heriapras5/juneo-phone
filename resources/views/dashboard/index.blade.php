@@ -79,7 +79,7 @@ $hasCustomRange = request()->has('from') && request()->has('to');
                 <span class="text-xs sm:text-sm font-semibold" id="infoFromDate">{{ $fromDate->format('d M Y') }}</span>
                 <span class="text-gray-300 mx-0.5 sm:mx-1">—</span>
                 <span class="text-xs sm:text-sm font-semibold" id="infoToDate">{{ $toDate->format('d M Y') }}</span>
-                <div class="text-[10px] sm:text-[11px] text-gray-400 mt-0.5" id="infoPeriodLabel">{{ $hasCustomRange ? 'Rentang Kustom' : $periodLabels[$period] }}</div>
+                <div class="text-[10px] sm:text-[11px] text-gray-400 mt-0.5" id="infoPeriodLabel">{{ $hasCustomRange ? 'Rentang Kustom' : ($periodLabels[$period] ?? 'Rentang Kustom') }}</div>
             </div>
             <span class="hidden lg:inline text-[10px] text-gray-400 italic ml-1 max-w-[200px] leading-tight">Gunakan filter di atas untuk mengubah rentang waktu tampilan data</span>
         </div>
@@ -162,7 +162,7 @@ $hasCustomRange = request()->has('from') && request()->has('to');
                 <div class="p-5 pb-1 flex-1 flex flex-col">
                     <h3 class="text-sm font-semibold text-gray-700 mb-1 flex items-center gap-2">
                         <i class="fas fa-chart-bar text-yellow-500"></i>
-                        Grafik <span id="chartPeriodLabel">{{ $periodLabels[$period] }}</span>
+                        Grafik <span id="chartPeriodLabel">{{ $periodLabels[$period] ?? 'Rentang Kustom' }}</span>
                     </h3>
                     <p class="text-[10px] text-gray-400 italic mb-3">Perbandingan Omzet, Pengeluaran &amp; Profit per periode</p>
                     <div class="relative flex-1 min-h-[180px] sm:min-h-[260px]">
@@ -187,6 +187,29 @@ $hasCustomRange = request()->has('from') && request()->has('to');
                         <canvas id="statusChart" style="max-height:100%;max-width:100%;"></canvas>
                     </div>
                     <div id="statusLegend" class="grid grid-cols-2 gap-x-4 gap-y-2 pt-3 border-t border-gray-100 mt-3 text-xs text-gray-500"></div>
+                    <div class="pt-3 mt-3 border-t border-gray-100">
+                        <p class="text-[10px] text-gray-400 italic mb-2">Ringkasan profit pada periode terpilih</p>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="rounded-lg border border-emerald-100 bg-emerald-50/60 px-3 py-2">
+                                <div class="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700">
+                                    <i class="fas fa-check-circle text-emerald-500"></i>
+                                    <span>Sudah Diambil</span>
+                                </div>
+                                <p class="text-[11px] text-gray-500 mt-1"><span id="pickupTakenCount">{{ $pickupSummary->taken_count }}</span> service</p>
+                                <p class="text-[10px] text-gray-400">Total Profit</p>
+                                <p id="pickupTakenProfit" class="text-sm font-semibold tabular-nums {{ $pickupSummary->taken_profit >= 0 ? 'text-emerald-600' : 'text-red-600' }}">Rp {{ number_format($pickupSummary->taken_profit, 0, ',', '.') }}</p>
+                            </div>
+                            <div class="rounded-lg border border-amber-100 bg-amber-50/60 px-3 py-2">
+                                <div class="flex items-center gap-1.5 text-[11px] font-semibold text-amber-700">
+                                    <i class="fas fa-clock text-amber-500"></i>
+                                    <span>Belum Diambil</span>
+                                </div>
+                                <p class="text-[11px] text-gray-500 mt-1"><span id="pickupPendingCount">{{ $pickupSummary->pending_count }}</span> service</p>
+                                <p class="text-[10px] text-gray-400">Total Profit</p>
+                                <p id="pickupPendingProfit" class="text-sm font-semibold tabular-nums {{ $pickupSummary->pending_profit >= 0 ? 'text-emerald-600' : 'text-red-600' }}">Rp {{ number_format($pickupSummary->pending_profit, 0, ',', '.') }}</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="h-1 rounded-b-xl bg-yellow-500"></div>
             </div>
@@ -320,6 +343,28 @@ function renderStatusLegend(labels, data, colors) {
             + '</div>';
     }
     wrap.innerHTML = html;
+}
+
+function updatePickupSummary(summary) {
+    if (!summary) return;
+    var takenCount = document.getElementById('pickupTakenCount');
+    var pendingCount = document.getElementById('pickupPendingCount');
+    var takenProfit = document.getElementById('pickupTakenProfit');
+    var pendingProfit = document.getElementById('pickupPendingProfit');
+
+    if (takenCount) takenCount.textContent = summary.taken_count || 0;
+    if (pendingCount) pendingCount.textContent = summary.pending_count || 0;
+
+    function setProfit(el, value) {
+        if (!el) return;
+        var num = Number(value) || 0;
+        el.textContent = fmtRp(num);
+        el.classList.remove('text-emerald-600', 'text-red-600');
+        el.classList.add(num >= 0 ? 'text-emerald-600' : 'text-red-600');
+    }
+
+    setProfit(takenProfit, summary.taken_profit);
+    setProfit(pendingProfit, summary.pending_profit);
 }
 
 function updateRecentServices(services) {
@@ -618,6 +663,9 @@ function updateKpiOnly(d, periodLabel) {
     
     // Grafik
     updateChart(d.chartData);
+
+    // Ringkasan status diambil vs belum diambil
+    if (d.pickupSummary) updatePickupSummary(d.pickupSummary);
 }
 
 function fetchData(params) {

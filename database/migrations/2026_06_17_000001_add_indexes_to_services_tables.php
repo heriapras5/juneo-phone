@@ -3,22 +3,12 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
     private function indexExists($table, $indexName): bool
     {
-        $connection = Schema::getConnection();
-        $database = $connection->getDatabaseName();
-        
-        $result = DB::select(
-            "SELECT COUNT(*) as count FROM information_schema.statistics 
-             WHERE table_schema = ? AND table_name = ? AND index_name = ?",
-            [$database, $table, $indexName]
-        );
-        
-        return $result[0]->count > 0;
+        return Schema::hasIndex($table, $indexName);
     }
 
     public function up(): void

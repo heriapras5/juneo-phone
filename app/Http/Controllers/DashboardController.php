@@ -42,6 +42,7 @@ class DashboardController extends Controller
 
         $periodTotals = $service->getPeriodTotals($fromDate, $toDate);
         $prevPeriodTotals = $service->getPreviousPeriodTotals($fromDate, $toDate);
+        $pickupSummary = $service->getPickupSummary($fromDate, $toDate);
 
         $changeOmzet   = $prevPeriodTotals->omzet > 0 ? round((($periodTotals->omzet - $prevPeriodTotals->omzet) / $prevPeriodTotals->omzet) * 100, 1) : ($periodTotals->omzet > 0 ? null : 0);
         $changePengeluaran = $prevPeriodTotals->pengeluaran > 0 ? round((($periodTotals->pengeluaran - $prevPeriodTotals->pengeluaran) / $prevPeriodTotals->pengeluaran) * 100, 1) : ($periodTotals->pengeluaran > 0 ? null : 0);
@@ -62,6 +63,7 @@ class DashboardController extends Controller
             'statusCounts',
             'periodTotals',
             'prevPeriodTotals',
+            'pickupSummary',
             'biayaCount',
             'isPeriodComplete',
             'changeOmzet',
@@ -119,6 +121,7 @@ class DashboardController extends Controller
 
         $periodTotals = $service->getPeriodTotals($fromDate, $toDate);
         $prevTotals   = $service->getPreviousPeriodTotals($fromDate, $toDate);
+        $pickupSummary = $service->getPickupSummary($fromDate, $toDate);
 
         $isComplete   = $toDate->toDateString() < now()->toDateString();
         $biayaCount   = BiayaHarian::whereDate('tanggal', now()->toDateString())->exists();
@@ -150,6 +153,7 @@ class DashboardController extends Controller
             'bank_jago'        => $periodTotals->bank_jago,
             'lainnya'          => $periodTotals->lainnya,
             'fees'             => $periodTotals->fees,
+            'pickupSummary'    => $pickupSummary,
 
             'changeOmzet'       => $changeOmzet,
             'changePengeluaran' => $changePengeluaran,
