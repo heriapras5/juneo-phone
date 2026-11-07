@@ -145,20 +145,148 @@ class DashboardService
         ];
     }
 
-    public function getPickupSummary(Carbon $fromDate, Carbon $toDate): object
+    public function getStatusBreakdown(Carbon $fromDate, Carbon $toDate, ?object $periodTotals = null): array
     {
-        $baseQuery = Service::where('status', '!=', 'batal')
-            ->whereDate('tanggal', '>=', $fromDate)
-            ->whereDate('tanggal', '<=', $toDate);
+        $rows = Service::whereDate('tanggal', '>=', $fromDate)
+            ->whereDate('tanggal', '<=', $toDate)
+            ->selectRaw('status, COUNT(*) as total, SUM(jasa) as omzet, SUM(pengeluaran) as pengeluaran')
+            ->groupBy('status')
+            ->get();
 
-        $takenQuery = (clone $baseQuery)->where('status', 'diambil');
-        $pendingQuery = (clone $baseQuery)->whereIn('status', ['menunggu', 'dikerjakan', 'selesai']);
+        $breakdown = [];
+        $metrics = [];
+
+        foreach (array_keys(Service::statusLabels()) as $status) {
+            $breakdown[$status] = ['count' => 0, 'profit' => 0];
+            $metrics[$status] = ['count' => 0, 'omzet' => 0.0, 'pengeluaran' => 0.0, 'gross' => 0.0];
+        }
+
+        foreach ($rows as $row) {
+            $status = $row->status;
+
+            if (!isset($breakdown[$status])) {
+                $breakdown[$status] = ['count' => 0, 'profit' => 0];
+                $metrics[$status] = ['count' => 0, 'omzet' => 0.0, 'pengeluaran' => 0.0, 'gross' => 0.0];
+            }
+
+            $count = (int) $row->total;
+            $breakdown[$status]['count'] = $count;
+
+            if ($status === Service::STATUS_BATAL) {
+                continue;
+            }
+
+            $omzet = (float) $row->omzet;
+            $pengeluaran = (float) $row->pengeluaran;
+            $metrics[$status] = [
+                'count' => $count,
+                'omzet' => $omzet,
+                'pengeluaran' => $pengeluaran,
+                'gross' => $omzet - $pengeluaran,
+            ];
+        }
+
+        if (!$periodTotals) {
+            $periodTotals = $this->getPeriodTotals($fromDate, $toDate);
+        }
+
+        $totalProfit = (int) round((float) $periodTotals->profit);
+        $totalGross = 0.0;
+        $totalOmzet = 0.0;
+        $totalCount = 0;
+
+        foreach ($metrics as $metric) {
+            $totalGross += $metric['gross'];
+            $totalOmzet += $metric['omzet'];
+            $totalCount += $metric['count'];
+        }
+
+        $weightKey = $totalGross > 0 ? 'gross' : ($totalOmzet > 0 ? 'omzet' : ($totalCount > 0 ? 'count' : null));
+
+        if ($weightKey !== null) {
+            $allocatable = [];
+            $weightTotal = 0.0;
+
+            foreach ($metrics as $status => $metric) {
+                if ($metric['count'] <= 0) {
+                    continue;
+                }
+
+                $weight = (float) $metric[$weightKey];
+                $allocatable[$status] = $weight;
+                $weightTotal += $weight;
+            }
+
+            if ($weightTotal != 0.0) {
+                $remaining = $totalProfit;
+                $lastStatus = array_key_last($allocatable);
+
+                foreach ($allocatable as $status => $weight) {
+                    if ($status === $lastStatus) {
+                        $profit = $remaining;
+                    } else {
+                        $profit = (int) round($totalProfit * ($weight / $weightTotal));
+                    }
+
+                    $breakdown[$status]['profit'] = $profit;
+                    $remaining -= $profit;
+                }
+            }
+        }
+
+        return $breakdown;
+    }
+
+    public function formatPeriodSummaryLabel(Carbon $fromDate, Carbon $toDate, string $period, bool $hasCustomRange): string
+    {
+        if ($hasCustomRange) {
+            if ($fromDate->isSameDay($toDate)) {
+                return '(' . $fromDate->format('d M Y') . ')';
+            }
+
+            return '(' . $fromDate->format('d M Y') . ' s.d. ' . $toDate->format('d M Y') . ')';
+        }
+
+        $weeklyStart = $fromDate->format($fromDate->month === $toDate->month ? 'd' : 'd M');
+
+        return match ($period) {
+            'daily' => 'Harian (' . $fromDate->format('d M Y') . ')',
+            'weekly' => 'Mingguan (' . $weeklyStart . ' s.d. ' . $toDate->format('d M Y') . ')',
+            'monthly' => 'Bulanan (' . $fromDate->format('F Y') . ')',
+            'yearly' => 'Tahunan (' . $fromDate->format('Y') . ')',
+            default => '(' . $fromDate->format('d M Y') . ' s.d. ' . $toDate->format('d M Y') . ')',
+        };
+    }
+
+    public function getPickupSummary(Carbon $fromDate, Carbon $toDate, ?object $periodTotals = null, ?array $statusBreakdown = null): object
+    {
+        if (!$periodTotals) {
+            $periodTotals = $this->getPeriodTotals($fromDate, $toDate);
+        }
+
+        if ($statusBreakdown === null) {
+            $statusBreakdown = $this->getStatusBreakdown($fromDate, $toDate, $periodTotals);
+        }
+
+        $takenCount = (int) ($statusBreakdown[Service::STATUS_DIAMBIL]['count'] ?? 0);
+        $takenProfit = (int) ($statusBreakdown[Service::STATUS_DIAMBIL]['profit'] ?? 0);
+        $pendingCount = 0;
+        $pendingProfit = 0;
+
+        foreach ([Service::STATUS_MENUNGGU, Service::STATUS_DIKERJAKAN, Service::STATUS_SELESAI] as $status) {
+            $pendingCount += (int) ($statusBreakdown[$status]['count'] ?? 0);
+            $pendingProfit += (int) ($statusBreakdown[$status]['profit'] ?? 0);
+        }
+
+        $totalProfit = (int) round((float) $periodTotals->profit);
+        $pendingProfit += $totalProfit - ($takenProfit + $pendingProfit);
 
         return (object) [
-            'taken_count' => $takenQuery->count(),
-            'taken_profit' => (float) $takenQuery->sum('keuntungan'),
-            'pending_count' => $pendingQuery->count(),
-            'pending_profit' => (float) $pendingQuery->sum('keuntungan'),
+            'taken_count' => $takenCount,
+            'taken_profit' => $takenProfit,
+            'pending_count' => $pendingCount,
+            'pending_profit' => $pendingProfit,
+            'total_profit' => $totalProfit,
         ];
     }
 

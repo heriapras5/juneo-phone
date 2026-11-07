@@ -182,13 +182,16 @@ $hasCustomRange = request()->has('from') && request()->has('to');
                         <i class="fas fa-chart-donut text-yellow-500"></i>
                         Status Service
                     </h3>
-                    <p class="text-[10px] text-gray-400 italic mb-3">Persentase status pengerjaan service saat ini</p>
+                    <p class="text-[10px] text-gray-400 italic mb-3">Persentase status service pada periode terpilih</p>
                     <div class="relative flex-1 min-h-[180px] sm:min-h-[260px] flex items-center justify-center">
                         <canvas id="statusChart" style="max-height:100%;max-width:100%;"></canvas>
                     </div>
                     <div id="statusLegend" class="grid grid-cols-2 gap-x-4 gap-y-2 pt-3 border-t border-gray-100 mt-3 text-xs text-gray-500"></div>
                     <div class="pt-3 mt-3 border-t border-gray-100">
-                        <p class="text-[10px] text-gray-400 italic mb-2">Ringkasan profit pada periode terpilih</p>
+                        <div class="flex items-center justify-between gap-2 mb-2">
+                            <p class="text-[10px] text-gray-400 italic">Ringkasan Profit {{ $summaryPeriodLabel }}</p>
+                            <button type="button" id="openStatusDetailBtn" class="text-[10px] font-semibold text-yellow-600 hover:text-yellow-700 whitespace-nowrap">Lihat rincian</button>
+                        </div>
                         <div class="grid grid-cols-2 gap-2">
                             <div class="rounded-lg border border-emerald-100 bg-emerald-50/60 px-3 py-2">
                                 <div class="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700">
@@ -196,7 +199,7 @@ $hasCustomRange = request()->has('from') && request()->has('to');
                                     <span>Sudah Diambil</span>
                                 </div>
                                 <p class="text-[11px] text-gray-500 mt-1"><span id="pickupTakenCount">{{ $pickupSummary->taken_count }}</span> service</p>
-                                <p class="text-[10px] text-gray-400">Total Profit</p>
+                                <p class="text-[10px] text-gray-400">Profit</p>
                                 <p id="pickupTakenProfit" class="text-sm font-semibold tabular-nums {{ $pickupSummary->taken_profit >= 0 ? 'text-emerald-600' : 'text-red-600' }}">Rp {{ number_format($pickupSummary->taken_profit, 0, ',', '.') }}</p>
                             </div>
                             <div class="rounded-lg border border-amber-100 bg-amber-50/60 px-3 py-2">
@@ -205,7 +208,7 @@ $hasCustomRange = request()->has('from') && request()->has('to');
                                     <span>Belum Diambil</span>
                                 </div>
                                 <p class="text-[11px] text-gray-500 mt-1"><span id="pickupPendingCount">{{ $pickupSummary->pending_count }}</span> service</p>
-                                <p class="text-[10px] text-gray-400">Total Profit</p>
+                                <p class="text-[10px] text-gray-400">Profit</p>
                                 <p id="pickupPendingProfit" class="text-sm font-semibold tabular-nums {{ $pickupSummary->pending_profit >= 0 ? 'text-emerald-600' : 'text-red-600' }}">Rp {{ number_format($pickupSummary->pending_profit, 0, ',', '.') }}</p>
                             </div>
                         </div>
@@ -262,12 +265,87 @@ $hasCustomRange = request()->has('from') && request()->has('to');
         </div>
     </section>
 </div>
+
+{{-- Modal rincian profit per status --}}
+<div id="statusDetailModal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="statusDetailModalTitle">
+    <div class="absolute inset-0 bg-gray-900/50" data-modal-close></div>
+    <div class="relative z-10 flex min-h-full items-center justify-center p-4">
+        <div class="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-xl">
+            <div class="flex items-start justify-between gap-3 border-b border-gray-100 px-5 py-4">
+                <div>
+                    <h3 id="statusDetailModalTitle" class="text-sm font-bold text-gray-800">Rincian Status Service</h3>
+                    <p id="statusModalPeriod" class="mt-0.5 text-[11px] text-gray-400"></p>
+                </div>
+                <button type="button" class="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600" data-modal-close aria-label="Tutup">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="max-h-[70vh] overflow-y-auto px-5 py-4">
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="rounded-lg border border-emerald-100 bg-emerald-50/60 px-3 py-2">
+                        <div class="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700">
+                            <i class="fas fa-check-circle text-emerald-500"></i>
+                            <span>Sudah Diambil</span>
+                        </div>
+                        <p class="mt-1 text-[11px] text-gray-500"><span id="statusModalTakenCount">0</span> service</p>
+                        <p class="text-[10px] text-gray-400">Profit</p>
+                        <p id="statusModalTakenProfit" class="text-sm font-semibold tabular-nums text-emerald-600">Rp 0</p>
+                    </div>
+                    <div class="rounded-lg border border-amber-100 bg-amber-50/60 px-3 py-2">
+                        <div class="flex items-center gap-1.5 text-[11px] font-semibold text-amber-700">
+                            <i class="fas fa-clock text-amber-500"></i>
+                            <span>Belum Diambil</span>
+                        </div>
+                        <p class="mt-1 text-[11px] text-gray-500"><span id="statusModalPendingCount">0</span> service</p>
+                        <p class="text-[10px] text-gray-400">Profit</p>
+                        <p id="statusModalPendingProfit" class="text-sm font-semibold tabular-nums text-emerald-600">Rp 0</p>
+                    </div>
+                </div>
+
+                <div class="mt-4 overflow-x-auto">
+                    <table class="w-full text-xs">
+                        <thead>
+                            <tr class="border-b border-gray-100 text-left text-[10px] uppercase tracking-wide text-gray-400">
+                                <th class="py-2 pr-3 font-semibold">Status</th>
+                                <th class="py-2 px-3 text-right font-semibold">Jumlah</th>
+                                <th class="py-2 pl-3 text-right font-semibold">Profit</th>
+                            </tr>
+                        </thead>
+                        <tbody id="statusModalTable"></tbody>
+                    </table>
+                </div>
+
+                <div class="mt-4 flex items-center justify-between gap-3 rounded-lg border border-emerald-100 bg-emerald-50/60 px-3 py-2">
+                    <span class="text-xs font-semibold text-emerald-700">Total Profit</span>
+                    <span id="statusModalTotalProfit" class="text-sm font-bold tabular-nums text-emerald-700">Rp 0</span>
+                </div>
+                <p id="statusModalNote" class="mt-2 text-[10px] leading-relaxed text-gray-400">Profit per status dibagi proporsional terhadap keuntungan kotor. Status Batal tidak dihitung dalam profit.</p>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
 <script>
 var periodLabels = @json($periodLabels);
-var statusCounts = @json($statusCounts);
+var statusBreakdown = @json($statusBreakdown);
+var pickupSummary = @json($pickupSummary);
+var summaryPeriodLabel = @json($summaryPeriodLabel);
+var statusOrder = ['menunggu', 'dikerjakan', 'selesai', 'diambil', 'batal'];
+var statusMeta = {
+    menunggu: { label: 'Menunggu', color: '#F59E0B' },
+    dikerjakan: { label: 'Dikerjakan', color: '#3B82F6' },
+    selesai: { label: 'Selesai', color: '#10B981' },
+    diambil: { label: 'Diambil', color: '#6B7280' },
+    batal: { label: 'Batal', color: '#EF4444' }
+};
+var statusCounts = {};
+statusOrder.forEach(function(key) {
+    statusCounts[key] = (statusBreakdown[key] && statusBreakdown[key].count) || 0;
+});
+var chartStatusKeys = [];
+var activeStatusKey = null;
 var chartInstance = null;
 var statusChartInstance = null;
 var lastUserAction = Date.now();
@@ -318,35 +396,81 @@ function updateChart(newChartData) {
     }
 }
 
-function updateStatusChart(newCounts) {
-    if (!statusChartInstance) return;
-    var counts = newCounts || statusCounts;
-    if (typeof counts === 'undefined') return;
-    var labels = ['Menunggu', 'Dikerjakan', 'Selesai', 'Diambil'];
-    var data = [counts.menunggu || 0, counts.dikerjakan || 0, counts.selesai || 0, counts.diambil || 0];
-    var colors = ['#F59E0B', '#3B82F6', '#10B981', '#6B7280'];
-    if (counts.batal) { labels.push('Batal'); data.push(counts.batal); colors.push('#EF4444'); }
-    statusChartInstance.data.labels = labels;
-    statusChartInstance.data.datasets[0].data = data;
-    statusChartInstance.update('none');
-    renderStatusLegend(labels, data, colors);
+function syncStatusCounts() {
+    statusCounts = {};
+    statusOrder.forEach(function(key) {
+        statusCounts[key] = (statusBreakdown[key] && statusBreakdown[key].count) || 0;
+    });
 }
 
-function renderStatusLegend(labels, data, colors) {
+function buildDoughnutData() {
+    var labels = [], data = [], colors = [], keys = [];
+
+    statusOrder.forEach(function(key) {
+        var item = statusBreakdown[key] || { count: 0, profit: 0 };
+        var count = Number(item.count) || 0;
+        if (key === 'batal' && count === 0) return;
+
+        var meta = statusMeta[key] || { label: key, color: '#9CA3AF' };
+        labels.push(meta.label);
+        data.push(count);
+        colors.push(meta.color);
+        keys.push(key);
+    });
+
+    return { labels: labels, data: data, colors: colors, keys: keys };
+}
+
+function updateStatusChart(newCounts, newBreakdown) {
+    if (newBreakdown) {
+        statusBreakdown = newBreakdown;
+    } else if (newCounts) {
+        statusOrder.forEach(function(key) {
+            if (!statusBreakdown[key]) statusBreakdown[key] = { count: 0, profit: 0 };
+            if (typeof newCounts[key] !== 'undefined') statusBreakdown[key].count = newCounts[key];
+        });
+    }
+
+    syncStatusCounts();
+
+    if (!statusChartInstance) return;
+
+    var info = buildDoughnutData();
+    chartStatusKeys = info.keys;
+    statusChartInstance.data.labels = info.labels;
+    statusChartInstance.data.datasets[0].data = info.data;
+    statusChartInstance.data.datasets[0].backgroundColor = info.colors;
+    statusChartInstance.update('none');
+    renderStatusLegend(info.labels, info.data, info.colors, info.keys);
+}
+
+function renderStatusLegend(labels, data, colors, keys) {
     var wrap = document.getElementById('statusLegend');
     if (!wrap) return;
     var html = '';
     for (var i = 0; i < labels.length; i++) {
-        html += '<div class="flex items-center gap-2 text-xs text-gray-500">'
+        var key = keys && keys[i] ? keys[i] : '';
+        var profit = (statusBreakdown[key] && statusBreakdown[key].profit) || 0;
+        html += '<button type="button" data-status-key="' + key + '" class="flex items-center gap-2 text-xs text-gray-500 text-left hover:text-gray-700" title="' + labels[i] + ': ' + data[i] + ' service, Profit ' + fmtRp(profit) + '">'
             + '<span class="inline-block w-2.5 h-2.5 rounded-sm flex-shrink-0" style="background:' + colors[i] + '"></span>'
             + '<span class="truncate">' + labels[i] + '</span>'
-            + '</div>';
+            + '</button>';
     }
     wrap.innerHTML = html;
 }
 
+function setProfitText(el, value) {
+    if (!el) return;
+    var num = Number(value) || 0;
+    el.textContent = fmtRp(num);
+    el.classList.remove('text-emerald-600', 'text-red-600', 'text-emerald-700', 'text-red-700');
+    el.classList.add(num >= 0 ? 'text-emerald-600' : 'text-red-600');
+}
+
 function updatePickupSummary(summary) {
     if (!summary) return;
+    pickupSummary = summary;
+
     var takenCount = document.getElementById('pickupTakenCount');
     var pendingCount = document.getElementById('pickupPendingCount');
     var takenProfit = document.getElementById('pickupTakenProfit');
@@ -355,16 +479,89 @@ function updatePickupSummary(summary) {
     if (takenCount) takenCount.textContent = summary.taken_count || 0;
     if (pendingCount) pendingCount.textContent = summary.pending_count || 0;
 
-    function setProfit(el, value) {
-        if (!el) return;
-        var num = Number(value) || 0;
-        el.textContent = fmtRp(num);
-        el.classList.remove('text-emerald-600', 'text-red-600');
-        el.classList.add(num >= 0 ? 'text-emerald-600' : 'text-red-600');
+    setProfitText(takenProfit, summary.taken_profit);
+    setProfitText(pendingProfit, summary.pending_profit);
+}
+
+function isStatusModalOpen() {
+    var modal = document.getElementById('statusDetailModal');
+    return modal && !modal.classList.contains('hidden');
+}
+
+function openStatusModal(statusKey) {
+    var modal = document.getElementById('statusDetailModal');
+    if (!modal) return;
+
+    activeStatusKey = statusKey || null;
+    renderStatusModal(activeStatusKey);
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeStatusModal() {
+    var modal = document.getElementById('statusDetailModal');
+    if (!modal) return;
+
+    modal.classList.add('hidden');
+    document.body.style.overflow = '';
+    activeStatusKey = null;
+}
+
+function renderStatusModal(highlightKey) {
+    var periodEl = document.getElementById('statusModalPeriod');
+    if (periodEl) {
+        periodEl.textContent = summaryPeriodLabel ? ('Ringkasan Profit ' + summaryPeriodLabel) : 'Ringkasan Profit';
     }
 
-    setProfit(takenProfit, summary.taken_profit);
-    setProfit(pendingProfit, summary.pending_profit);
+    var summary = pickupSummary || {};
+    var takenCountEl = document.getElementById('statusModalTakenCount');
+    var pendingCountEl = document.getElementById('statusModalPendingCount');
+    var takenProfitEl = document.getElementById('statusModalTakenProfit');
+    var pendingProfitEl = document.getElementById('statusModalPendingProfit');
+
+    if (takenCountEl) takenCountEl.textContent = summary.taken_count || 0;
+    if (pendingCountEl) pendingCountEl.textContent = summary.pending_count || 0;
+    setProfitText(takenProfitEl, summary.taken_profit);
+    setProfitText(pendingProfitEl, summary.pending_profit);
+
+    var tbody = document.getElementById('statusModalTable');
+    if (tbody) {
+        var rows = '';
+
+        statusOrder.forEach(function(key) {
+            var meta = statusMeta[key] || { label: key, color: '#9CA3AF' };
+            var item = statusBreakdown[key] || { count: 0, profit: 0 };
+            var count = Number(item.count) || 0;
+            var profit = key === 'batal' ? 0 : (Number(item.profit) || 0);
+            var rowClass = (highlightKey && highlightKey === key) ? ' bg-yellow-50' : '';
+
+            rows += '<tr class="border-b border-gray-100 last:border-0' + rowClass + '">'
+                + '<td class="py-2 pr-3"><span class="inline-flex items-center gap-1.5 text-gray-600"><span class="h-2 w-2 rounded-full" style="background:' + meta.color + '"></span>' + meta.label + '</span></td>'
+                + '<td class="py-2 px-3 text-right tabular-nums text-gray-600">' + count + ' service</td>'
+                + '<td class="py-2 pl-3 text-right tabular-nums font-semibold ' + (profit >= 0 ? 'text-emerald-600' : 'text-red-600') + '">' + (key === 'batal' ? '-' : fmtRp(profit)) + '</td>'
+                + '</tr>';
+        });
+
+        tbody.innerHTML = rows;
+    }
+
+    var noteEl = document.getElementById('statusModalNote');
+    if (noteEl) {
+        var hasService = statusOrder.some(function(key) {
+            return key !== 'batal' && ((statusBreakdown[key] && statusBreakdown[key].count) || 0) > 0;
+        });
+        noteEl.textContent = hasService
+            ? 'Profit per status dibagi proporsional terhadap keuntungan kotor. Status Batal tidak dihitung dalam profit.'
+            : 'Tidak ada service pada periode ini. Profit periode, termasuk biaya, ditampilkan pada Total Profit.';
+    }
+
+    var totalEl = document.getElementById('statusModalTotalProfit');
+    if (totalEl) {
+        var total = Number(summary.total_profit) || 0;
+        totalEl.textContent = fmtRp(total);
+        totalEl.classList.remove('text-emerald-700', 'text-red-700');
+        totalEl.classList.add(total >= 0 ? 'text-emerald-700' : 'text-red-700');
+    }
 }
 
 function updateRecentServices(services) {
@@ -664,8 +861,15 @@ function updateKpiOnly(d, periodLabel) {
     // Grafik
     updateChart(d.chartData);
 
-    // Ringkasan status diambil vs belum diambil
+    // Ringkasan dan rincian status mengikuti periode yang sama
+    if (d.summaryPeriodLabel) summaryPeriodLabel = d.summaryPeriodLabel;
     if (d.pickupSummary) updatePickupSummary(d.pickupSummary);
+    if (d.statusBreakdown) {
+        updateStatusChart(d.statusCounts, d.statusBreakdown);
+    } else if (d.statusCounts) {
+        updateStatusChart(d.statusCounts);
+    }
+    if (isStatusModalOpen()) renderStatusModal(activeStatusKey);
 }
 
 function fetchData(params) {
@@ -708,25 +912,70 @@ document.addEventListener('DOMContentLoaded', function() {
 
     var ctx2 = document.getElementById('statusChart');
     if (ctx2) {
-        var scLabels = ['Menunggu', 'Dikerjakan', 'Selesai', 'Diambil'];
-        var scData = [statusCounts.menunggu || 0, statusCounts.dikerjakan || 0, statusCounts.selesai || 0, statusCounts.diambil || 0];
-        var scColors = ['#F59E0B', '#3B82F6', '#10B981', '#6B7280'];
-        if (statusCounts.batal) { scLabels.push('Batal'); scData.push(statusCounts.batal); scColors.push('#EF4444'); }
+        var statusInfo = buildDoughnutData();
+        chartStatusKeys = statusInfo.keys;
+
         statusChartInstance = new Chart(ctx2, {
             type: 'doughnut',
             data: {
-                labels: scLabels,
-                datasets: [{ data: scData, backgroundColor: scColors, borderWidth: 0 }]
+                labels: statusInfo.labels,
+                datasets: [{ data: statusInfo.data, backgroundColor: statusInfo.colors, borderWidth: 0 }]
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
                 cutout: '70%',
                 animation: { animateRotate: true, duration: 1000, easing: 'easeOutQuart' },
-                plugins: { legend: { display: false } }
+                interaction: { mode: 'nearest', intersect: true },
+                onClick: function(e, elements) {
+                    if (elements.length) {
+                        openStatusModal(chartStatusKeys[elements[0].index]);
+                    }
+                },
+                onHover: function(e) {
+                    e.native.target.style.cursor = e.chart.getElementsAtEventForMode(e, 'nearest', { intersect: true }).length ? 'pointer' : 'default';
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            title: function(items) {
+                                var key = chartStatusKeys[items[0].dataIndex];
+                                return statusMeta[key] ? statusMeta[key].label : (items[0].label || '');
+                            },
+                            label: function(context) {
+                                var key = chartStatusKeys[context.dataIndex];
+                                var profit = (statusBreakdown[key] && statusBreakdown[key].profit) || 0;
+                                return [context.raw + ' service', 'Profit: ' + fmtRp(profit)];
+                            }
+                        }
+                    }
+                }
             }
         });
-        renderStatusLegend(scLabels, scData, scColors);
+        renderStatusLegend(statusInfo.labels, statusInfo.data, statusInfo.colors, statusInfo.keys);
     }
+
+    // Rincian status
+    var openStatusDetailBtn = document.getElementById('openStatusDetailBtn');
+    if (openStatusDetailBtn) {
+        openStatusDetailBtn.addEventListener('click', function() { openStatusModal(null); });
+    }
+
+    var statusLegend = document.getElementById('statusLegend');
+    if (statusLegend) {
+        statusLegend.addEventListener('click', function(e) {
+            var btn = e.target.closest('[data-status-key]');
+            if (btn) openStatusModal(btn.dataset.statusKey || null);
+        });
+    }
+
+    document.querySelectorAll('#statusDetailModal [data-modal-close]').forEach(function(el) {
+        el.addEventListener('click', closeStatusModal);
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && isStatusModalOpen()) closeStatusModal();
+    });
 
     // Tab clicks
     document.querySelectorAll('.period-btn').forEach(function(btn) {
@@ -765,7 +1014,6 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(function(r) { return r.json(); })
             .then(function(recentData) {
                 updateRecentServices(recentData.recentServices);
-                updateStatusChart(recentData.statusCounts);
             })
             .catch(function() {});
     }, 30000);

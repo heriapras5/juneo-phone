@@ -7,7 +7,6 @@ use App\Models\Customer;
 use App\Models\Service;
 use App\Services\DashboardService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -35,14 +34,12 @@ class DashboardController extends Controller
             ->limit(10)
             ->get();
 
-        $statusCounts = Service::select('status', DB::raw('COUNT(*) as total'))
-            ->groupBy('status')
-            ->pluck('total', 'status')
-            ->toArray();
-
         $periodTotals = $service->getPeriodTotals($fromDate, $toDate);
         $prevPeriodTotals = $service->getPreviousPeriodTotals($fromDate, $toDate);
-        $pickupSummary = $service->getPickupSummary($fromDate, $toDate);
+        $statusBreakdown = $service->getStatusBreakdown($fromDate, $toDate, $periodTotals);
+        $statusCounts = collect($statusBreakdown)->map(fn ($item) => $item['count'])->toArray();
+        $pickupSummary = $service->getPickupSummary($fromDate, $toDate, $periodTotals, $statusBreakdown);
+        $summaryPeriodLabel = $service->formatPeriodSummaryLabel($fromDate, $toDate, $period, (bool) ($from && $to));
 
         $changeOmzet   = $prevPeriodTotals->omzet > 0 ? round((($periodTotals->omzet - $prevPeriodTotals->omzet) / $prevPeriodTotals->omzet) * 100, 1) : ($periodTotals->omzet > 0 ? null : 0);
         $changePengeluaran = $prevPeriodTotals->pengeluaran > 0 ? round((($periodTotals->pengeluaran - $prevPeriodTotals->pengeluaran) / $prevPeriodTotals->pengeluaran) * 100, 1) : ($periodTotals->pengeluaran > 0 ? null : 0);
@@ -61,9 +58,11 @@ class DashboardController extends Controller
             'toDate',
             'recentServices',
             'statusCounts',
+            'statusBreakdown',
             'periodTotals',
             'prevPeriodTotals',
             'pickupSummary',
+            'summaryPeriodLabel',
             'biayaCount',
             'isPeriodComplete',
             'changeOmzet',
@@ -89,14 +88,8 @@ class DashboardController extends Controller
                 'tanggal' => $s->tanggal->format('d/m'),
             ]);
 
-        $statusCounts = Service::select('status', DB::raw('COUNT(*) as total'))
-            ->groupBy('status')
-            ->pluck('total', 'status')
-            ->toArray();
-
         return response()->json([
             'recentServices' => $services,
-            'statusCounts' => $statusCounts,
         ]);
     }
 
@@ -121,7 +114,10 @@ class DashboardController extends Controller
 
         $periodTotals = $service->getPeriodTotals($fromDate, $toDate);
         $prevTotals   = $service->getPreviousPeriodTotals($fromDate, $toDate);
-        $pickupSummary = $service->getPickupSummary($fromDate, $toDate);
+        $statusBreakdown = $service->getStatusBreakdown($fromDate, $toDate, $periodTotals);
+        $statusCounts = collect($statusBreakdown)->map(fn ($item) => $item['count'])->toArray();
+        $pickupSummary = $service->getPickupSummary($fromDate, $toDate, $periodTotals, $statusBreakdown);
+        $summaryPeriodLabel = $service->formatPeriodSummaryLabel($fromDate, $toDate, $period, (bool) ($from && $to));
 
         $isComplete   = $toDate->toDateString() < now()->toDateString();
         $biayaCount   = BiayaHarian::whereDate('tanggal', now()->toDateString())->exists();
@@ -154,6 +150,9 @@ class DashboardController extends Controller
             'lainnya'          => $periodTotals->lainnya,
             'fees'             => $periodTotals->fees,
             'pickupSummary'    => $pickupSummary,
+            'statusBreakdown'  => $statusBreakdown,
+            'statusCounts'     => $statusCounts,
+            'summaryPeriodLabel' => $summaryPeriodLabel,
 
             'changeOmzet'       => $changeOmzet,
             'changePengeluaran' => $changePengeluaran,
