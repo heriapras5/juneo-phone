@@ -159,7 +159,7 @@ window._pageData = {
                             @endphp
                             @foreach($allTypes as $tipe)
                                 <div class="leading-relaxed whitespace-nowrap">
-                                    <span class="text-gray-400">•</span>
+                                    <span class="text-gray-400">-</span>
                                     <span>{{ $tipe }}</span>
                                 </div>
                             @endforeach
@@ -189,7 +189,7 @@ window._pageData = {
                         <td class="px-5 py-3 text-sm text-gray-600 whitespace-nowrap">
                             @forelse($mergerList as $kr)
                                 <div class="leading-relaxed whitespace-nowrap">
-                                    <span class="text-gray-400">•</span>
+                                    <span class="text-gray-400">-</span>
                                     <span>{{ $kr['nama'] }}</span>
                                 </div>
                             @empty

@@ -77,7 +77,7 @@ $hasCustomRange = request()->has('from') && request()->has('to');
             </span>
             <div class="leading-tight min-w-0">
                 <span class="text-xs sm:text-sm font-semibold" id="infoFromDate">{{ $fromDate->format('d M Y') }}</span>
-                <span class="text-gray-300 mx-0.5 sm:mx-1">—</span>
+                <span class="text-gray-300 mx-0.5 sm:mx-1">-</span>
                 <span class="text-xs sm:text-sm font-semibold" id="infoToDate">{{ $toDate->format('d M Y') }}</span>
                 <div class="text-[10px] sm:text-[11px] text-gray-400 mt-0.5" id="infoPeriodLabel">{{ $hasCustomRange ? 'Rentang Kustom' : ($periodLabels[$period] ?? 'Rentang Kustom') }}</div>
             </div>
@@ -133,7 +133,7 @@ $hasCustomRange = request()->has('from') && request()->has('to');
         <div class="flex items-center gap-2">
             <span class="h-5 w-1.5 rounded-full bg-gradient-to-b from-yellow-500 to-amber-500"></span>
             <h2 class="text-sm font-bold text-gray-800 uppercase tracking-wide">Ringkasan Keuangan</h2>
-            <span class="text-[10px] sm:text-[11px] text-gray-400 italic hidden sm:inline">— Pengeluaran, Omzet, Kebutuhan Pribadi &amp; Profit</span>
+            <span class="text-[10px] sm:text-[11px] text-gray-400 italic hidden sm:inline">- Pengeluaran, Omzet, Kebutuhan Pribadi &amp; Profit</span>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-stretch" id="rowKpi">
             @include('dashboard._partials.kpi-cards', [
@@ -243,7 +243,7 @@ $hasCustomRange = request()->has('from') && request()->has('to');
                                 $kr = is_string($service->kerusakan) ? json_decode($service->kerusakan, true) : $service->kerusakan;
                                 $krNames = is_array($kr) ? array_map(fn($k) => is_array($k) ? ($k['nama'] ?? '') : $k, $kr) : [];
                             @endphp
-                            <p class="text-xs text-gray-500 truncate">{{ $service->type_hp }} — {{ is_array($kr) ? implode(', ', array_filter($krNames)) : $service->kerusakan }}</p>
+                            <p class="text-xs text-gray-500 truncate">{{ $service->type_hp }} - {{ is_array($kr) ? implode(', ', array_filter($krNames)) : $service->kerusakan }}</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-2 flex-shrink-0 ml-2">
@@ -345,7 +345,6 @@ statusOrder.forEach(function(key) {
     statusCounts[key] = (statusBreakdown[key] && statusBreakdown[key].count) || 0;
 });
 var chartStatusKeys = [];
-var activeStatusKey = null;
 var chartInstance = null;
 var statusChartInstance = null;
 var lastUserAction = Date.now();
@@ -451,10 +450,10 @@ function renderStatusLegend(labels, data, colors, keys) {
     for (var i = 0; i < labels.length; i++) {
         var key = keys && keys[i] ? keys[i] : '';
         var profit = (statusBreakdown[key] && statusBreakdown[key].profit) || 0;
-        html += '<button type="button" data-status-key="' + key + '" class="flex items-center gap-2 text-xs text-gray-500 text-left hover:text-gray-700" title="' + labels[i] + ': ' + data[i] + ' service, Profit ' + fmtRp(profit) + '">'
+        html += '<div class="flex items-center gap-2 text-xs text-gray-500 text-left" title="' + labels[i] + ': ' + data[i] + ' service, Profit ' + fmtRp(profit) + '">'
             + '<span class="inline-block w-2.5 h-2.5 rounded-sm flex-shrink-0" style="background:' + colors[i] + '"></span>'
             + '<span class="truncate">' + labels[i] + '</span>'
-            + '</button>';
+            + '</div>';
     }
     wrap.innerHTML = html;
 }
@@ -488,12 +487,11 @@ function isStatusModalOpen() {
     return modal && !modal.classList.contains('hidden');
 }
 
-function openStatusModal(statusKey) {
+function openStatusModal() {
     var modal = document.getElementById('statusDetailModal');
     if (!modal) return;
 
-    activeStatusKey = statusKey || null;
-    renderStatusModal(activeStatusKey);
+    renderStatusModal();
     modal.classList.remove('hidden');
     document.body.style.overflow = 'hidden';
 }
@@ -504,10 +502,9 @@ function closeStatusModal() {
 
     modal.classList.add('hidden');
     document.body.style.overflow = '';
-    activeStatusKey = null;
 }
 
-function renderStatusModal(highlightKey) {
+function renderStatusModal() {
     var periodEl = document.getElementById('statusModalPeriod');
     if (periodEl) {
         periodEl.textContent = summaryPeriodLabel ? ('Ringkasan Profit ' + summaryPeriodLabel) : 'Ringkasan Profit';
@@ -533,9 +530,8 @@ function renderStatusModal(highlightKey) {
             var item = statusBreakdown[key] || { count: 0, profit: 0 };
             var count = Number(item.count) || 0;
             var profit = key === 'batal' ? 0 : (Number(item.profit) || 0);
-            var rowClass = (highlightKey && highlightKey === key) ? ' bg-yellow-50' : '';
 
-            rows += '<tr class="border-b border-gray-100 last:border-0' + rowClass + '">'
+            rows += '<tr class="border-b border-gray-100 last:border-0">'
                 + '<td class="py-2 pr-3"><span class="inline-flex items-center gap-1.5 text-gray-600"><span class="h-2 w-2 rounded-full" style="background:' + meta.color + '"></span>' + meta.label + '</span></td>'
                 + '<td class="py-2 px-3 text-right tabular-nums text-gray-600">' + count + ' service</td>'
                 + '<td class="py-2 pl-3 text-right tabular-nums font-semibold ' + (profit >= 0 ? 'text-emerald-600' : 'text-red-600') + '">' + (key === 'batal' ? '-' : fmtRp(profit)) + '</td>'
@@ -593,7 +589,7 @@ function updateRecentServices(services) {
             +   '<div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-yellow-50 to-amber-100 items-center justify-center flex-shrink-0 hidden sm:flex"><i class="fas fa-mobile-alt text-yellow-600 text-[10px] sm:text-xs"></i></div>'
             +   '<div class="min-w-0">'
             +     '<p class="text-sm font-medium text-gray-900 truncate">' + s.customer_name + '</p>'
-            +     '<p class="text-xs text-gray-500 truncate">' + s.type_hp + ' — ' + kerusakan + '</p>'
+            +     '<p class="text-xs text-gray-500 truncate">' + s.type_hp + ' - ' + kerusakan + '</p>'
             +   '</div>'
             + '</div>'
             + '<div class="flex items-center gap-2 flex-shrink-0 ml-2">'
@@ -624,7 +620,7 @@ function kpiCardHTML(cfg) {
             + '<span class="text-xs text-gray-400">vs periode lalu</span>'
             + '</div>';
     } else {
-        changeHtml = '<div class="flex items-center gap-1 mt-1"><span class="text-xs font-medium text-gray-400">— vs periode lalu</span></div>';
+        changeHtml = '<div class="flex items-center gap-1 mt-1"><span class="text-xs font-medium text-gray-400">Belum ada data pembanding</span></div>';
     }
 
     var foot  = cfg.foot  ? '<p class="text-xs text-gray-400 mt-3">' + cfg.foot + '</p>' : '';
@@ -662,7 +658,7 @@ function buildKpiCardsHTML(d, periodLabel) {
     var cards = [
         kpiCardHTML({
             title: 'Pengeluaran ' + periodLabel,
-            desc: 'Modal sparepart — total biaya beli komponen service',
+            desc: 'Modal sparepart - total biaya beli komponen service',
             value: d.pengeluaran, valueCls: 'text-red-500',
             icon: 'fa-cart-shopping', iconBg: 'from-red-50 to-rose-100', iconColor: 'red-600',
             change: d.changePengeluaran, upIsGood: false,
@@ -673,7 +669,7 @@ function buildKpiCardsHTML(d, periodLabel) {
         }),
         kpiCardHTML({
             title: 'Omzet ' + periodLabel,
-            desc: 'Total tagihan jasa service ke pelanggan — belum dipotong biaya apapun',
+            desc: 'Total tagihan jasa service ke pelanggan - belum dipotong biaya apapun',
             value: d.omzet, valueCls: 'text-gray-900',
             icon: 'fa-money-bill-wave', iconBg: 'from-emerald-50 to-green-100', iconColor: 'emerald-600',
             change: d.changeOmzet, upIsGood: true,
@@ -696,7 +692,7 @@ function buildKpiCardsHTML(d, periodLabel) {
                 if (regularFees.length) { desc += ' + ' + regularFees.map(function(f){ return f.label; }).join(' + '); }
                 desc += ' + Lainnya';
                 if (tambahanFees.length) { desc += ' + ' + tambahanFees.map(function(f){ return f.label; }).join(' + '); }
-                return desc + ' — total biaya kebutuhan harian';
+                return desc + ' - total biaya kebutuhan harian';
             })(),
             value: d.kebutuhan_pribadi, valueCls: 'text-orange-600',
             icon: 'fa-wallet', iconBg: 'from-orange-50 to-amber-100', iconColor: 'orange-600',
@@ -869,7 +865,7 @@ function updateKpiOnly(d, periodLabel) {
     } else if (d.statusCounts) {
         updateStatusChart(d.statusCounts);
     }
-    if (isStatusModalOpen()) renderStatusModal(activeStatusKey);
+    if (isStatusModalOpen()) renderStatusModal();
 }
 
 function fetchData(params) {
@@ -926,14 +922,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 cutout: '70%',
                 animation: { animateRotate: true, duration: 1000, easing: 'easeOutQuart' },
                 interaction: { mode: 'nearest', intersect: true },
-                onClick: function(e, elements) {
-                    if (elements.length) {
-                        openStatusModal(chartStatusKeys[elements[0].index]);
-                    }
-                },
-                onHover: function(e) {
-                    e.native.target.style.cursor = e.chart.getElementsAtEventForMode(e, 'nearest', { intersect: true }).length ? 'pointer' : 'default';
-                },
                 plugins: {
                     legend: { display: false },
                     tooltip: {
@@ -958,15 +946,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Rincian status
     var openStatusDetailBtn = document.getElementById('openStatusDetailBtn');
     if (openStatusDetailBtn) {
-        openStatusDetailBtn.addEventListener('click', function() { openStatusModal(null); });
-    }
-
-    var statusLegend = document.getElementById('statusLegend');
-    if (statusLegend) {
-        statusLegend.addEventListener('click', function(e) {
-            var btn = e.target.closest('[data-status-key]');
-            if (btn) openStatusModal(btn.dataset.statusKey || null);
-        });
+        openStatusDetailBtn.addEventListener('click', openStatusModal);
     }
 
     document.querySelectorAll('#statusDetailModal [data-modal-close]').forEach(function(el) {

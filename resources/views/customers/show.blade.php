@@ -86,7 +86,7 @@ $statusLabels = \App\Models\Service::statusLabels();
                         <td class="px-5 py-4 text-sm text-gray-600 max-w-xs whitespace-nowrap">
                             @forelse($sMerger as $sKr)
                                 <div class="truncate leading-relaxed">
-                                    <span class="text-gray-400">•</span>
+                                    <span class="text-gray-400">-</span>
                                     <span>{{ $sKr['nama'] }}</span>
                                 </div>
                             @empty

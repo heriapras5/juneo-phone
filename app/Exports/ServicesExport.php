@@ -63,7 +63,7 @@ class ServicesExport implements FromQuery, WithHeadings, WithMapping, WithStyles
         $allTypesText = ServiceHelper::getAllTypesText($row);
 
         $merger = ServiceHelper::getKerusakanTeknisiMerger($row);
-        $kerusakanText = $merger->map(fn($i) => '• ' . $i['nama'])->implode("\n");
+        $kerusakanText = $merger->map(fn($i) => '- ' . $i['nama'])->implode("\n");
         $teknisiText = $merger->map(fn($i) => $i['teknisi'] ? ServiceHelper::getTeknisiLabel($i['teknisi']) : '-')->implode("\n");
 
         $statusLabels = ['menunggu' => 'Menunggu', 'dikerjakan' => 'Dikerjakan', 'selesai' => 'Selesai', 'diambil' => 'Diambil', 'batal' => 'Batal'];

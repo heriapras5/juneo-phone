@@ -265,7 +265,7 @@ class Service extends Model
                 if (!static::isValidTransition($originalStatus, $newStatus)) {
                     throw new \InvalidArgumentException(
                         "Transisi status tidak valid: " .
-                        (static::statusLabels()[$originalStatus] ?? $originalStatus) . " → " .
+                        (static::statusLabels()[$originalStatus] ?? $originalStatus) . " -> " .
                         (static::statusLabels()[$newStatus] ?? $newStatus)
                     );
                 }

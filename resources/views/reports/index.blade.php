@@ -3,7 +3,7 @@
 @section('title', 'Laporan')
 @section('page-title')
     @if($from && $to)
-        Laporan Service {{ \Carbon\Carbon::parse($from)->format('d/m/Y') }} — {{ \Carbon\Carbon::parse($to)->format('d/m/Y') }}
+        Laporan Service {{ \Carbon\Carbon::parse($from)->format('d/m/Y') }} s.d. {{ \Carbon\Carbon::parse($to)->format('d/m/Y') }}
     @else
         Laporan Service {{ $tahun }}
     @endif
@@ -103,7 +103,7 @@
                                     ->values();
                             @endphp
                             @foreach($allTypes as $type)
-• {{ $type }}
+- {{ $type }}
                             @endforeach
                         ">
                             @php
@@ -113,7 +113,7 @@
                                     ->values();
                             @endphp
                             @foreach($allTypes as $type)
-                            <div class="truncate">• {{ $type }}</div>
+                            <div class="truncate">- {{ $type }}</div>
                             @endforeach
                         </td>
                         @php
@@ -142,7 +142,7 @@
                         <td class="px-4 py-3 text-sm text-gray-600 max-w-[220px]">
                             @forelse($rMerger as $rKr)
                                 <div class="truncate leading-relaxed">
-                                    <span class="text-gray-400">•</span>
+                                    <span class="text-gray-400">-</span>
                                     <span>{{ $rKr['nama'] }}</span>
                                 </div>
                             @empty

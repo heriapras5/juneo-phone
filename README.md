@@ -59,17 +59,17 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 **Juneo Phone** adalah aplikasi manajemen service HP berbasis Laravel 12 yang dirancang untuk membantu bengkel service HP dalam mengelola pelanggan, service, keuangan, dan laporan secara efisien.
 
 ### 🔧 Fitur Utama
-- ✅ Manajemen pelanggan
-- ✅ Tracking service dengan multi-item (beberapa HP dalam satu service)
-- ✅ Status workflow (Menunggu → Dikerjakan → Selesai → Diambil)
-- ✅ Teknisi assignment (Adit/Edi/Nur)
-- ✅ Antrian prioritas dengan indikator urgency
-- ✅ Garansi management
-- ✅ Biaya harian & gaji karyawan
-- ✅ Dashboard statistik & KPI
-- ✅ Laporan multi-format (Excel, CSV, PDF)
-- ✅ Google OAuth login
-- ✅ Role-based access control (SuperAdmin, Admin)
+- Manajemen pelanggan
+- Tracking service dengan multi-item (beberapa HP dalam satu service)
+- Status workflow (Menunggu -> Dikerjakan -> Selesai -> Diambil)
+- Teknisi assignment (Adit/Edi/Nur)
+- Antrian prioritas dengan indikator urgency
+- Garansi management
+- Biaya harian & gaji karyawan
+- Dashboard statistik & KPI
+- Laporan multi-format (Excel, CSV, PDF)
+- Google OAuth login
+- Role-based access control (SuperAdmin, Admin)
 
 ### 🚀 Deployment Guide
 

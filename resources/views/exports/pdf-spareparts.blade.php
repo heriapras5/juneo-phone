@@ -25,7 +25,7 @@
         <p class="subtitle">DATA SPAREPART</p>
         @php $alamatToko = \App\Models\Setting::getValue('alamat', ''); $telpToko = \App\Models\Setting::getValue('nota_telepon', ''); @endphp
         @if($alamatToko || $telpToko)
-        <p class="info">{{ $alamatToko }}@if($alamatToko && $telpToko) — @endif{{ $telpToko ? 'No WA: '.$telpToko : '' }}</p>
+        <p class="info">{{ $alamatToko }}@if($alamatToko && $telpToko) - @endif{{ $telpToko ? 'No WA: '.$telpToko : '' }}</p>
         @endif
     </div>
 

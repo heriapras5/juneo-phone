@@ -27,6 +27,9 @@ class DashboardTest extends TestCase
         $response = $this->get('/dashboard');
 
         $response->assertStatus(200);
+        $response->assertSee('openStatusDetailBtn', false);
+        $response->assertDontSee('statusProfitHintBtn', false);
+        $response->assertDontSee('Klik grafik untuk lihat profit');
     }
 
     public function test_dashboard_accepts_custom_date_range(): void

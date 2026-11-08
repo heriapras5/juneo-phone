@@ -55,7 +55,7 @@
     <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-center gap-3 shadow-sm">
         <i class="fas fa-exclamation-triangle text-red-500 text-lg"></i>
         <div>
-            <span class="font-semibold">{{ $urgentCount }} service</span> sudah menunggu lebih dari <strong>5 hari</strong> — prioritaskan segera!
+            <span class="font-semibold">{{ $urgentCount }} service</span> sudah menunggu lebih dari <strong>5 hari</strong> - prioritaskan segera!
         </div>
     </div>
     @endif
@@ -137,7 +137,7 @@
                             @php $qTypes = $service->serviceItems->pluck('type_hp')->unique()->values(); @endphp
                             @if($qTypes->isNotEmpty())
                                 @foreach($qTypes as $qTipe)
-                                    <div class="leading-relaxed whitespace-nowrap"><span class="text-gray-400">•</span> {{ $qTipe }}</div>
+                                    <div class="leading-relaxed whitespace-nowrap"><span class="text-gray-400">-</span> {{ $qTipe }}</div>
                                 @endforeach
                             @else
                                 <span class="text-gray-400">-</span>
@@ -170,7 +170,7 @@
                         <td class="px-3 py-3 text-sm text-gray-600 max-w-[200px]">
                             @forelse($qMerger as $qKr)
                                 <div class="leading-relaxed truncate">
-                                    <span class="text-gray-400">•</span>
+                                    <span class="text-gray-400">-</span>
                                     <span class="truncate">{{ $qKr['nama'] }}</span>
                                 </div>
                             @empty
@@ -254,7 +254,7 @@
                     <tr>
                         <td colspan="12" class="px-4 py-12 text-center text-gray-400">
                             <i class="fas fa-check-circle text-3xl mb-2 block"></i>
-                            Tidak ada antrian — semua service sudah selesai atau diambil
+                            Tidak ada antrian - semua service sudah selesai atau diambil
                         </td>
                     </tr>
                     @endforelse
@@ -272,13 +272,13 @@
         @endif
     </div>
 
-    {{-- Selesai — Siap Diambil --}}
+    {{-- Selesai - Siap Diambil --}}
     @if($completedServices->count() > 0)
     <div class="bg-white border border-gray-200 rounded-xl shadow-sm">
         <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
             <h3 class="text-sm font-semibold text-gray-700 flex items-center gap-2">
                 <i class="fas fa-check-circle text-emerald-500"></i>
-                Selesai — Siap Diambil
+                Selesai - Siap Diambil
                 <span class="text-xs font-normal text-gray-400">({{ $completedServices->total() }})</span>
             </h3>
         </div>

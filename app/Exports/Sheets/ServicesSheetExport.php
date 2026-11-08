@@ -54,7 +54,7 @@ class ServicesSheetExport implements FromCollection, WithHeadings, WithMapping, 
         $allTypes = collect([$service->type_hp])
             ->concat($service->serviceItems->pluck('type_hp'))
             ->unique()->values();
-        $typesText = '• ' . $allTypes->implode(' | • ');
+        $typesText = '- ' . $allTypes->implode(' | - ');
 
         $allKerusakan = collect();
         $parentKr = is_string($service->kerusakan) ? (json_decode($service->kerusakan, true) ?? [$service->kerusakan]) : (array) ($service->kerusakan ?? []);
@@ -64,7 +64,7 @@ class ServicesSheetExport implements FromCollection, WithHeadings, WithMapping, 
             foreach ($itemKr as $kr) { $allKerusakan->push(is_array($kr) ? ($kr['nama'] ?? '') : $kr); }
         }
         $allKerusakan = $allKerusakan->unique()->values();
-        $kerusakanText = '• ' . $allKerusakan->implode(' | • ');
+        $kerusakanText = '- ' . $allKerusakan->implode(' | - ');
 
         return [
             $this->rowNumber,

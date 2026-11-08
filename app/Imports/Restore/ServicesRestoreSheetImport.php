@@ -73,9 +73,9 @@ class ServicesRestoreSheetImport implements ToModel, WithHeadingRow, SkipsEmptyR
         if (empty($value)) {
             return '';
         }
-        $value = preg_replace('/^•\s*/', '', $value);
+        $value = preg_replace('/^[•\-]\s*/u', '', $value);
         $items = explode(' | ', $value);
-        return trim($items[0] ?? '');
+        return trim(preg_replace('/^[•\-]\s*/u', '', $items[0] ?? ''));
     }
 
     private function parseKerusakan($value)
@@ -83,9 +83,12 @@ class ServicesRestoreSheetImport implements ToModel, WithHeadingRow, SkipsEmptyR
         if (empty($value)) {
             return '[]';
         }
-        $value = preg_replace('/^•\s*/', '', $value);
+        $value = preg_replace('/^[•\-]\s*/u', '', $value);
         $items = explode(' | ', $value);
-        $items = array_map('trim', $items);
+        $items = array_map(
+            fn ($item) => preg_replace('/^[•\-]\s*/u', '', trim($item)),
+            $items
+        );
         return json_encode($items);
     }
 }

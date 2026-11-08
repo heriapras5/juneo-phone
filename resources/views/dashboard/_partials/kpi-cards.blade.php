@@ -8,7 +8,7 @@ $profitPositive = $periodTotals->profit >= 0;
         <div class="flex items-start justify-between">
             <div class="flex-1 min-w-0">
                 <p class="text-xs text-gray-500 uppercase tracking-wider font-medium truncate">Pengeluaran {{ $periodLabels[$period] ?? 'Rentang Kustom' }}</p>
-                <p class="text-[10px] text-gray-400 italic mt-1 hidden sm:block truncate">Modal sparepart — total biaya beli komponen service</p>
+                <p class="text-[10px] text-gray-400 italic mt-1 hidden sm:block truncate">Modal sparepart - total biaya beli komponen service</p>
                 <p class="text-base sm:text-xl lg:text-2xl font-bold mt-1 kpi-value text-red-500" data-value="{{ $periodTotals->pengeluaran }}">Rp {{ number_format($periodTotals->pengeluaran, 0, ',', '.') }}</p>
                 @if($changePengeluaran !== null)
                 <div class="flex items-center gap-1 mt-1">
@@ -18,7 +18,7 @@ $profitPositive = $periodTotals->profit >= 0;
                 </div>
                 @else
                 <div class="flex items-center gap-1 mt-1">
-                    <span class="text-xs font-medium text-gray-400">— vs periode lalu</span>
+                    <span class="text-xs font-medium text-gray-400">Belum ada data pembanding</span>
                 </div>
                 @endif
             </div>
@@ -43,7 +43,7 @@ $profitPositive = $periodTotals->profit >= 0;
         <div class="flex items-start justify-between">
             <div class="flex-1 min-w-0">
                 <p class="text-xs text-gray-500 uppercase tracking-wider font-medium truncate">Omzet {{ $periodLabels[$period] ?? 'Rentang Kustom' }}</p>
-                <p class="text-[10px] text-gray-400 italic mt-1 hidden sm:block truncate">Total tagihan jasa service ke pelanggan — belum dipotong biaya apapun</p>
+                <p class="text-[10px] text-gray-400 italic mt-1 hidden sm:block truncate">Total tagihan jasa service ke pelanggan - belum dipotong biaya apapun</p>
                 <p class="text-base sm:text-xl lg:text-2xl font-bold mt-1 kpi-value text-gray-900" data-value="{{ $periodTotals->omzet }}">Rp {{ number_format($periodTotals->omzet, 0, ',', '.') }}</p>
                 @if($changeOmzet !== null)
                 <div class="flex items-center gap-1 mt-1">
@@ -53,7 +53,7 @@ $profitPositive = $periodTotals->profit >= 0;
                 </div>
                 @else
                 <div class="flex items-center gap-1 mt-1">
-                    <span class="text-xs font-medium text-gray-400">— vs periode lalu</span>
+                    <span class="text-xs font-medium text-gray-400">Belum ada data pembanding</span>
                 </div>
                 @endif
             </div>
@@ -82,7 +82,7 @@ $tambahanFees = collect($periodTotals->fees)->where('kategori', 'fee_tambahan')-
         <div class="flex items-start justify-between">
             <div class="flex-1 min-w-0">
                 <p class="text-xs text-gray-500 uppercase tracking-wider font-medium truncate">Kebutuhan Pribadi {{ $periodLabels[$period] ?? 'Rentang Kustom' }}</p>
-                <p class="text-[10px] text-gray-400 italic mt-1 hidden sm:block truncate">Bank Jago + {{ $regularFees->pluck('label')->implode(' + ') }} + Lainnya + {{ $tambahanFees->pluck('label')->implode(' + ') }} — total biaya kebutuhan harian</p>
+                <p class="text-[10px] text-gray-400 italic mt-1 hidden sm:block truncate">Bank Jago + {{ $regularFees->pluck('label')->implode(' + ') }} + Lainnya + {{ $tambahanFees->pluck('label')->implode(' + ') }} - total biaya kebutuhan harian</p>
                 <p class="text-base sm:text-xl lg:text-2xl font-bold mt-1 kpi-value text-orange-600" data-value="{{ $periodTotals->kebutuhan_pribadi }}">Rp {{ number_format($periodTotals->kebutuhan_pribadi, 0, ',', '.') }}</p>
                 {{-- Mobile: grid 2 kolom label : value --}}
                 <div class="grid grid-cols-2 gap-x-3 gap-y-0.5 mt-3 text-xs sm:hidden">
@@ -130,7 +130,7 @@ $tambahanFees = collect($periodTotals->fees)->where('kategori', 'fee_tambahan')-
                 </div>
                 @else
                 <div class="flex items-center gap-1 mt-1">
-                    <span class="text-xs font-medium text-gray-400">— vs periode lalu</span>
+                    <span class="text-xs font-medium text-gray-400">Belum ada data pembanding</span>
                 </div>
                 @endif
             </div>
@@ -167,7 +167,7 @@ $tambahanFees = collect($periodTotals->fees)->where('kategori', 'fee_tambahan')-
                 </div>
                 @else
                 <div class="flex items-center gap-1 mt-1">
-                    <span class="text-xs font-medium text-gray-400">— vs periode lalu</span>
+                    <span class="text-xs font-medium text-gray-400">Belum ada data pembanding</span>
                 </div>
                 @endif
             </div>

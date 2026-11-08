@@ -14,7 +14,7 @@ class ServiceHelper
 
         if ($allTypes->isEmpty()) return '-';
 
-        return '• ' . $allTypes->implode("\n• ");
+        return '- ' . $allTypes->implode("\n- ");
     }
 
     public static function getAllKerusakanText($service): string
@@ -42,7 +42,7 @@ class ServiceHelper
 
         if ($allKerusakan->isEmpty()) return '-';
 
-        return '• ' . $allKerusakan->implode(' | • ');
+        return '- ' . $allKerusakan->implode(' | - ');
     }
 
     public static function getTeknisiList($service): Collection

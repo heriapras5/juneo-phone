@@ -228,7 +228,7 @@ class ServiceController extends Controller
             if (!in_array($requested, (array)($allowedTransitions[$current] ?? []))) {
                 $allowed = $allowedTransitions[$current] ?? [];
                 $allowedLabels = array_map(fn($s) => Service::statusLabels()[$s] ?? $s, $allowed);
-                return redirect()->back()->withInput()->with('error', 'Status hanya bisa diubah ke: ' . implode(' → ', $allowedLabels) . '.');
+                return redirect()->back()->withInput()->with('error', 'Status hanya bisa diubah ke: ' . implode(' -> ', $allowedLabels) . '.');
             }
         }
 
@@ -354,7 +354,7 @@ class ServiceController extends Controller
         if (!in_array($requested, (array)($allowedTransitions[$current] ?? []))) {
             $allowed = $allowedTransitions[$current] ?? [];
             $allowedLabels = array_map(fn($s) => Service::statusLabels()[$s] ?? $s, $allowed);
-            $allowedStr = implode(' → ', $allowedLabels);
+            $allowedStr = implode(' -> ', $allowedLabels);
             return response()->json([
                 'success' => false,
                 'message' => 'Status hanya bisa diubah ke: ' . $allowedStr . '.',

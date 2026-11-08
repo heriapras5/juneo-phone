@@ -99,7 +99,7 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
         $allTypesText = ServiceHelper::getAllTypesText($row);
 
         $merger = ServiceHelper::getKerusakanTeknisiMerger($row);
-        $kerusakanText = $merger->map(fn($i) => '• ' . $i['nama'])->implode("\n");
+        $kerusakanText = $merger->map(fn($i) => '- ' . $i['nama'])->implode("\n");
         $teknisiText = $merger->map(fn($i) => $i['teknisi'] ? ServiceHelper::getTeknisiLabel($i['teknisi']) : '-')->implode("\n");
 
         return [
@@ -134,18 +134,18 @@ class LaporanBulananSheet implements FromCollection, WithHeadings, WithMapping, 
                 $colCount = 'K';
                 $range = 'A1:' . $colCount . '1';
 
-                $sheet->setCellValue('A1', 'LAPORAN SERVICE' . ($this->fromDate && $this->toDate ? ' (' . $this->fromDate->format('d/m/Y') . ' — ' . $this->toDate->format('d/m/Y') . ')' : ' TAHUN ' . $this->tahun));
+                $sheet->setCellValue('A1', 'LAPORAN SERVICE' . ($this->fromDate && $this->toDate ? ' (' . $this->fromDate->format('d/m/Y') . ' s.d. ' . $this->toDate->format('d/m/Y') . ')' : ' TAHUN ' . $this->tahun));
                 $sheet->mergeCells($range);
                 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
                 $sheet->getStyle('A1')->getAlignment()
                     ->setHorizontal(Alignment::HORIZONTAL_CENTER)
                     ->setVertical(Alignment::VERTICAL_CENTER);
 
-                $subtitle = $this->label . ' ' . $this->tahun . ' — ' . $this->namaToko;
+                $subtitle = $this->label . ' ' . $this->tahun . ' - ' . $this->namaToko;
                 if ($this->customerId) {
                     $customer = \App\Models\Customer::find($this->customerId);
                     if ($customer) {
-                        $subtitle .= ' — Filter: ' . $customer->nama;
+                        $subtitle .= ' - Filter: ' . $customer->nama;
                     }
                 }
                 $sheet->setCellValue('A2', $subtitle);

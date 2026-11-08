@@ -131,7 +131,7 @@ class BackfillTeknisiAdit extends Command
         // ── Summary ──
         $this->newLine();
         if ($dryRun) {
-            $this->warn('=== DRY-RUN SELESAI — Tidak ada perubahan nyata ===');
+            $this->warn('=== DRY-RUN SELESAI - Tidak ada perubahan nyata ===');
         } else {
             $this->info('=== BACKFILL SELESAI ===');
         }

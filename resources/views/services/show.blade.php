@@ -171,7 +171,7 @@
                             @endif
                         </td>
                         <td class="py-2 px-2 text-gray-600">
-                            <span class="text-gray-400">•</span>
+                            <span class="text-gray-400">-</span>
                             <span>{{ $d['nama'] }}</span>
                         </td>
                         <td class="py-2 px-2 text-center text-gray-600">

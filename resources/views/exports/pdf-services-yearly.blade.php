@@ -28,14 +28,14 @@
         <h1>{{ $namaToko }}</h1>
         <p class="subtitle">
             @if(!empty($from) && !empty($to))
-                LAPORAN SERVICE ({{ \Carbon\Carbon::parse($from)->format('d/m/Y') }} — {{ \Carbon\Carbon::parse($to)->format('d/m/Y') }})
+                LAPORAN SERVICE ({{ \Carbon\Carbon::parse($from)->format('d/m/Y') }} s.d. {{ \Carbon\Carbon::parse($to)->format('d/m/Y') }})
             @else
                 LAPORAN SERVICE TAHUN {{ $tahun }}
             @endif
         </p>
         @php $alamatToko = App\Models\Setting::getValue('alamat', ''); $telpToko = App\Models\Setting::getValue('nota_telepon', ''); @endphp
         @if($alamatToko || $telpToko)
-        <p class="info">{{ $alamatToko }}@if($alamatToko && $telpToko) — @endif{{ $telpToko ? 'No WA: '.$telpToko : '' }}</p>
+        <p class="info">{{ $alamatToko }}@if($alamatToko && $telpToko) - @endif{{ $telpToko ? 'No WA: '.$telpToko : '' }}</p>
         @endif
     </div>
 
@@ -71,13 +71,13 @@
                     @php $pdfTypes = \App\Helpers\ServiceHelper::getAllTypesArray($service); @endphp
                     <td>
                         @foreach($pdfTypes as $type)
-                        <div>• {{ $type }}</div>
+                        <div>- {{ $type }}</div>
                         @endforeach
                     </td>
                     <td>
                         @php $pdfMerger = \App\Helpers\ServiceHelper::getKerusakanTeknisiMerger($service); @endphp
                         @foreach($pdfMerger as $kr)
-                        <div>• {{ $kr['nama'] }}</div>
+                        <div>- {{ $kr['nama'] }}</div>
                         @endforeach
                     </td>
                     <td style="text-align:center;">
@@ -107,7 +107,7 @@
     @if(empty($bulanList))
         <p style="text-align:center; margin-top:40px; color:#000;">
             @if(!empty($from) && !empty($to))
-                Tidak ada data service untuk periode {{ \Carbon\Carbon::parse($from)->format('d/m/Y') }} — {{ \Carbon\Carbon::parse($to)->format('d/m/Y') }}.
+                Tidak ada data service untuk periode {{ \Carbon\Carbon::parse($from)->format('d/m/Y') }} s.d. {{ \Carbon\Carbon::parse($to)->format('d/m/Y') }}.
             @else
                 Tidak ada data service untuk tahun {{ $tahun }}.
             @endif

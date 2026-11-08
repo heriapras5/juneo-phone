@@ -135,13 +135,13 @@ class LaporanRekapSheet implements FromArray, WithHeadings, WithTitle, WithStyle
                 $sheet->insertNewRowBefore(1);
 
                 $title = $this->fromDate && $this->toDate
-                    ? 'REKAP LAPORAN SERVICE (' . $this->fromDate->format('d/m/Y') . ' — ' . $this->toDate->format('d/m/Y') . ')'
+                    ? 'REKAP LAPORAN SERVICE (' . $this->fromDate->format('d/m/Y') . ' s.d. ' . $this->toDate->format('d/m/Y') . ')'
                     : 'REKAP LAPORAN SERVICE TAHUN ' . $this->tahun;
-                $title .= ' — ' . $this->namaToko;
+                $title .= ' - ' . $this->namaToko;
                 if ($this->customerId) {
                     $customer = \App\Models\Customer::find($this->customerId);
                     if ($customer) {
-                        $title .= ' — Filter: ' . $customer->nama;
+                        $title .= ' - Filter: ' . $customer->nama;
                     }
                 }
                 $sheet->setCellValue('A1', $title);
