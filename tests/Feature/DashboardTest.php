@@ -6,6 +6,8 @@ use App\Models\BiayaHarian;
 use App\Models\Customer;
 use App\Models\Service;
 use App\Models\User;
+use App\Services\DashboardService;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -178,5 +180,100 @@ class DashboardTest extends TestCase
         $this->assertEquals(-138500, $summary['pending_profit']);
         $this->assertEquals(-138500, $summary['total_profit']);
         $this->assertEquals($response->json('profit'), $summary['total_profit']);
+    }
+
+    public function test_summary_period_label_element_is_rendered(): void
+    {
+        $response = $this->get('/dashboard');
+
+        $response->assertOk();
+        $response->assertSee('pickupSummaryPeriodLabel', false);
+    }
+
+    public function test_fee_note_does_not_leak_from_previous_period(): void
+    {
+        BiayaHarian::create([
+            'tanggal' => '2026-11-01',
+            'kategori' => 'fee_edi',
+            'nama' => 'Edi',
+            'jumlah' => 60000,
+            'keterangan' => 'Libur',
+        ]);
+
+        BiayaHarian::create([
+            'tanggal' => '2026-11-08',
+            'kategori' => 'fee_edi',
+            'nama' => 'Edi',
+            'jumlah' => 60000,
+            'keterangan' => null,
+        ]);
+
+        $service = app(DashboardService::class);
+        $totals = $service->getPeriodTotals(
+            Carbon::parse('2026-10-26')->startOfDay(),
+            Carbon::parse('2026-11-08')->endOfDay()
+        );
+
+        $fee = collect($totals->fees)->firstWhere('kategori', 'fee_edi');
+
+        $this->assertNotNull($fee);
+        $this->assertNull($fee->keterangan, 'Catatan lama tidak boleh terbawa saat catatan terbaru kosong.');
+    }
+
+    public function test_latest_fee_note_wins_when_present(): void
+    {
+        BiayaHarian::create([
+            'tanggal' => '2026-11-01',
+            'kategori' => 'fee_edi',
+            'nama' => 'Edi',
+            'jumlah' => 60000,
+            'keterangan' => 'Libur',
+        ]);
+
+        BiayaHarian::create([
+            'tanggal' => '2026-11-08',
+            'kategori' => 'fee_edi',
+            'nama' => 'Edi',
+            'jumlah' => 60000,
+            'keterangan' => 'Masuk',
+        ]);
+
+        $service = app(DashboardService::class);
+        $totals = $service->getPeriodTotals(
+            Carbon::parse('2026-10-26')->startOfDay(),
+            Carbon::parse('2026-11-08')->endOfDay()
+        );
+
+        $fee = collect($totals->fees)->firstWhere('kategori', 'fee_edi');
+
+        $this->assertNotNull($fee);
+        $this->assertSame('Masuk', $fee->keterangan);
+    }
+
+    public function test_fee_components_without_data_or_zero_are_hidden(): void
+    {
+        BiayaHarian::create([
+            'tanggal' => now()->toDateString(),
+            'kategori' => 'bank_jago',
+            'jumlah' => 138500,
+        ]);
+
+        BiayaHarian::create([
+            'tanggal' => now()->toDateString(),
+            'kategori' => 'fee_tambahan',
+            'nama' => 'Kosong',
+            'jumlah' => 0,
+        ]);
+
+        $response = $this->getJson('/dashboard/data?period=daily');
+        $response->assertOk();
+
+        $fees = $response->json('fees');
+        $this->assertSame([], $fees, 'Fee tanpa data atau bernilai 0 tidak boleh ikut dikirim.');
+
+        $html = $this->get('/dashboard')->getContent();
+        $this->assertStringContainsString('Bank Jago', $html);
+        $this->assertStringNotContainsString('Fee Edi', $html);
+        $this->assertStringNotContainsString('Fee Nur', $html);
     }
 }

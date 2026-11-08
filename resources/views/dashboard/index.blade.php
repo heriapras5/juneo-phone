@@ -189,7 +189,7 @@ $hasCustomRange = request()->has('from') && request()->has('to');
                     <div id="statusLegend" class="grid grid-cols-2 gap-x-4 gap-y-2 pt-3 border-t border-gray-100 mt-3 text-xs text-gray-500"></div>
                     <div class="pt-3 mt-3 border-t border-gray-100">
                         <div class="flex items-center justify-between gap-2 mb-2">
-                            <p class="text-[10px] text-gray-400 italic">Ringkasan Profit {{ $summaryPeriodLabel }}</p>
+                            <p id="pickupSummaryPeriodLabel" class="text-[10px] text-gray-400 italic">Ringkasan Profit {{ $summaryPeriodLabel }}</p>
                             <button type="button" id="openStatusDetailBtn" class="text-[10px] font-semibold text-yellow-600 hover:text-yellow-700 whitespace-nowrap">Lihat rincian</button>
                         </div>
                         <div class="grid grid-cols-2 gap-2">
@@ -482,6 +482,12 @@ function updatePickupSummary(summary) {
     setProfitText(pendingProfit, summary.pending_profit);
 }
 
+function updateSummaryPeriodLabel() {
+    var el = document.getElementById('pickupSummaryPeriodLabel');
+    if (!el) return;
+    el.textContent = summaryPeriodLabel ? ('Ringkasan Profit ' + summaryPeriodLabel) : 'Ringkasan Profit';
+}
+
 function isStatusModalOpen() {
     var modal = document.getElementById('statusDetailModal');
     return modal && !modal.classList.contains('hidden');
@@ -684,15 +690,19 @@ function buildKpiCardsHTML(d, periodLabel) {
                 var regularFees = [], tambahanFees = [];
                 if (d.fees && d.fees.length) {
                     d.fees.forEach(function(f) {
+                        if (!(Number(f.total) > 0)) return;
                         if (f.kategori === 'fee_tambahan') { tambahanFees.push(f); }
                         else { regularFees.push(f); }
                     });
                 }
-                var desc = 'Bank Jago';
-                if (regularFees.length) { desc += ' + ' + regularFees.map(function(f){ return f.label; }).join(' + '); }
-                desc += ' + Lainnya';
-                if (tambahanFees.length) { desc += ' + ' + tambahanFees.map(function(f){ return f.label; }).join(' + '); }
-                return desc + ' - total biaya kebutuhan harian';
+                var parts = [];
+                if (Number(d.bank_jago) > 0) { parts.push('Bank Jago'); }
+                regularFees.forEach(function(f) { parts.push(f.label); });
+                if (Number(d.lainnya) > 0) { parts.push('Lainnya'); }
+                tambahanFees.forEach(function(f) { parts.push(f.label); });
+                return parts.length
+                    ? parts.join(' + ') + ' - total biaya kebutuhan harian'
+                    : 'Belum ada komponen biaya pada periode ini';
             })(),
             value: d.kebutuhan_pribadi, valueCls: 'text-orange-600',
             icon: 'fa-wallet', iconBg: 'from-orange-50 to-amber-100', iconColor: 'orange-600',
@@ -701,6 +711,7 @@ function buildKpiCardsHTML(d, periodLabel) {
                 var regularFees = [], tambahanFees = [];
                 if (d.fees && d.fees.length) {
                     d.fees.forEach(function(f) {
+                        if (!(Number(f.total) > 0)) return;
                         if (f.kategori === 'fee_tambahan') { tambahanFees.push(f); }
                         else { regularFees.push(f); }
                     });
@@ -718,19 +729,35 @@ function buildKpiCardsHTML(d, periodLabel) {
                     feeMobile += renderFeeMobile(f, 'fa-user', 'text-purple-500');
                     feeDesktop += renderFeeDesktop(f, 'fa-user', 'text-purple-500');
                 });
-                feeMobile += '<span class="text-gray-400 truncate"><i class="fas fa-box text-[10px] text-amber-500 mr-1"></i>Lainnya</span><span class="font-medium text-gray-900 tabular-nums text-right">' + fmtRp(d.lainnya) + '</span>';
-                feeDesktop += '<div class="flex items-center justify-between gap-2"><span class="text-gray-400 truncate"><i class="fas fa-box text-[10px] text-amber-500 mr-1"></i>Lainnya</span><span class="font-medium text-gray-900 tabular-nums">' + fmtRp(d.lainnya) + '</span></div>';
+                if (Number(d.lainnya) > 0) {
+                    feeMobile += '<span class="text-gray-400 truncate"><i class="fas fa-box text-[10px] text-amber-500 mr-1"></i>Lainnya</span><span class="font-medium text-gray-900 tabular-nums text-right">' + fmtRp(d.lainnya) + '</span>';
+                    feeDesktop += '<div class="flex items-center justify-between gap-2"><span class="text-gray-400 truncate"><i class="fas fa-box text-[10px] text-amber-500 mr-1"></i>Lainnya</span><span class="font-medium text-gray-900 tabular-nums">' + fmtRp(d.lainnya) + '</span></div>';
+                }
                 tambahanFees.forEach(function(f) {
                     feeMobile += renderFeeMobile(f, 'fa-plus-circle', 'text-amber-500');
                     feeDesktop += renderFeeDesktop(f, 'fa-plus-circle', 'text-amber-500');
                 });
+                var bankJagoMobile = Number(d.bank_jago) > 0
+                    ? '<span class="text-gray-400 truncate"><i class="fas fa-university text-[10px] text-blue-500 mr-1"></i>Bank Jago</span><span class="font-medium text-gray-900 tabular-nums text-right">' + fmtRp(d.bank_jago) + '</span>'
+                    : '';
+                var bankJagoDesktop = Number(d.bank_jago) > 0
+                    ? '<div class="flex items-center justify-between gap-2"><span class="text-gray-400 truncate"><i class="fas fa-university text-[10px] text-blue-500 mr-1"></i>Bank Jago</span><span class="font-medium text-gray-900 tabular-nums">' + fmtRp(d.bank_jago) + '</span></div>'
+                    : '';
+                var emptyNote = (feeMobile === '' && bankJagoMobile === '')
+                    ? '<span class="text-gray-400 italic col-span-2">Belum ada komponen biaya pada periode ini</span>'
+                    : '';
+                var emptyNoteDesktop = (feeDesktop === '' && bankJagoDesktop === '')
+                    ? '<div class="text-gray-400 italic">Belum ada komponen biaya pada periode ini</div>'
+                    : '';
                 return '<div class="grid grid-cols-2 gap-x-3 gap-y-0.5 mt-3 text-xs sm:hidden">'
-                    + '<span class="text-gray-400 truncate"><i class="fas fa-university text-[10px] text-blue-500 mr-1"></i>Bank Jago</span><span class="font-medium text-gray-900 tabular-nums text-right">' + fmtRp(d.bank_jago) + '</span>'
+                    + bankJagoMobile
                     + feeMobile
+                    + emptyNote
                     + '</div>'
                     + '<div class="hidden sm:block space-y-0.5 mt-3 text-xs">'
-                    + '<div class="flex items-center justify-between gap-2"><span class="text-gray-400 truncate"><i class="fas fa-university text-[10px] text-blue-500 mr-1"></i>Bank Jago</span><span class="font-medium text-gray-900 tabular-nums">' + fmtRp(d.bank_jago) + '</span></div>'
+                    + bankJagoDesktop
                     + feeDesktop
+                    + emptyNoteDesktop
                     + '</div>';
             })(),
             sparkPath: 'M0,25 Q20,20 40,22 T80,15 T120,18 T160,8 T200,10',
@@ -859,6 +886,7 @@ function updateKpiOnly(d, periodLabel) {
 
     // Ringkasan dan rincian status mengikuti periode yang sama
     if (d.summaryPeriodLabel) summaryPeriodLabel = d.summaryPeriodLabel;
+    updateSummaryPeriodLabel();
     if (d.pickupSummary) updatePickupSummary(d.pickupSummary);
     if (d.statusBreakdown) {
         updateStatusChart(d.statusCounts, d.statusBreakdown);

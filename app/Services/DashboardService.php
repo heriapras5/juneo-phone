@@ -92,34 +92,44 @@ class DashboardService
         $fees = [];
 
         $feeEdi = (int) BiayaHarian::whereDate('tanggal', '>=', $fromDate)->whereDate('tanggal', '<=', $toDate)->where('kategori', 'fee_edi')->sum('jumlah');
-        $feeEdiLabel = BiayaHarian::whereDate('tanggal', '>=', $fromDate)->whereDate('tanggal', '<=', $toDate)
-            ->where('kategori', 'fee_edi')->whereNotNull('nama')->latest()->value('nama') ?? 'Fee Edi';
-        $feeEdiKet = BiayaHarian::whereDate('tanggal', '>=', $fromDate)->whereDate('tanggal', '<=', $toDate)
-            ->where('kategori', 'fee_edi')->whereNotNull('keterangan')->latest('tanggal')->value('keterangan');
-        $fees[] = (object) [
-            'nama' => 'Edi', 'kategori' => 'fee_edi', 'total' => $feeEdi,
-            'label' => $feeEdiLabel, 'keterangan' => $feeEdiKet,
-            'warna' => 'bg-blue-100 text-blue-700 border-blue-200',
-        ];
+        if ($feeEdi > 0) {
+            // Ambil baris terakhir pada periode terpilih, tanpa menyaring keterangan,
+            // supaya catatan lama tidak terbawa saat catatan terbaru kosong.
+            $feeEdiRow = BiayaHarian::whereDate('tanggal', '>=', $fromDate)->whereDate('tanggal', '<=', $toDate)
+                ->where('kategori', 'fee_edi')
+                ->orderByDesc('tanggal')->orderByDesc('id')->first();
+            $fees[] = (object) [
+                'nama' => 'Edi', 'kategori' => 'fee_edi', 'total' => $feeEdi,
+                'label' => ($feeEdiRow && $feeEdiRow->nama) ? $feeEdiRow->nama : 'Fee Edi',
+                'keterangan' => $feeEdiRow?->keterangan,
+                'warna' => 'bg-blue-100 text-blue-700 border-blue-200',
+            ];
+        }
 
         $feeNur = (int) BiayaHarian::whereDate('tanggal', '>=', $fromDate)->whereDate('tanggal', '<=', $toDate)->where('kategori', 'fee_nur')->sum('jumlah');
-        $feeNurLabel = BiayaHarian::whereDate('tanggal', '>=', $fromDate)->whereDate('tanggal', '<=', $toDate)
-            ->where('kategori', 'fee_nur')->whereNotNull('nama')->latest()->value('nama') ?? 'Fee Nur';
-        $feeNurKet = BiayaHarian::whereDate('tanggal', '>=', $fromDate)->whereDate('tanggal', '<=', $toDate)
-            ->where('kategori', 'fee_nur')->whereNotNull('keterangan')->latest('tanggal')->value('keterangan');
-        $fees[] = (object) [
-            'nama' => 'Nur', 'kategori' => 'fee_nur', 'total' => $feeNur,
-            'label' => $feeNurLabel, 'keterangan' => $feeNurKet,
-            'warna' => 'bg-purple-100 text-purple-700 border-purple-200',
-        ];
+        if ($feeNur > 0) {
+            $feeNurRow = BiayaHarian::whereDate('tanggal', '>=', $fromDate)->whereDate('tanggal', '<=', $toDate)
+                ->where('kategori', 'fee_nur')
+                ->orderByDesc('tanggal')->orderByDesc('id')->first();
+            $fees[] = (object) [
+                'nama' => 'Nur', 'kategori' => 'fee_nur', 'total' => $feeNur,
+                'label' => ($feeNurRow && $feeNurRow->nama) ? $feeNurRow->nama : 'Fee Nur',
+                'keterangan' => $feeNurRow?->keterangan,
+                'warna' => 'bg-purple-100 text-purple-700 border-purple-200',
+            ];
+        }
 
         $tambahanRows = BiayaHarian::whereDate('tanggal', '>=', $fromDate)->whereDate('tanggal', '<=', $toDate)
-            ->where('kategori', 'fee_tambahan')->get();
+            ->where('kategori', 'fee_tambahan')->orderBy('tanggal')->orderBy('id')->get();
         foreach ($tambahanRows as $row) {
+            $total = (int) $row->jumlah;
+            if ($total <= 0) {
+                continue;
+            }
             $fees[] = (object) [
                 'nama' => $row->nama,
                 'kategori' => 'fee_tambahan',
-                'total' => (int) $row->jumlah,
+                'total' => $total,
                 'label' => $row->nama,
                 'keterangan' => $row->keterangan,
                 'warna' => 'bg-amber-100 text-amber-700 border-amber-200',
