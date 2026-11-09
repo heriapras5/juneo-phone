@@ -314,8 +314,10 @@ class PhoneTradeTest extends TestCase
             ->first();
 
         $this->assertNotNull($history);
-        $this->assertStringContainsString('Harga beli', $history->note);
-        $this->assertStringContainsString('Biaya service', $history->note);
+        $this->assertStringContainsString('Harga beli diubah menjadi: Rp 4.500.000', $history->note);
+        $this->assertStringContainsString('Biaya service ditetapkan: Rp 250.000', $history->note);
+        $this->assertStringNotContainsString('->', $history->note);
+        $this->assertStringNotContainsString('5.000.000', $history->note);
     }
 
     public function test_sold_history_merges_status_and_price_change(): void
@@ -339,7 +341,8 @@ class PhoneTradeTest extends TestCase
         $this->assertSame('terjual', $history->status_to);
         $this->assertStringContainsString('Status diubah menjadi Terjual.', $history->note);
         $this->assertStringContainsString('Harga jual ditetapkan: Rp 650.000', $history->note);
-        $this->assertStringNotContainsString('Rp 0 ->', $history->note);
+        $this->assertStringNotContainsString('->', $history->note);
+        $this->assertStringNotContainsString('Rp 0', $history->note);
         $this->assertSame(0, PhoneTradeHistory::where('phone_trade_id', $trade->id)
             ->where('tipe', PhoneTrade::TIPE_UPDATE)
             ->count());

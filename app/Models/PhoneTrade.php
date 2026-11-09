@@ -157,8 +157,7 @@ class PhoneTrade extends Model
             } elseif ($to === null || $to == 0.0) {
                 $changes[] = $label . ' dikosongkan';
             } else {
-                $changes[] = $label . ': Rp ' . number_format($from, 0, ',', '.')
-                    . ' -> Rp ' . number_format($to, 0, ',', '.');
+                $changes[] = $label . ' diubah menjadi: Rp ' . number_format($to, 0, ',', '.');
             }
         }
 
