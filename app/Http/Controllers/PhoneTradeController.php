@@ -137,18 +137,19 @@ class PhoneTradeController extends Controller
 
     public function exportExcel(Request $request)
     {
-        $filters = $request->only(['search', 'status', 'sumber', 'from', 'to']);
+        $filters = $this->exportFilters($request);
+        $summary = $this->buildSummary($filters);
         $namaToko = str_replace(' ', '-', Setting::getValue('nama_toko', 'Juneo-Phone'));
 
         return Excel::download(
-            new PhoneTradesExport($filters),
+            new PhoneTradesExport($filters, $summary),
             'Laporan-Jual-Beli-HP-' . $namaToko . '.xlsx'
         );
     }
 
     public function exportPdf(Request $request)
     {
-        $filters = $request->only(['search', 'status', 'sumber', 'from', 'to']);
+        $filters = $this->exportFilters($request);
 
         $trades = PhoneTrade::filter($filters)
             ->orderByDesc('tanggal_masuk')
@@ -163,6 +164,18 @@ class PhoneTradeController extends Controller
         $pdf->setOptions(['show_warnings' => true]);
 
         return $pdf->stream('Laporan-Jual-Beli-HP-' . str_replace(' ', '-', $namaToko) . '.pdf');
+    }
+
+    private function exportFilters(Request $request): array
+    {
+        $request->validate([
+            'status' => 'nullable|in:stok,terjual',
+            'sumber' => 'nullable|in:langsung,service',
+            'from' => 'nullable|date',
+            'to' => 'nullable|date',
+        ]);
+
+        return $request->only(['search', 'status', 'sumber', 'from', 'to']);
     }
 
     private function buildSummary(array $filters): array
