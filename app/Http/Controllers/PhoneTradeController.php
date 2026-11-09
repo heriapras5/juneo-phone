@@ -104,6 +104,11 @@ class PhoneTradeController extends Controller
             'pembeli' => 'nullable|string|max:255',
         ]);
 
+        if ($phoneTrade->status === PhoneTrade::STATUS_TERJUAL && $validated['status'] === PhoneTrade::STATUS_STOK) {
+            return redirect()->back()
+                ->with('error', 'Status Terjual tidak dapat dikembalikan ke Tersedia.');
+        }
+
         $phoneTrade->update($validated);
 
         if ($request->input('redirect_to') === 'index') {

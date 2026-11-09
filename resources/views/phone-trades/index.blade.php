@@ -158,7 +158,8 @@ window._pageData = Object.assign(window._pageData || {}, { editTrade: {{ Js::fro
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     <a href="{{ route('phone-trades.show', $trade) }}" class="block group">
                                         <div class="text-sm font-semibold text-gray-900 group-hover:text-yellow-600">{{ $trade->type_hp }}</div>
-                                        <div class="text-[13px] text-gray-600 font-medium">
+                                        <div class="text-[13px] text-gray-600 font-medium truncate max-w-[180px]"
+                                            title="{{ collect([$trade->brand, $trade->storage, $trade->warna])->filter()->implode(' · ') ?: '-' }}">
                                             {{ collect([$trade->brand, $trade->storage, $trade->warna])->filter()->implode(' · ') ?: '-' }}
                                         </div>
                                     </a>
@@ -178,22 +179,21 @@ window._pageData = Object.assign(window._pageData || {}, { editTrade: {{ Js::fro
                                 </td>
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     <div class="text-sm text-gray-900">{{ $trade->tanggal_masuk?->format('d/m/Y') }}</div>
-                                    <div class="text-[13px] text-gray-700 font-medium tabular-nums">Rp {{ number_format($trade->harga_beli, 0, ',', '.') }}</div>
+                                    <div class="text-[13px] text-gray-700 font-medium tabular-nums"
+                                        title="Biaya perbaikan: Rp {{ number_format($trade->biaya_perbaikan, 0, ',', '.') }} | Total modal: Rp {{ number_format($trade->total_modal, 0, ',', '.') }}@if($trade->penjual) | Penjual: {{ $trade->penjual }}@endif">
+                                        Rp {{ number_format($trade->harga_beli, 0, ',', '.') }}
+                                    </div>
                                     @if((float) $trade->biaya_perbaikan > 0)
                                         <div class="text-[11px] text-amber-700 font-medium tabular-nums">+ Perbaikan Rp {{ number_format($trade->biaya_perbaikan, 0, ',', '.') }}</div>
-                                        <div class="text-[11px] text-gray-600 font-medium tabular-nums">Modal Rp {{ number_format($trade->total_modal, 0, ',', '.') }}</div>
-                                    @endif
-                                    @if($trade->penjual)
-                                        <div class="text-xs text-gray-600 font-medium">{{ $trade->penjual }}</div>
                                     @endif
                                 </td>
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     @if($trade->status === \App\Models\PhoneTrade::STATUS_TERJUAL)
                                         <div class="text-sm text-gray-900">{{ $trade->tanggal_keluar?->format('d/m/Y') }}</div>
-                                        <div class="text-[13px] text-gray-700 font-medium tabular-nums">Rp {{ number_format($trade->harga_jual, 0, ',', '.') }}</div>
-                                        @if($trade->pembeli)
-                                            <div class="text-xs text-gray-600 font-medium">{{ $trade->pembeli }}</div>
-                                        @endif
+                                        <div class="text-[13px] text-gray-700 font-medium tabular-nums"
+                                            title="@if($trade->pembeli)Pembeli: {{ $trade->pembeli }}@endif">
+                                            Rp {{ number_format($trade->harga_jual, 0, ',', '.') }}
+                                        </div>
                                     @else
                                         <span class="text-sm text-gray-300">-</span>
                                     @endif
@@ -201,10 +201,14 @@ window._pageData = Object.assign(window._pageData || {}, { editTrade: {{ Js::fro
                                 <td class="px-4 py-3 text-center whitespace-nowrap">
                                     <div class="inline-flex flex-col items-center">
                                         <button type="button" data-status-badge
+                                            @if(!empty(\App\Models\PhoneTrade::allowedTransitions()[$trade->status] ?? []))
                                             @click="toggleStatus({{ $trade->id }}, $event)"
-                                            class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold border {{ $trade->status_class }} cursor-pointer hover:opacity-80">
+                                            @endif
+                                            class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold border {{ $trade->status_class }} {{ !empty(\App\Models\PhoneTrade::allowedTransitions()[$trade->status] ?? []) ? 'cursor-pointer hover:opacity-80' : '' }}">
                                             {{ $trade->status_label }}
-                                            <i class="fas fa-chevron-down text-[10px]"></i>
+                                            @if(!empty(\App\Models\PhoneTrade::allowedTransitions()[$trade->status] ?? []))
+                                                <i class="fas fa-chevron-down text-[10px]"></i>
+                                            @endif
                                         </button>
                                         <div x-show="rowState[{{ $trade->id }}]?.openStatus"
                                             data-status-dropdown
@@ -240,12 +244,6 @@ window._pageData = Object.assign(window._pageData || {}, { editTrade: {{ Js::fro
                                             @endunless
                                         </div>
                                     </div>
-                                    <form id="status-form-{{ $trade->id }}" method="POST" action="{{ route('phone-trades.update-status', $trade) }}" class="hidden">
-                                        @csrf
-                                        @method('PUT')
-                                        <input type="hidden" name="status" value="{{ \App\Models\PhoneTrade::STATUS_STOK }}">
-                                        <input type="hidden" name="redirect_to" value="index">
-                                    </form>
                                 </td>
                                 <td class="px-4 py-3 text-right whitespace-nowrap tabular-nums">
                                     @if($trade->status === \App\Models\PhoneTrade::STATUS_TERJUAL)

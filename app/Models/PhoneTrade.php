@@ -181,7 +181,7 @@ class PhoneTrade extends Model
     {
         return [
             self::STATUS_STOK => [self::STATUS_TERJUAL],
-            self::STATUS_TERJUAL => [self::STATUS_STOK],
+            self::STATUS_TERJUAL => [],
         ];
     }
 
