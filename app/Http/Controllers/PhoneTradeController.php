@@ -159,9 +159,17 @@ class PhoneTradeController extends Controller
         $summary = $this->buildSummary($filters);
         $namaToko = Setting::getValue('nama_toko', 'Juneo Phone');
 
+        ini_set('memory_limit', '512M');
+        ini_set('max_execution_time', '300');
+        @set_time_limit(300);
+
         $pdf = Pdf::loadView('exports.pdf-phone-trades', compact('trades', 'summary', 'filters', 'namaToko'));
         $pdf->setPaper('A4', 'landscape');
-        $pdf->setOptions(['show_warnings' => true]);
+        $pdf->setOptions([
+            'show_warnings' => false,
+            'isRemoteEnabled' => false,
+            'isHtml5ParserEnabled' => true,
+        ]);
 
         return $pdf->stream('Laporan-Jual-Beli-HP-' . str_replace(' ', '-', $namaToko) . '.pdf');
     }

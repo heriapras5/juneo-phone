@@ -44,4 +44,22 @@ class ReportTest extends TestCase
         $response = $this->get('/reports/import');
         $response->assertStatus(200);
     }
+
+    public function test_pdf_preview_streams_pdf(): void
+    {
+        Service::create([
+            'customer_id' => $this->customer->id,
+            'type_hp' => 'Test PDF',
+            'kerusakan' => 'Test',
+            'tanggal' => now()->toDateString(),
+            'status' => 'selesai',
+            'jasa' => 100000,
+            'pengeluaran' => 25000,
+        ]);
+
+        $response = $this->get('/reports/preview-pdf?tahun=' . now()->format('Y'));
+
+        $response->assertOk();
+        $response->assertHeader('content-type', 'application/pdf');
+    }
 }
