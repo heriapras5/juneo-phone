@@ -68,6 +68,7 @@ class SettingController extends Controller
             );
 
             FaviconGenerator::generateFromLogo($path);
+            FaviconGenerator::generateDisplayLogo($path);
         }
 
         Setting::flushCache();

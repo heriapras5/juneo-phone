@@ -11,6 +11,10 @@
     @php
         $logoSetting = \App\Models\Setting::getValue('logo');
         $logoUrl = $logoSetting ? route('storage.file', $logoSetting) : null;
+        $logoDisplayPath = public_path('logo-display.png');
+        $logoDisplayUrl = file_exists($logoDisplayPath)
+            ? asset('logo-display.png') . '?v=' . filemtime($logoDisplayPath)
+            : $logoUrl;
         $faviconPath = public_path('favicon.png');
         $faviconUrl = asset('favicon.png') . '?v=' . (file_exists($faviconPath) ? filemtime($faviconPath) : time());
         $faviconIcoPath = public_path('favicon.ico');
@@ -79,8 +83,8 @@
                             <div class="brand-logo-scene relative h-20 w-20 rounded-full sm:h-24 sm:w-24">
                                 <div class="pointer-events-none absolute -bottom-4 left-1/2 z-0 h-4 w-20 -translate-x-1/2 rounded-full bg-black/55 blur-lg sm:w-24"></div>
 
-                                @if($logoUrl)
-                                    <img src="{{ $logoUrl }}" alt="Logo {{ $namaToko }}" loading="eager" decoding="async"
+                                @if($logoDisplayUrl)
+                                    <img src="{{ $logoDisplayUrl }}" alt="Logo {{ $namaToko }}" loading="eager" decoding="async"
                                         class="absolute inset-0 z-10 h-full w-full rounded-full object-cover"
                                         onerror="this.onerror=null;this.src='{{ asset('favicon.png') }}';">
                                 @else

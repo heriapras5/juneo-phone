@@ -10,6 +10,11 @@
         $faviconUrl = asset('favicon.png') . '?v=' . (file_exists($faviconPath) ? filemtime($faviconPath) : time());
         $faviconIcoPath = public_path('favicon.ico');
         $faviconIcoUrl = asset('favicon.ico') . '?v=' . (file_exists($faviconIcoPath) ? filemtime($faviconIcoPath) : time());
+        $brandLogoSetting = \App\Models\Setting::getValue('logo');
+        $brandDisplayPath = public_path('logo-display.png');
+        $brandLogoDisplayUrl = file_exists($brandDisplayPath)
+            ? asset('logo-display.png') . '?v=' . filemtime($brandDisplayPath)
+            : ($brandLogoSetting ? route('storage.file', $brandLogoSetting) : null);
     @endphp
     <link rel="icon" type="image/x-icon" href="{{ $faviconIcoUrl }}" sizes="any">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ $faviconUrl }}">
@@ -81,15 +86,11 @@ x-init="
             {{-- Logo Area --}}
             <a href="{{ route('dashboard') }}"
                 class="flex-shrink-0 flex justify-center flex-row items-center gap-3 px-3 pt-5 pb-5">
-                @php
-                    $logoSetting = \App\Models\Setting::getValue('logo');
-                    $logoUrl = $logoSetting ? route('storage.file', $logoSetting) : null;
-                @endphp
                 <div :class="{ 'w-16 h-16': sidebarOpen, 'w-10 h-10': !sidebarOpen }" class="brand-logo-wrap relative flex-shrink-0 rounded-full w-16 h-16 transition-all duration-150 ease-in-out">
                     <div class="brand-logo-scene relative h-full w-full">
                         <div class="pointer-events-none absolute -bottom-2 left-1/2 z-0 h-2 w-3/4 -translate-x-1/2 rounded-full bg-black/50 blur-md"></div>
-                        @if($logoUrl)
-                            <img src="{{ $logoUrl }}" alt="Logo" width="64" height="64"
+                        @if($brandLogoDisplayUrl)
+                            <img src="{{ $brandLogoDisplayUrl }}" alt="Logo" width="64" height="64" decoding="async"
                                 class="absolute inset-0 z-10 h-full w-full rounded-full object-cover"
                                 onerror="this.onerror=null;this.src='{{ asset('favicon.png') }}';">
                         @else
@@ -229,16 +230,12 @@ x-init="
             class="md:hidden fixed inset-y-0 left-0 z-40 w-64 bg-gradient-to-b from-gray-900 via-gray-950 to-black text-white flex flex-col border-r border-gray-800/50">
 
             <div class="flex-shrink-0 flex items-center justify-between h-16 px-4 border-b border-gray-800">
-                @php
-                    $logoSetting = \App\Models\Setting::getValue('logo');
-                    $logoUrl = $logoSetting ? route('storage.file', $logoSetting) : null;
-                @endphp
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-3">
                     <div class="brand-logo-wrap relative w-9 h-9 rounded-full flex-shrink-0">
                         <div class="brand-logo-scene relative h-full w-full">
                             <div class="pointer-events-none absolute -bottom-1.5 left-1/2 z-0 h-1.5 w-3/4 -translate-x-1/2 rounded-full bg-black/50 blur-sm"></div>
-                            @if($logoUrl)
-                                <img src="{{ $logoUrl }}" alt="Logo"
+                            @if($brandLogoDisplayUrl)
+                                <img src="{{ $brandLogoDisplayUrl }}" alt="Logo" decoding="async"
                                     class="absolute inset-0 z-10 h-full w-full rounded-full object-cover"
                                     onerror="this.onerror=null;this.src='{{ asset('favicon.png') }}';">
                             @else

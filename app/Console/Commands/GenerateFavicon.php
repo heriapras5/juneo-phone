@@ -26,7 +26,9 @@ class GenerateFavicon extends Command
             return self::FAILURE;
         }
 
-        $this->info('Favicon berhasil dibuat dari logo: ' . $logoPath);
+        FaviconGenerator::generateDisplayLogo($logoPath);
+
+        $this->info('Favicon dan logo tampilan berhasil dibuat dari logo: ' . $logoPath);
         return self::SUCCESS;
     }
 }

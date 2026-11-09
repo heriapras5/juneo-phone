@@ -4,6 +4,12 @@
 @section('page-title', 'Pengaturan')
 
 @section('content')
+@php
+    $settingsLogoDisplayPath = public_path('logo-display.png');
+    $settingsLogoDisplayUrl = file_exists($settingsLogoDisplayPath)
+        ? asset('logo-display.png') . '?v=' . filemtime($settingsLogoDisplayPath)
+        : (!empty($settings['logo']) ? asset('storage/' . $settings['logo']) : null);
+@endphp
 <div class="max-w-2xl mx-auto">
     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
         <form method="POST" action="{{ route('settings.update') }}" enctype="multipart/form-data" x-data="{
@@ -17,10 +23,10 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Logo</label>
                     <div class="flex items-start gap-4">
-                        <div class="w-20 h-20 rounded-full overflow-hidden flex items-center justify-center bg-gray-50 flex-shrink-0 ring-4 ring-yellow-500/30 shadow-2xl shadow-yellow-500/30" style="filter: drop-shadow(0 4px 8px rgba(255,215,0,0.25));">
+                        <div class="w-20 h-20 rounded-full overflow-hidden flex items-center justify-center bg-gray-50 flex-shrink-0 ring-1 ring-amber-200 shadow-lg shadow-amber-500/20">
                             <template x-if="!previewLogo">
-                                @if($settings['logo'])
-                                    <img src="{{ asset('storage/' . $settings['logo']) }}" alt="Logo" class="w-full h-full object-cover">
+                                @if($settingsLogoDisplayUrl)
+                                    <img src="{{ $settingsLogoDisplayUrl }}" alt="Logo" class="w-full h-full object-cover">
                                 @else
                                     <i class="fas fa-store text-2xl text-gray-300"></i>
                                 @endif
