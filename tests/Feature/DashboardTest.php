@@ -184,6 +184,50 @@ class DashboardTest extends TestCase
         $this->assertEquals(-138500, $response->json('profit'));
     }
 
+    public function test_rounding_remainder_is_not_allocated_to_batal_status(): void
+    {
+        $customer = Customer::create(['nama' => 'Pelanggan Rounding']);
+        $tanggal = now()->toDateString();
+
+        foreach (['menunggu', 'diambil', 'selesai'] as $status) {
+            Service::create([
+                'customer_id' => $customer->id,
+                'type_hp' => 'iPhone 12',
+                'kerusakan' => 'LCD',
+                'tanggal' => $tanggal,
+                'status' => $status,
+                'jasa' => 100,
+                'pengeluaran' => 0,
+            ]);
+        }
+
+        Service::create([
+            'customer_id' => $customer->id,
+            'type_hp' => 'iPhone 12',
+            'kerusakan' => 'LCD',
+            'tanggal' => $tanggal,
+            'status' => 'batal',
+            'jasa' => 300,
+            'pengeluaran' => 0,
+        ]);
+
+        BiayaHarian::create([
+            'tanggal' => $tanggal,
+            'kategori' => 'lainnya',
+            'jumlah' => 200,
+        ]);
+
+        $response = $this->getJson('/dashboard/data?period=daily');
+        $response->assertOk();
+
+        $summary = $response->json('pickupSummary');
+
+        $this->assertEquals(100, $response->json('profit'));
+        $this->assertEquals(0, $response->json('statusBreakdown.batal.profit'));
+        $this->assertEquals(100, $summary['taken_profit'] + $summary['pending_profit']);
+        $this->assertEquals(100, $summary['total_profit']);
+    }
+
     public function test_summary_period_label_element_is_rendered(): void
     {
         $response = $this->get('/dashboard');

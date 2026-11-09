@@ -27,22 +27,18 @@
         .login-logo-spin {
             animation: loginLogoSpin 7s cubic-bezier(.65,.05,.36,1) infinite;
             transform-style: preserve-3d;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            will-change: transform;
+            transform: translateZ(0);
             transition: transform 0.25s ease;
         }
-        .login-logo {
-            filter: drop-shadow(0 12px 16px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 18px rgba(245, 158, 11, 0.55));
-            transition: filter 0.3s ease;
+        .login-logo-wrap {
+            box-shadow: 0 14px 24px -12px rgba(0, 0, 0, 0.55), 0 0 18px -4px rgba(245, 158, 11, 0.45);
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
         }
-        .login-logo:hover,
-        .login-logo-wrap:hover .login-logo {
-            filter: drop-shadow(0 20px 28px rgba(0, 0, 0, 0.65)) drop-shadow(0 0 26px rgba(245, 158, 11, 1)) drop-shadow(0 0 50px rgba(245, 158, 11, 0.55));
-        }
-        .login-logo-glow {
-            opacity: 0.75;
-            transition: opacity 0.3s ease;
-        }
-        .login-logo-wrap:hover .login-logo-glow {
-            opacity: 1;
+        .login-logo-wrap:hover {
+            box-shadow: 0 18px 30px -12px rgba(0, 0, 0, 0.6), 0 0 24px -4px rgba(245, 158, 11, 0.65);
         }
         .login-logo-wrap:hover .login-logo-spin {
             animation: none;
@@ -100,8 +96,7 @@
                     {{-- Logo --}}
                     <div class="mb-4 flex justify-center">
                         <div class="login-logo-wrap relative rounded-full transition-all duration-300 hover:-translate-y-1 hover:scale-105">
-                            <div class="login-logo-glow pointer-events-none absolute -inset-2 rounded-full bg-amber-400/30 blur-xl"></div>
-                            <div class="pointer-events-none absolute -bottom-3 left-1/2 h-3 w-16 -translate-x-1/2 rounded-full bg-black/40 blur-md sm:w-20"></div>
+                            <div class="pointer-events-none absolute -bottom-4 left-1/2 h-4 w-20 -translate-x-1/2 rounded-full bg-black/55 blur-lg sm:w-24"></div>
 
                             @if($logoUrl)
                                 <img src="{{ $logoUrl }}" alt="Logo {{ $namaToko }}"

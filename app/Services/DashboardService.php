@@ -224,9 +224,17 @@ class DashboardService
         $allocatable = [];
 
         foreach ($services as $status => $service) {
-            if ($service['count'] > 0) {
-                $allocatable[$status] = (float) $service[$weightKey];
+            if ($status === Service::STATUS_BATAL || $service['count'] <= 0) {
+                continue;
             }
+
+            $weight = (float) $service[$weightKey];
+
+            if ($weight === 0.0) {
+                continue;
+            }
+
+            $allocatable[$status] = $weight;
         }
 
         $weightTotal = array_sum($allocatable);
