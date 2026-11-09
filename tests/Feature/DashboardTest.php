@@ -84,7 +84,7 @@ class DashboardTest extends TestCase
         $this->assertEquals($response->json('profit'), $summary['taken_profit'] + $summary['pending_profit']);
     }
 
-    public function test_pickup_summary_matches_profit_card_after_kebutuhan_pribadi(): void
+    public function test_pickup_summary_splits_period_profit_after_kebutuhan_pribadi(): void
     {
         $customer = Customer::create(['nama' => 'Pelanggan Test']);
         $tanggal = now()->toDateString();
@@ -161,7 +161,7 @@ class DashboardTest extends TestCase
         $this->assertEquals(360000, $response->json('statusBreakdown.selesai.profit'));
     }
 
-    public function test_pickup_summary_stays_synced_without_services(): void
+    public function test_pickup_summary_ignores_kebutuhan_pribadi_without_services(): void
     {
         BiayaHarian::create([
             'tanggal' => now()->toDateString(),
@@ -177,9 +177,11 @@ class DashboardTest extends TestCase
         $this->assertEquals(0, $summary['taken_count']);
         $this->assertEquals(0, $summary['pending_count']);
         $this->assertEquals(0, $summary['taken_profit']);
-        $this->assertEquals(-138500, $summary['pending_profit']);
-        $this->assertEquals(-138500, $summary['total_profit']);
-        $this->assertEquals($response->json('profit'), $summary['total_profit']);
+        $this->assertEquals(0, $summary['pending_profit']);
+        $this->assertEquals(0, $summary['total_profit']);
+        $this->assertEquals(0, $response->json('statusBreakdown.selesai.profit'));
+        $this->assertEquals(0, $response->json('statusBreakdown.diambil.profit'));
+        $this->assertEquals(-138500, $response->json('profit'));
     }
 
     public function test_summary_period_label_element_is_rendered(): void

@@ -51,27 +51,27 @@ window._pageData = Object.assign(window._pageData || {}, { editTrade: {{ Js::fro
         {{-- Filter --}}
         <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
             <div class="flex flex-wrap items-end gap-3">
-                <form method="GET" class="flex flex-wrap items-end gap-3">
-                    <div>
+                <form method="GET" class="flex flex-wrap items-end gap-3 w-full sm:w-auto">
+                    <div class="w-full sm:w-auto">
                         <label class="block text-xs font-medium text-gray-500 mb-1">Cari</label>
                         <input type="text" name="search" value="{{ $filters['search'] ?? '' }}"
                             placeholder="Kode, HP, penjual, pembeli..."
-                            class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 placeholder-gray-400 outline-none w-56">
+                            class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 placeholder-gray-400 outline-none w-56 max-w-full">
                     </div>
-                    <div>
+                    <div class="w-[calc(50%-0.5rem)] sm:w-auto">
                         <label class="block text-xs font-medium text-gray-500 mb-1">Status</label>
                         <select name="status"
-                            class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
+                            class="w-full sm:w-auto px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
                             <option value="">Semua Status</option>
                             @foreach($statusLabels as $value => $label)
                                 <option value="{{ $value }}" {{ ($filters['status'] ?? '') === $value ? 'selected' : '' }}>{{ $label }}</option>
                             @endforeach
                         </select>
                     </div>
-                    <div>
+                    <div class="w-[calc(50%-0.5rem)] sm:w-auto">
                         <label class="block text-xs font-medium text-gray-500 mb-1">Sumber</label>
                         <select name="sumber"
-                            class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
+                            class="w-full sm:w-auto px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
                             <option value="">Semua Sumber</option>
                             @foreach($sumberLabels as $value => $label)
                                 <option value="{{ $value }}" {{ ($filters['sumber'] ?? '') === $value ? 'selected' : '' }}>{{ $label }}</option>
@@ -79,12 +79,12 @@ window._pageData = Object.assign(window._pageData || {}, { editTrade: {{ Js::fro
                         </select>
                     </div>
                     <div class="w-[calc(50%-0.5rem)] sm:w-auto">
-                        <label class="block text-xs font-medium text-gray-700 mb-1.5">Dari Tanggal Masuk</label>
+                        <label class="block text-xs font-medium text-gray-700 mb-1.5">Dari Tanggal</label>
                         <div class="relative w-full sm:w-44" x-data="dateField('{{ $filters['from'] ?? '' }}')">
                             <input type="date" name="from" x-ref="input" x-model="value"
                                 @focus="focused = true" @blur="focused = false" @click="openPicker()"
                                 class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                aria-label="Dari Tanggal Masuk" title="Dari Tanggal Masuk" autocomplete="off">
+                                aria-label="Dari Tanggal" title="Dari Tanggal" autocomplete="off">
                             <div class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm text-left pointer-events-none"
                                 :class="[value ? 'text-gray-900' : 'text-gray-400', focused ? 'border-yellow-500 ring-2 ring-yellow-500/30' : '']">
                                 <span x-text="display">dd/mm/yyyy</span>
@@ -93,12 +93,12 @@ window._pageData = Object.assign(window._pageData || {}, { editTrade: {{ Js::fro
                         </div>
                     </div>
                     <div class="w-[calc(50%-0.5rem)] sm:w-auto">
-                        <label class="block text-xs font-medium text-gray-700 mb-1.5">Sampai Tanggal Masuk</label>
+                        <label class="block text-xs font-medium text-gray-700 mb-1.5">Sampai Tanggal</label>
                         <div class="relative w-full sm:w-44" x-data="dateField('{{ $filters['to'] ?? '' }}')">
                             <input type="date" name="to" x-ref="input" x-model="value"
                                 @focus="focused = true" @blur="focused = false" @click="openPicker()"
                                 class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                aria-label="Sampai Tanggal Masuk" title="Sampai Tanggal Masuk" autocomplete="off">
+                                aria-label="Sampai Tanggal" title="Sampai Tanggal" autocomplete="off">
                             <div class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm text-left pointer-events-none"
                                 :class="[value ? 'text-gray-900' : 'text-gray-400', focused ? 'border-yellow-500 ring-2 ring-yellow-500/30' : '']">
                                 <span x-text="display">dd/mm/yyyy</span>

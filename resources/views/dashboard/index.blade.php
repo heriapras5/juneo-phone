@@ -319,7 +319,7 @@ $hasCustomRange = request()->has('from') && request()->has('to');
                     <span class="text-xs font-semibold text-emerald-700">Total Profit</span>
                     <span id="statusModalTotalProfit" class="text-sm font-bold tabular-nums text-emerald-700">Rp 0</span>
                 </div>
-                <p id="statusModalNote" class="mt-2 text-[10px] leading-relaxed text-gray-400">Profit per status dibagi proporsional terhadap keuntungan kotor. Status Batal tidak dihitung dalam profit.</p>
+                <p id="statusModalNote" class="mt-2 text-[10px] leading-relaxed text-gray-400">Profit per status diambil dari Profit periode (setelah Kebutuhan Pribadi) yang dibagi sesuai kontribusi service tiap status. Jika belum ada service, profit status tetap Rp 0. Status Batal tidak dihitung.</p>
             </div>
         </div>
     </div>
@@ -545,16 +545,6 @@ function renderStatusModal() {
         });
 
         tbody.innerHTML = rows;
-    }
-
-    var noteEl = document.getElementById('statusModalNote');
-    if (noteEl) {
-        var hasService = statusOrder.some(function(key) {
-            return key !== 'batal' && ((statusBreakdown[key] && statusBreakdown[key].count) || 0) > 0;
-        });
-        noteEl.textContent = hasService
-            ? 'Profit per status dibagi proporsional terhadap keuntungan kotor. Status Batal tidak dihitung dalam profit.'
-            : 'Tidak ada service pada periode ini. Profit periode, termasuk biaya, ditampilkan pada Total Profit.';
     }
 
     var totalEl = document.getElementById('statusModalTotalProfit');

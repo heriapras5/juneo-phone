@@ -164,11 +164,11 @@ class DashboardService
             ->get();
 
         $breakdown = [];
-        $metrics = [];
+        $services = [];
 
         foreach (array_keys(Service::statusLabels()) as $status) {
             $breakdown[$status] = ['count' => 0, 'profit' => 0];
-            $metrics[$status] = ['count' => 0, 'omzet' => 0.0, 'pengeluaran' => 0.0, 'gross' => 0.0];
+            $services[$status] = ['count' => 0, 'omzet' => 0.0, 'gross' => 0.0];
         }
 
         foreach ($rows as $row) {
@@ -176,7 +176,7 @@ class DashboardService
 
             if (!isset($breakdown[$status])) {
                 $breakdown[$status] = ['count' => 0, 'profit' => 0];
-                $metrics[$status] = ['count' => 0, 'omzet' => 0.0, 'pengeluaran' => 0.0, 'gross' => 0.0];
+                $services[$status] = ['count' => 0, 'omzet' => 0.0, 'gross' => 0.0];
             }
 
             $count = (int) $row->total;
@@ -188,60 +188,63 @@ class DashboardService
 
             $omzet = (float) $row->omzet;
             $pengeluaran = (float) $row->pengeluaran;
-            $metrics[$status] = [
+
+            $services[$status] = [
                 'count' => $count,
                 'omzet' => $omzet,
-                'pengeluaran' => $pengeluaran,
                 'gross' => $omzet - $pengeluaran,
             ];
+        }
+
+        $totalGross = 0.0;
+        $totalOmzet = 0.0;
+        $totalCount = 0;
+
+        foreach ($services as $service) {
+            $totalGross += $service['gross'];
+            $totalOmzet += $service['omzet'];
+            $totalCount += $service['count'];
+        }
+
+        // Tanpa service sama sekali, profit status dibiarkan 0 agar pengeluaran /
+        // kebutuhan pribadi tidak muncul pada kartu Sudah Diambil / Belum Diambil.
+        if ($totalCount <= 0) {
+            return $breakdown;
         }
 
         if (!$periodTotals) {
             $periodTotals = $this->getPeriodTotals($fromDate, $toDate);
         }
 
+        // Profit periode (patokan: kartu Profit) dibagi ke tiap status sesuai
+        // kontribusi service-nya, sehingga jumlah status = Profit periode.
         $totalProfit = (int) round((float) $periodTotals->profit);
-        $totalGross = 0.0;
-        $totalOmzet = 0.0;
-        $totalCount = 0;
+        $weightKey = $totalGross > 0 ? 'gross' : ($totalOmzet > 0 ? 'omzet' : 'count');
 
-        foreach ($metrics as $metric) {
-            $totalGross += $metric['gross'];
-            $totalOmzet += $metric['omzet'];
-            $totalCount += $metric['count'];
+        $allocatable = [];
+
+        foreach ($services as $status => $service) {
+            if ($service['count'] > 0) {
+                $allocatable[$status] = (float) $service[$weightKey];
+            }
         }
 
-        $weightKey = $totalGross > 0 ? 'gross' : ($totalOmzet > 0 ? 'omzet' : ($totalCount > 0 ? 'count' : null));
+        $weightTotal = array_sum($allocatable);
 
-        if ($weightKey !== null) {
-            $allocatable = [];
-            $weightTotal = 0.0;
+        if ($weightTotal <= 0.0) {
+            return $breakdown;
+        }
 
-            foreach ($metrics as $status => $metric) {
-                if ($metric['count'] <= 0) {
-                    continue;
-                }
+        $remaining = $totalProfit;
+        $lastStatus = array_key_last($allocatable);
 
-                $weight = (float) $metric[$weightKey];
-                $allocatable[$status] = $weight;
-                $weightTotal += $weight;
-            }
+        foreach ($allocatable as $status => $weight) {
+            $profit = $status === $lastStatus
+                ? $remaining
+                : (int) round($totalProfit * ($weight / $weightTotal));
 
-            if ($weightTotal != 0.0) {
-                $remaining = $totalProfit;
-                $lastStatus = array_key_last($allocatable);
-
-                foreach ($allocatable as $status => $weight) {
-                    if ($status === $lastStatus) {
-                        $profit = $remaining;
-                    } else {
-                        $profit = (int) round($totalProfit * ($weight / $weightTotal));
-                    }
-
-                    $breakdown[$status]['profit'] = $profit;
-                    $remaining -= $profit;
-                }
-            }
+            $breakdown[$status]['profit'] = $profit;
+            $remaining -= $profit;
         }
 
         return $breakdown;
@@ -268,14 +271,10 @@ class DashboardService
         };
     }
 
-    public function getPickupSummary(Carbon $fromDate, Carbon $toDate, ?object $periodTotals = null, ?array $statusBreakdown = null): object
+    public function getPickupSummary(Carbon $fromDate, Carbon $toDate, ?array $statusBreakdown = null): object
     {
-        if (!$periodTotals) {
-            $periodTotals = $this->getPeriodTotals($fromDate, $toDate);
-        }
-
         if ($statusBreakdown === null) {
-            $statusBreakdown = $this->getStatusBreakdown($fromDate, $toDate, $periodTotals);
+            $statusBreakdown = $this->getStatusBreakdown($fromDate, $toDate);
         }
 
         $takenCount = (int) ($statusBreakdown[Service::STATUS_DIAMBIL]['count'] ?? 0);
@@ -288,15 +287,14 @@ class DashboardService
             $pendingProfit += (int) ($statusBreakdown[$status]['profit'] ?? 0);
         }
 
-        $totalProfit = (int) round((float) $periodTotals->profit);
-        $pendingProfit += $totalProfit - ($takenProfit + $pendingProfit);
-
+        // Kartu Sudah/Belum Diambil menjumlahkan profit per status yang sudah
+        // memuat pembagian Profit periode. Tanpa service, semuanya tetap 0.
         return (object) [
             'taken_count' => $takenCount,
             'taken_profit' => $takenProfit,
             'pending_count' => $pendingCount,
             'pending_profit' => $pendingProfit,
-            'total_profit' => $totalProfit,
+            'total_profit' => $takenProfit + $pendingProfit,
         ];
     }
 

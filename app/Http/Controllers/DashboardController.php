@@ -38,7 +38,7 @@ class DashboardController extends Controller
         $prevPeriodTotals = $service->getPreviousPeriodTotals($fromDate, $toDate);
         $statusBreakdown = $service->getStatusBreakdown($fromDate, $toDate, $periodTotals);
         $statusCounts = collect($statusBreakdown)->map(fn ($item) => $item['count'])->toArray();
-        $pickupSummary = $service->getPickupSummary($fromDate, $toDate, $periodTotals, $statusBreakdown);
+        $pickupSummary = $service->getPickupSummary($fromDate, $toDate, $statusBreakdown);
         $summaryPeriodLabel = $service->formatPeriodSummaryLabel($fromDate, $toDate, $period, (bool) ($from && $to));
 
         $changeOmzet   = $prevPeriodTotals->omzet > 0 ? round((($periodTotals->omzet - $prevPeriodTotals->omzet) / $prevPeriodTotals->omzet) * 100, 1) : ($periodTotals->omzet > 0 ? null : 0);
@@ -116,7 +116,7 @@ class DashboardController extends Controller
         $prevTotals   = $service->getPreviousPeriodTotals($fromDate, $toDate);
         $statusBreakdown = $service->getStatusBreakdown($fromDate, $toDate, $periodTotals);
         $statusCounts = collect($statusBreakdown)->map(fn ($item) => $item['count'])->toArray();
-        $pickupSummary = $service->getPickupSummary($fromDate, $toDate, $periodTotals, $statusBreakdown);
+        $pickupSummary = $service->getPickupSummary($fromDate, $toDate, $statusBreakdown);
         $summaryPeriodLabel = $service->formatPeriodSummaryLabel($fromDate, $toDate, $period, (bool) ($from && $to));
 
         $isComplete   = $toDate->toDateString() < now()->toDateString();
