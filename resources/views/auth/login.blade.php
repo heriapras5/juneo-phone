@@ -27,6 +27,7 @@
         .login-logo-spin {
             animation: loginLogoSpin 7s cubic-bezier(.65,.05,.36,1) infinite;
             transform-style: preserve-3d;
+            transition: transform 0.25s ease;
         }
         .login-logo {
             filter: drop-shadow(0 12px 16px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 18px rgba(245, 158, 11, 0.55));
@@ -34,10 +35,18 @@
         }
         .login-logo:hover,
         .login-logo-wrap:hover .login-logo {
-            filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 32px rgba(245, 158, 11, 0.95));
+            filter: drop-shadow(0 20px 28px rgba(0, 0, 0, 0.65)) drop-shadow(0 0 26px rgba(245, 158, 11, 1)) drop-shadow(0 0 50px rgba(245, 158, 11, 0.55));
+        }
+        .login-logo-glow {
+            opacity: 0.75;
+            transition: opacity 0.3s ease;
+        }
+        .login-logo-wrap:hover .login-logo-glow {
+            opacity: 1;
         }
         .login-logo-wrap:hover .login-logo-spin {
-            animation-play-state: paused;
+            animation: none;
+            transform: perspective(700px) rotateY(0deg) scale(1.02);
         }
         .login-card-shell {
             position: relative;
@@ -51,13 +60,15 @@
             background: conic-gradient(
                 from 0deg,
                 rgba(253, 224, 71, 0) 0deg,
-                rgba(253, 224, 71, 0) 300deg,
-                rgba(253, 224, 71, 0) 310deg,
-                rgba(253, 224, 71, 0.95) 332deg,
-                rgba(245, 158, 11, 0.95) 346deg,
+                rgba(253, 224, 71, 0) 250deg,
+                rgba(253, 224, 71, 0.18) 270deg,
+                rgba(253, 224, 71, 0.95) 300deg,
+                rgba(245, 158, 11, 1) 330deg,
+                rgba(245, 158, 11, 0.35) 350deg,
                 rgba(253, 224, 71, 0) 360deg
             );
-            animation: loginBorderSpin 4.5s linear infinite;
+            filter: brightness(1.25);
+            animation: loginBorderSpin 5.5s linear infinite;
         }
         .login-card-inner {
             position: relative;
@@ -84,12 +95,12 @@
 
     <main class="relative z-10 flex min-h-dvh w-full items-center justify-center px-4 py-8 sm:px-6">
         <div class="w-full max-w-[22rem] sm:max-w-[24rem]">
-            <div class="login-card-shell group rounded-[1.65rem] p-[2px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.65),0_0_50px_-20px_rgba(245,158,11,0.55)] transition-shadow duration-300 hover:shadow-[0_30px_70px_-15px_rgba(0,0,0,0.7),0_0_65px_-18px_rgba(245,158,11,0.75)] focus-within:shadow-[0_30px_70px_-15px_rgba(0,0,0,0.7),0_0_65px_-18px_rgba(245,158,11,0.75)]">
-                <div class="login-card-inner rounded-[1.6rem] bg-white p-5 sm:p-6">
+            <div class="login-card-shell group rounded-[1.65rem] p-[4px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.65),0_0_50px_-20px_rgba(245,158,11,0.55)] transition-shadow duration-300 hover:shadow-[0_30px_70px_-15px_rgba(0,0,0,0.7),0_0_65px_-18px_rgba(245,158,11,0.75)] focus-within:shadow-[0_30px_70px_-15px_rgba(0,0,0,0.7),0_0_65px_-18px_rgba(245,158,11,0.75)]">
+                <div class="login-card-inner rounded-[1.55rem] bg-white p-5 sm:p-6">
                     {{-- Logo --}}
                     <div class="mb-4 flex justify-center">
                         <div class="login-logo-wrap relative rounded-full transition-all duration-300 hover:-translate-y-1 hover:scale-105">
-                            <div class="pointer-events-none absolute -inset-2 rounded-full bg-amber-400/20 blur-xl"></div>
+                            <div class="login-logo-glow pointer-events-none absolute -inset-2 rounded-full bg-amber-400/30 blur-xl"></div>
                             <div class="pointer-events-none absolute -bottom-3 left-1/2 h-3 w-16 -translate-x-1/2 rounded-full bg-black/40 blur-md sm:w-20"></div>
 
                             @if($logoUrl)
@@ -101,10 +112,6 @@
                                     <i class="fas fa-mobile-screen-button text-xl"></i>
                                 </span>
                             @endif
-
-                            <span class="pointer-events-none absolute -right-2 -top-2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-yellow-200 via-amber-400 to-yellow-600 text-[10px] text-slate-950 shadow-[0_0_14px_rgba(245,158,11,0.85)]">
-                                <i class="fas fa-star"></i>
-                            </span>
                         </div>
                     </div>
 
