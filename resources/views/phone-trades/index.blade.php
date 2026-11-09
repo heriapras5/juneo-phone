@@ -169,7 +169,7 @@ window._pageData = Object.assign(window._pageData || {}, { editTrade: {{ Js::fro
                             @endphp
                             <tr class="hover:bg-gray-50/50" data-row="{{ $trade->id }}">
                                 <td class="px-4 py-3 text-sm text-gray-500 text-center whitespace-nowrap">{{ $loop->iteration + ($trades->currentPage() - 1) * $trades->perPage() }}</td>
-                                <td class="px-4 py-3 text-xs font-semibold whitespace-nowrap">
+                                <td class="px-4 py-3 text-sm font-semibold whitespace-nowrap">
                                     <a href="{{ route('phone-trades.show', $trade) }}" class="text-yellow-600 hover:text-yellow-700 hover:underline">
                                         {{ $trade->kode ?? '-' }}
                                     </a>

@@ -172,9 +172,6 @@
                         @endif
                         <option value="terjual">Terjual</option>
                     </select>
-                    @if($isSold)
-                        <p class="text-[11px] text-amber-600 mt-1">Status Terjual sudah final dan tidak dapat dikembalikan ke Tersedia.</p>
-                    @endif
                     @error('status') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
             </div>
