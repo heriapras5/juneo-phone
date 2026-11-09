@@ -143,9 +143,6 @@
                     </p>
                 </div>
             </div>
-            <div class="mt-3 rounded-lg bg-gray-50 border border-gray-200 px-4 py-3 text-sm text-gray-500">
-                HP masih tersedia. Harga jual dapat diisi tanpa mengubah status.
-            </div>
             @endif
         </div>
 
@@ -158,13 +155,18 @@
         @endif
     </div>
 
-    {{-- Ubah Status --}}
+    {{-- Status & Penjualan --}}
     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6"
         x-data="{ status: '{{ old('status', $phoneTrade->status) }}' }">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <i class="fas fa-arrows-rotate text-yellow-500"></i>
-            Ubah Status
-        </h3>
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <i class="fas fa-arrows-rotate text-yellow-500"></i>
+                Status &amp; Penjualan
+            </h3>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border {{ $phoneTrade->status_class }}">
+                {{ $phoneTrade->status_label }}
+            </span>
+        </div>
 
         <form method="POST" action="{{ route('phone-trades.update-status', $phoneTrade) }}" class="space-y-4">
             @csrf
@@ -190,7 +192,6 @@
                     <input type="text" inputmode="numeric" name="harga_jual"
                         value="{{ old('harga_jual', $phoneTrade->harga_jual !== null ? number_format((float) $phoneTrade->harga_jual, 0, ',', '.') : '') }}"
                         class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-right focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none tabular-nums">
-                    <p class="text-[10px] text-gray-400 mt-1">Harga jual bisa diisi sebelum status Terjual.</p>
                     @error('harga_jual') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div x-show="status === 'terjual'" x-cloak>
@@ -211,7 +212,7 @@
             <div class="flex items-center gap-3 pt-2">
                 <button type="submit"
                     class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm">
-                    <i class="fas fa-save"></i> Simpan
+                    <i class="fas fa-save"></i> Simpan Perubahan
                 </button>
                 <p class="text-xs text-gray-400">Perubahan status dan nominal otomatis tercatat di riwayat.</p>
             </div>
@@ -222,7 +223,7 @@
     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
         <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <i class="fas fa-clock-rotate-left text-yellow-500"></i>
-            Riwayat Perubahan
+            Riwayat Aktivitas
         </h3>
 
         @if($phoneTrade->histories->isNotEmpty())

@@ -277,7 +277,7 @@ class PhoneTradeTest extends TestCase
 
         $this->get('/phone-trades/' . $trade->id)
             ->assertOk()
-            ->assertSee('Riwayat Perubahan')
+            ->assertSee('Riwayat Aktivitas')
             ->assertSee('Data HP ditambahkan.');
 
         $this->put('/phone-trades/' . $trade->id . '/status', [
@@ -318,7 +318,7 @@ class PhoneTradeTest extends TestCase
         $this->assertStringContainsString('Biaya service', $history->note);
     }
 
-    public function test_sold_history_uses_defined_price_note(): void
+    public function test_sold_history_merges_status_and_price_change(): void
     {
         $this->post('/phone-trades', $this->payload());
         $trade = PhoneTrade::firstOrFail();
@@ -331,14 +331,18 @@ class PhoneTradeTest extends TestCase
         ])->assertSessionHas('success');
 
         $history = PhoneTradeHistory::where('phone_trade_id', $trade->id)
-            ->where('tipe', PhoneTrade::TIPE_UPDATE)
+            ->where('tipe', PhoneTrade::TIPE_STATUS)
             ->latest('id')
             ->first();
 
         $this->assertNotNull($history);
+        $this->assertSame('terjual', $history->status_to);
+        $this->assertStringContainsString('Status diubah menjadi Terjual.', $history->note);
         $this->assertStringContainsString('Harga jual ditetapkan: Rp 650.000', $history->note);
         $this->assertStringNotContainsString('Rp 0 ->', $history->note);
-        $this->assertNull($history->status_to);
+        $this->assertSame(0, PhoneTradeHistory::where('phone_trade_id', $trade->id)
+            ->where('tipe', PhoneTrade::TIPE_UPDATE)
+            ->count());
     }
 
     public function test_exports_return_success(): void

@@ -86,24 +86,33 @@ class PhoneTrade extends Model
         });
 
         static::updated(function (PhoneTrade $trade) {
-            if ($trade->wasChanged('status')) {
+            $changes = $trade->monetaryChanges();
+            $statusChanged = $trade->wasChanged('status');
+
+            if ($statusChanged) {
+                $note = 'Status diubah menjadi ' . $trade->status_label . '.';
+
+                if (!empty($changes)) {
+                    $note .= ' ' . implode('; ', $changes) . '.';
+                }
+
                 $trade->histories()->create([
                     'tipe' => self::TIPE_STATUS,
                     'status_from' => $trade->getOriginal('status'),
                     'status_to' => $trade->status,
-                    'note' => 'Status diubah menjadi ' . $trade->status_label . '.',
+                    'note' => $note,
                     'user_id' => auth()->id(),
                 ]);
-            }
 
-            $changes = $trade->monetaryChanges();
+                return;
+            }
 
             if (!empty($changes)) {
                 $trade->histories()->create([
                     'tipe' => self::TIPE_UPDATE,
                     'status_from' => null,
                     'status_to' => null,
-                    'note' => implode('; ', $changes),
+                    'note' => implode('; ', $changes) . '.',
                     'user_id' => auth()->id(),
                 ]);
             }
