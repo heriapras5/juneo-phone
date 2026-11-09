@@ -28,6 +28,14 @@
             animation: loginLogoSpin 7s cubic-bezier(.65,.05,.36,1) infinite;
             transform-style: preserve-3d;
         }
+        .login-logo {
+            filter: drop-shadow(0 12px 16px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 18px rgba(245, 158, 11, 0.55));
+            transition: filter 0.3s ease;
+        }
+        .login-logo:hover,
+        .login-logo-wrap:hover .login-logo {
+            filter: drop-shadow(0 16px 22px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 28px rgba(245, 158, 11, 0.85));
+        }
         .login-border {
             position: relative;
             overflow: hidden;
@@ -76,14 +84,16 @@
                     {{-- Logo --}}
                     <div class="mb-4 flex justify-center">
                         @if($logoUrl)
-                            <div class="rounded-full shadow-[0_14px_28px_-10px_rgba(0,0,0,0.45),0_0_24px_-6px_rgba(245,158,11,0.45)] transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:shadow-[0_18px_35px_-10px_rgba(0,0,0,0.55),0_0_35px_-4px_rgba(245,158,11,0.80)]">
+                            <div class="login-logo-wrap relative rounded-full transition-all duration-300 hover:-translate-y-1 hover:scale-105">
+                                <div class="pointer-events-none absolute -inset-2 rounded-full bg-amber-400/20 blur-xl"></div>
                                 <img src="{{ $logoUrl }}" alt="Logo {{ $namaToko }}"
-                                    class="login-logo-spin h-16 w-16 rounded-full object-cover"
+                                    class="login-logo login-logo-spin relative h-20 w-20 rounded-full object-cover sm:h-24 sm:w-24"
                                     onerror="this.onerror=null;this.src='{{ asset('favicon.png') }}';">
                             </div>
                         @else
-                            <div class="rounded-full shadow-[0_14px_28px_-10px_rgba(0,0,0,0.45),0_0_24px_-6px_rgba(245,158,11,0.45)] transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:shadow-[0_18px_35px_-10px_rgba(0,0,0,0.55),0_0_35px_-4px_rgba(245,158,11,0.80)]">
-                                <span class="login-logo-spin flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 to-amber-600 text-slate-950">
+                            <div class="login-logo-wrap relative rounded-full transition-all duration-300 hover:-translate-y-1 hover:scale-105">
+                                <div class="pointer-events-none absolute -inset-2 rounded-full bg-amber-400/20 blur-xl"></div>
+                                <span class="login-logo login-logo-spin relative flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 to-amber-600 text-slate-950 sm:h-24 sm:w-24">
                                     <i class="fas fa-mobile-screen-button text-xl"></i>
                                 </span>
                             </div>
@@ -143,9 +153,8 @@
                     </div>
 
                     <div>
-                        <div class="mb-1.5 flex items-center justify-between gap-3">
+                        <div class="mb-1.5">
                             <label for="password" class="block text-sm font-semibold text-slate-800">Password</label>
-                            <span class="text-xs font-medium text-slate-600">Hubungi admin jika lupa</span>
                         </div>
                         <div class="relative">
                             <i class="fas fa-lock pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-slate-500"></i>
@@ -199,8 +208,7 @@
 
                 <div class="mt-5 border-t border-slate-200 pt-3 text-center">
                     <p class="text-xs leading-relaxed text-slate-500">
-                        &copy; {{ date('Y') }} {{ $namaToko }}<br>
-                        Akses terbatas untuk pengguna yang berwenang.
+                        &copy; {{ date('Y') }} {{ $namaToko }}
                     </p>
                 </div>
             </div>
