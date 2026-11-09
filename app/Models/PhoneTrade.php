@@ -102,7 +102,7 @@ class PhoneTrade extends Model
                 $trade->histories()->create([
                     'tipe' => self::TIPE_UPDATE,
                     'status_from' => null,
-                    'status_to' => $trade->status,
+                    'status_to' => null,
                     'note' => implode('; ', $changes),
                     'user_id' => auth()->id(),
                 ]);
@@ -133,15 +133,24 @@ class PhoneTrade extends Model
                 continue;
             }
 
-            $from = (float) ($this->getOriginal($field) ?? 0);
-            $to = (float) ($this->{$field} ?? 0);
+            $rawFrom = $this->getOriginal($field);
+            $rawTo = $this->{$field};
 
-            if ($from === $to) {
+            $from = ($rawFrom === null || $rawFrom === '') ? null : (float) $rawFrom;
+            $to = ($rawTo === null || $rawTo === '') ? null : (float) $rawTo;
+
+            if (($from ?? 0.0) === ($to ?? 0.0)) {
                 continue;
             }
 
-            $changes[] = $label . ': Rp ' . number_format($from, 0, ',', '.')
-                . ' -> Rp ' . number_format($to, 0, ',', '.');
+            if (($from === null || $from == 0.0) && $to !== null && $to > 0) {
+                $changes[] = $label . ' ditetapkan: Rp ' . number_format($to, 0, ',', '.');
+            } elseif ($to === null || $to == 0.0) {
+                $changes[] = $label . ' dikosongkan';
+            } else {
+                $changes[] = $label . ': Rp ' . number_format($from, 0, ',', '.')
+                    . ' -> Rp ' . number_format($to, 0, ',', '.');
+            }
         }
 
         return $changes;

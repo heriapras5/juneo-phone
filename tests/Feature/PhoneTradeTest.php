@@ -318,6 +318,29 @@ class PhoneTradeTest extends TestCase
         $this->assertStringContainsString('Biaya service', $history->note);
     }
 
+    public function test_sold_history_uses_defined_price_note(): void
+    {
+        $this->post('/phone-trades', $this->payload());
+        $trade = PhoneTrade::firstOrFail();
+
+        $this->put('/phone-trades/' . $trade->id . '/status', [
+            'status' => 'terjual',
+            'tanggal_keluar' => now()->toDateString(),
+            'harga_jual' => '650.000',
+            'pembeli' => 'Andi',
+        ])->assertSessionHas('success');
+
+        $history = PhoneTradeHistory::where('phone_trade_id', $trade->id)
+            ->where('tipe', PhoneTrade::TIPE_UPDATE)
+            ->latest('id')
+            ->first();
+
+        $this->assertNotNull($history);
+        $this->assertStringContainsString('Harga jual ditetapkan: Rp 650.000', $history->note);
+        $this->assertStringNotContainsString('Rp 0 ->', $history->note);
+        $this->assertNull($history->status_to);
+    }
+
     public function test_exports_return_success(): void
     {
         PhoneTrade::create($this->payload([

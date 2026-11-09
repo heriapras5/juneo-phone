@@ -231,7 +231,8 @@
                 <div class="space-y-4">
                     @foreach($phoneTrade->histories as $history)
                         @php
-                            $dotClass = $history->status_to
+                            $isUpdate = $history->tipe === \App\Models\PhoneTrade::TIPE_UPDATE;
+                            $dotClass = (!$isUpdate && $history->status_to)
                                 ? ($statusTimelineClasses[$history->status_to] ?? 'border-gray-500')
                                 : 'border-amber-500';
                         @endphp
@@ -242,7 +243,7 @@
                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{ \App\Models\PhoneTradeHistory::tipeClasses()[$history->tipe] ?? 'bg-gray-100 text-gray-600' }}">
                                         {{ $history->tipe_label }}
                                     </span>
-                                    @if($history->status_to)
+                                    @if(!$isUpdate && $history->status_to)
                                         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border {{ \App\Models\PhoneTrade::statusClasses()[$history->status_to] ?? 'bg-gray-100 text-gray-600 border-gray-200' }}">
                                             {{ $statusLabels[$history->status_to] ?? $history->status_to }}
                                         </span>
