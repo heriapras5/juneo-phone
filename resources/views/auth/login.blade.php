@@ -10,13 +10,15 @@
 
     @php
         $logoSetting = \App\Models\Setting::getValue('logo');
-        $logoExists = $logoSetting && \Illuminate\Support\Facades\Storage::disk('public')->exists($logoSetting);
-        $logoUrl = $logoExists ? route('storage.file', $logoSetting) : null;
-        $faviconUrl = $logoUrl ?: asset('favicon.png');
+        $logoUrl = $logoSetting ? route('storage.file', $logoSetting) : null;
+        $faviconPath = public_path('favicon.png');
+        $faviconUrl = asset('favicon.png') . '?v=' . (file_exists($faviconPath) ? filemtime($faviconPath) : time());
         $namaToko = \App\Models\Setting::getValue('nama_toko', 'Juneo Phone');
     @endphp
 
-    <link rel="icon" href="{{ $faviconUrl }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ $faviconUrl }}">
+    <link rel="shortcut icon" type="image/png" href="{{ $faviconUrl }}">
+    <link rel="apple-touch-icon" href="{{ $faviconUrl }}">
 
     <style>
         @keyframes loginLogoSpin {
@@ -27,7 +29,6 @@
         }
         .login-logo-spin {
             animation: loginLogoSpin 7s cubic-bezier(.65,.05,.36,1) infinite;
-            transform-style: preserve-3d;
             will-change: transform;
             transform: translateZ(0);
             transition: transform 0.25s ease;
@@ -96,14 +97,14 @@
                     <div class="mb-4 flex justify-center">
                         <div class="login-logo-wrap relative rounded-full transition-all duration-300 hover:-translate-y-1 hover:scale-105">
                             <div class="login-logo login-logo-spin relative h-20 w-20 rounded-full sm:h-24 sm:w-24">
-                                <div class="pointer-events-none absolute -bottom-4 left-1/2 h-4 w-20 -translate-x-1/2 rounded-full bg-black/55 blur-lg sm:w-24"></div>
+                                <div class="pointer-events-none absolute -bottom-4 left-1/2 z-0 h-4 w-20 -translate-x-1/2 rounded-full bg-black/55 blur-lg sm:w-24"></div>
 
                                 @if($logoUrl)
-                                    <img src="{{ $logoUrl }}" alt="Logo {{ $namaToko }}"
-                                        class="relative h-full w-full rounded-full object-cover"
+                                    <img src="{{ $logoUrl }}" alt="Logo {{ $namaToko }}" loading="eager" decoding="async"
+                                        class="absolute inset-0 z-10 h-full w-full rounded-full object-cover"
                                         onerror="this.onerror=null;this.src='{{ asset('favicon.png') }}';">
                                 @else
-                                    <span class="relative flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 to-amber-600 text-slate-950">
+                                    <span class="absolute inset-0 z-10 flex items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 to-amber-600 text-slate-950">
                                         <i class="fas fa-mobile-screen-button text-xl"></i>
                                     </span>
                                 @endif
