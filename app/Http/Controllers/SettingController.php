@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\DamageCategory;
 use App\Models\Setting;
 use App\Models\TypeHpOption;
+use App\Support\FaviconGenerator;
 use Illuminate\Http\Request;
 
 class SettingController extends Controller
@@ -65,6 +66,8 @@ class SettingController extends Controller
                 ['key' => 'logo'],
                 ['value' => $path]
             );
+
+            FaviconGenerator::generateFromLogo($path);
         }
 
         Setting::flushCache();
