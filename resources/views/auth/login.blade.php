@@ -27,8 +27,6 @@
         .login-logo-spin {
             animation: loginLogoSpin 7s cubic-bezier(.65,.05,.36,1) infinite;
             transform-style: preserve-3d;
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
             will-change: transform;
             transform: translateZ(0);
             transition: transform 0.25s ease;
@@ -38,7 +36,7 @@
             transition: box-shadow 0.3s ease, transform 0.3s ease;
         }
         .login-logo-wrap:hover {
-            box-shadow: 0 18px 30px -12px rgba(0, 0, 0, 0.6), 0 0 24px -4px rgba(245, 158, 11, 0.65);
+            box-shadow: 0 0 0 1.5px rgba(245, 158, 11, 0.95), 0 0 0 4px rgba(245, 158, 11, 0.15), 0 18px 30px -12px rgba(0, 0, 0, 0.6), 0 0 24px -4px rgba(245, 158, 11, 0.65);
         }
         .login-logo-wrap:hover .login-logo-spin {
             animation: none;
@@ -96,17 +94,19 @@
                     {{-- Logo --}}
                     <div class="mb-4 flex justify-center">
                         <div class="login-logo-wrap relative rounded-full transition-all duration-300 hover:-translate-y-1 hover:scale-105">
-                            <div class="pointer-events-none absolute -bottom-4 left-1/2 h-4 w-20 -translate-x-1/2 rounded-full bg-black/55 blur-lg sm:w-24"></div>
+                            <div class="login-logo login-logo-spin relative h-20 w-20 rounded-full bg-slate-950 sm:h-24 sm:w-24">
+                                <div class="pointer-events-none absolute -bottom-4 left-1/2 h-4 w-20 -translate-x-1/2 rounded-full bg-black/55 blur-lg sm:w-24"></div>
 
-                            @if($logoUrl)
-                                <img src="{{ $logoUrl }}" alt="Logo {{ $namaToko }}"
-                                    class="login-logo login-logo-spin relative h-20 w-20 rounded-full object-cover sm:h-24 sm:w-24"
-                                    onerror="this.onerror=null;this.src='{{ asset('favicon.png') }}';">
-                            @else
-                                <span class="login-logo login-logo-spin relative flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 to-amber-600 text-slate-950 sm:h-24 sm:w-24">
-                                    <i class="fas fa-mobile-screen-button text-xl"></i>
-                                </span>
-                            @endif
+                                @if($logoUrl)
+                                    <img src="{{ $logoUrl }}" alt="Logo {{ $namaToko }}"
+                                        class="relative h-full w-full rounded-full object-cover"
+                                        onerror="this.onerror=null;this.src='{{ asset('favicon.png') }}';">
+                                @else
+                                    <span class="relative flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 to-amber-600 text-slate-950">
+                                        <i class="fas fa-mobile-screen-button text-xl"></i>
+                                    </span>
+                                @endif
+                            </div>
                         </div>
                     </div>
 
