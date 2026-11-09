@@ -10,10 +10,10 @@
         .header h1 { margin: 0; font-size: 18px; letter-spacing: 1px; color: #000; }
         .header .subtitle { margin: 4px 0 0; font-size: 12px; font-weight: bold; color: #000; }
         .header .info { margin: 2px 0 0; font-size: 7px; color: #000; }
-        .summary { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
-        .summary td { border: 1px solid #ddd; padding: 5px 7px; background: #f9fafb; width: 16.66%; }
-        .summary .label { display: block; font-size: 7px; color: #555; text-transform: uppercase; letter-spacing: .5px; }
-        .summary .value { display: block; font-size: 10px; font-weight: bold; color: #000; margin-top: 2px; }
+        .summary-bottom { width: 100%; border-collapse: collapse; margin-top: 8px; }
+        .summary-bottom td { border: 1px solid #B8860B; padding: 4px 7px; background: #fff8e1; color: #000; }
+        .summary-bottom .summary-title { font-size: 9px; font-weight: bold; }
+        .summary-bottom .summary-values { font-size: 8px; }
         table.data { width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 7px; }
         table.data th { background: #B8860B; color: #fff; padding: 4px; text-align: left; border: 1px solid #B8860B; }
         table.data td { padding: 2px 4px; border: 1px solid #ddd; color: #000; }
@@ -40,35 +40,6 @@
         @endif
         <p class="info">{{ $adaPeriode ? 'Periode: ' . $dari . ' s.d. ' . $sampai : 'Seluruh periode' }}</p>
     </div>
-
-    <table class="summary">
-        <tr>
-            <td>
-                <span class="label">Stok Tersedia</span>
-                <span class="value">{{ number_format($summary['stock_count'], 0, ',', '.') }} unit</span>
-            </td>
-            <td>
-                <span class="label">Modal Stok</span>
-                <span class="value">Rp {{ number_format($summary['stock_modal'], 0, ',', '.') }}</span>
-            </td>
-            <td>
-                <span class="label">Terjual</span>
-                <span class="value">{{ number_format($summary['sold_count'], 0, ',', '.') }} unit</span>
-            </td>
-            <td>
-                <span class="label">Omzet</span>
-                <span class="value">Rp {{ number_format($summary['omzet'], 0, ',', '.') }}</span>
-            </td>
-            <td>
-                <span class="label">Modal Terjual</span>
-                <span class="value">Rp {{ number_format($summary['modal_terjual'], 0, ',', '.') }}</span>
-            </td>
-            <td>
-                <span class="label">Profit</span>
-                <span class="value">Rp {{ number_format($summary['laba'], 0, ',', '.') }}</span>
-            </td>
-        </tr>
-    </table>
 
     <table class="data">
         <thead>
@@ -99,7 +70,7 @@
                     {{ $trade->tanggal_masuk?->format('d/m/Y') }}
                     <br><span class="text-muted">Beli: Rp {{ number_format($trade->harga_beli, 0, ',', '.') }}</span>
                     @if((float) $trade->biaya_perbaikan > 0)
-                    <br><span class="text-muted">Perbaikan: Rp {{ number_format($trade->biaya_perbaikan, 0, ',', '.') }}</span>
+                    <br><span class="text-muted">Service: Rp {{ number_format($trade->biaya_perbaikan, 0, ',', '.') }}</span>
                     @endif
                 </td>
                 <td class="text-center">{{ $trade->status_label }}</td>
@@ -108,8 +79,10 @@
                         {{ $trade->tanggal_keluar?->format('d/m/Y') }}
                         <br><span class="text-muted">Jual: Rp {{ number_format($trade->harga_jual, 0, ',', '.') }}</span>
                         @if($trade->pembeli)
-                        <br><span class="text-muted">{{ $trade->pembeli }}</span>
+                        <br><span class="text-muted">Nama Pembeli: {{ $trade->pembeli }}</span>
                         @endif
+                    @elseif($trade->harga_jual !== null)
+                        <span class="text-muted">Rencana: Rp {{ number_format($trade->harga_jual, 0, ',', '.') }}</span>
                     @else
                         -
                     @endif
@@ -125,6 +98,24 @@
             </tr>
             @endforelse
         </tbody>
+    </table>
+
+    <table class="summary-bottom">
+        <tr>
+            <td class="summary-title">
+                RINGKASAN JUAL BELI HP{{ $adaPeriode ? ' (' . $dari . ' s.d. ' . $sampai . ')' : '' }}
+            </td>
+        </tr>
+        <tr>
+            <td class="summary-values">
+                Stok Tersedia: {{ number_format($summary['stock_count'], 0, ',', '.') }} unit
+                &nbsp;|&nbsp; Modal Stok: Rp {{ number_format($summary['stock_modal'], 0, ',', '.') }}
+                &nbsp;|&nbsp; Terjual: {{ number_format($summary['sold_count'], 0, ',', '.') }} unit
+                &nbsp;|&nbsp; Omzet: Rp {{ number_format($summary['omzet'], 0, ',', '.') }}
+                &nbsp;|&nbsp; Modal Terjual: Rp {{ number_format($summary['modal_terjual'], 0, ',', '.') }}
+                &nbsp;|&nbsp; Profit: Rp {{ number_format($summary['laba'], 0, ',', '.') }}
+            </td>
+        </tr>
     </table>
 
     <div class="footer">

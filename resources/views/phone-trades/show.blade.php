@@ -89,7 +89,7 @@
                         <p class="text-sm font-medium text-gray-900">{{ $phoneTrade->tanggal_masuk?->format('d F Y') }}</p>
                     </div>
                     <div>
-                        <p class="text-xs text-gray-500 uppercase tracking-wider">Penjual</p>
+                        <p class="text-xs text-gray-500 uppercase tracking-wider">Nama Penjual</p>
                         <p class="text-sm font-medium text-gray-900">{{ $phoneTrade->penjual ?: '-' }}</p>
                     </div>
                 </div>
@@ -99,7 +99,7 @@
                         <p class="text-sm font-medium text-gray-900 tabular-nums">Rp {{ number_format($phoneTrade->harga_beli, 0, ',', '.') }}</p>
                     </div>
                     <div>
-                        <p class="text-xs text-gray-500 uppercase tracking-wider">Biaya Perbaikan</p>
+                        <p class="text-xs text-gray-500 uppercase tracking-wider">Biaya Service</p>
                         <p class="text-sm font-medium text-gray-900 tabular-nums">Rp {{ number_format($phoneTrade->biaya_perbaikan, 0, ',', '.') }}</p>
                     </div>
                 </div>
@@ -120,7 +120,7 @@
                     <p class="text-sm font-medium text-gray-900">{{ $phoneTrade->tanggal_keluar?->format('d F Y') }}</p>
                 </div>
                 <div>
-                    <p class="text-xs text-gray-500 uppercase tracking-wider">Pembeli</p>
+                    <p class="text-xs text-gray-500 uppercase tracking-wider">Nama Pembeli</p>
                     <p class="text-sm font-medium text-gray-900">{{ $phoneTrade->pembeli ?: '-' }}</p>
                 </div>
                 <div>
@@ -135,8 +135,16 @@
                 </div>
             </div>
             @else
-            <div class="rounded-lg bg-gray-50 border border-gray-200 px-4 py-3 text-sm text-gray-500">
-                HP masih tersedia. Ubah status menjadi <strong>Terjual</strong> saat HP sudah laku.
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <p class="text-xs text-gray-500 uppercase tracking-wider">Harga Jual (Rencana)</p>
+                    <p class="text-sm font-medium text-gray-900 tabular-nums">
+                        {{ $phoneTrade->harga_jual !== null ? 'Rp ' . number_format($phoneTrade->harga_jual, 0, ',', '.') : '-' }}
+                    </p>
+                </div>
+            </div>
+            <div class="mt-3 rounded-lg bg-gray-50 border border-gray-200 px-4 py-3 text-sm text-gray-500">
+                HP masih tersedia. Harga jual dapat diisi tanpa mengubah status.
             </div>
             @endif
         </div>
@@ -176,23 +184,24 @@
                 </div>
             </div>
 
-            <div x-show="status === 'terjual'" x-cloak class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
+                    <label class="block text-xs font-medium text-gray-500 mb-1.5">Harga Jual</label>
+                    <input type="text" inputmode="numeric" name="harga_jual"
+                        value="{{ old('harga_jual', $phoneTrade->harga_jual !== null ? number_format((float) $phoneTrade->harga_jual, 0, ',', '.') : '') }}"
+                        class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-right focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none tabular-nums">
+                    <p class="text-[10px] text-gray-400 mt-1">Harga jual bisa diisi sebelum status Terjual.</p>
+                    @error('harga_jual') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div x-show="status === 'terjual'" x-cloak>
                     <label class="block text-xs font-medium text-gray-500 mb-1.5">Tanggal Keluar <span class="text-yellow-600">*</span></label>
                     <input type="date" name="tanggal_keluar"
                         value="{{ old('tanggal_keluar', $phoneTrade->tanggal_keluar?->format('Y-m-d')) }}"
                         class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
                     @error('tanggal_keluar') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-500 mb-1.5">Harga Jual <span class="text-yellow-600">*</span></label>
-                    <input type="text" inputmode="numeric" name="harga_jual"
-                        value="{{ old('harga_jual', $phoneTrade->harga_jual !== null ? number_format((float) $phoneTrade->harga_jual, 0, ',', '.') : '') }}"
-                        class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-right focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none tabular-nums">
-                    @error('harga_jual') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-500 mb-1.5">Pembeli</label>
+                <div x-show="status === 'terjual'" x-cloak>
+                    <label class="block text-xs font-medium text-gray-500 mb-1.5">Nama Pembeli</label>
                     <input type="text" name="pembeli" value="{{ old('pembeli', $phoneTrade->pembeli) }}"
                         class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
                     @error('pembeli') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror

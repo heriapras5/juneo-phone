@@ -207,7 +207,7 @@ window._pageData = Object.assign(window._pageData || {}, { editTrade: {{ Js::fro
                                         Rp {{ number_format($trade->harga_beli, 0, ',', '.') }}
                                     </div>
                                     @if((float) $trade->biaya_perbaikan > 0)
-                                        <div class="text-[11px] text-amber-700 font-medium tabular-nums" title="Biaya perbaikan">
+                                        <div class="text-[11px] text-amber-700 font-medium tabular-nums" title="Biaya service">
                                             + Rp {{ number_format($trade->biaya_perbaikan, 0, ',', '.') }}
                                         </div>
                                     @endif
@@ -222,7 +222,11 @@ window._pageData = Object.assign(window._pageData || {}, { editTrade: {{ Js::fro
                                 <td class="px-4 py-3 text-right whitespace-nowrap">
                                     @if($trade->status === \App\Models\PhoneTrade::STATUS_TERJUAL)
                                         <div class="text-sm font-medium text-gray-900 tabular-nums"
-                                            title="@if($trade->pembeli)Pembeli: {{ $trade->pembeli }}@endif">
+                                            title="@if($trade->pembeli)Nama Pembeli: {{ $trade->pembeli }}@endif">
+                                            Rp {{ number_format($trade->harga_jual, 0, ',', '.') }}
+                                        </div>
+                                    @elseif($trade->harga_jual !== null)
+                                        <div class="text-sm font-medium text-gray-500 tabular-nums" title="Harga jual rencana">
                                             Rp {{ number_format($trade->harga_jual, 0, ',', '.') }}
                                         </div>
                                     @else
@@ -525,16 +529,15 @@ window._pageData = Object.assign(window._pageData || {}, { editTrade: {{ Js::fro
                                 @error('harga_beli') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-500 mb-1.5">Biaya Perbaikan</label>
+                                <label class="block text-xs font-medium text-gray-500 mb-1.5">Biaya Service</label>
                                 <input type="text" inputmode="numeric" name="biaya_perbaikan"
                                     :value="formatNumber(formData.biaya_perbaikan)" @input="onCurrencyInput('biaya_perbaikan', $event)"
                                     placeholder="0"
                                     class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-right focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none tabular-nums">
-                                <p class="text-[10px] text-gray-400 mt-1">Biaya sparepart/teknisi. HP dari service yang harga belinya sudah termasuk biaya service, isi 0.</p>
                                 @error('biaya_perbaikan') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-500 mb-1.5">Penjual</label>
+                                <label class="block text-xs font-medium text-gray-500 mb-1.5">Nama Penjual</label>
                                 <input type="text" name="penjual" x-model="formData.penjual"
                                     class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
                                 @error('penjual') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
@@ -566,23 +569,24 @@ window._pageData = Object.assign(window._pageData || {}, { editTrade: {{ Js::fro
                             </div>
                         </div>
 
-                        <div x-show="formData.status === 'terjual'" x-cloak class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                             <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1.5">Harga Jual</label>
+                                <input type="text" inputmode="numeric" name="harga_jual"
+                                    :value="formatNumber(formData.harga_jual)" @input="onCurrencyInput('harga_jual', $event)"
+                                    placeholder="0"
+                                    class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-right focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none tabular-nums">
+                                <p class="text-[10px] text-gray-400 mt-1">Harga jual bisa diisi sebelum status Terjual.</p>
+                                @error('harga_jual') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div x-show="formData.status === 'terjual'" x-cloak>
                                 <label class="block text-xs font-medium text-gray-500 mb-1.5">Tanggal Keluar <span class="text-yellow-600">*</span></label>
                                 <input type="date" name="tanggal_keluar" x-model="formData.tanggal_keluar"
                                     class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
                                 @error('tanggal_keluar') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-500 mb-1.5">Harga Jual <span class="text-yellow-600">*</span></label>
-                                <input type="text" inputmode="numeric" name="harga_jual"
-                                    :value="formatNumber(formData.harga_jual)" @input="onCurrencyInput('harga_jual', $event)"
-                                    placeholder="0"
-                                    class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-right focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none tabular-nums">
-                                @error('harga_jual') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-500 mb-1.5">Pembeli</label>
+                            <div x-show="formData.status === 'terjual'" x-cloak>
+                                <label class="block text-xs font-medium text-gray-500 mb-1.5">Nama Pembeli</label>
                                 <input type="text" name="pembeli" x-model="formData.pembeli"
                                     class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
                                 @error('pembeli') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror

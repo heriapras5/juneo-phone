@@ -251,7 +251,6 @@ class PhoneTradeController extends Controller
 
         if ($validated['status'] === PhoneTrade::STATUS_STOK) {
             $validated['tanggal_keluar'] = null;
-            $validated['harga_jual'] = null;
             $validated['pembeli'] = null;
         }
 

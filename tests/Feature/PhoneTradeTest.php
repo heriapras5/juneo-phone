@@ -133,6 +133,43 @@ class PhoneTradeTest extends TestCase
         $this->assertSame(now()->toDateString(), $trade->tanggal_keluar?->toDateString());
     }
 
+    public function test_harga_jual_can_be_saved_while_status_is_stock(): void
+    {
+        $this->post('/phone-trades', $this->payload([
+            'status' => 'stok',
+            'harga_jual' => '6.500.000',
+        ]))->assertSessionHas('success');
+
+        $trade = PhoneTrade::firstOrFail();
+
+        $this->assertSame('stok', $trade->status);
+        $this->assertSame(6500000.0, (float) $trade->harga_jual);
+        $this->assertSame(0.0, $trade->keuntungan);
+        $this->assertNull($trade->tanggal_keluar);
+        $this->assertNull($trade->pembeli);
+
+        $this->get('/phone-trades/' . $trade->id)
+            ->assertOk()
+            ->assertSee('Harga Jual (Rencana)')
+            ->assertSee('Rp 6.500.000');
+    }
+
+    public function test_harga_jual_can_be_updated_from_detail_while_stock(): void
+    {
+        $this->post('/phone-trades', $this->payload());
+        $trade = PhoneTrade::firstOrFail();
+
+        $this->put('/phone-trades/' . $trade->id . '/status', [
+            'status' => 'stok',
+            'harga_jual' => '7.250.000',
+        ])->assertSessionHas('success');
+
+        $trade->refresh();
+
+        $this->assertSame('stok', $trade->status);
+        $this->assertSame(7250000.0, (float) $trade->harga_jual);
+    }
+
     public function test_summary_separates_stock_and_sales(): void
     {
         PhoneTrade::create($this->payload([
@@ -278,7 +315,7 @@ class PhoneTradeTest extends TestCase
 
         $this->assertNotNull($history);
         $this->assertStringContainsString('Harga beli', $history->note);
-        $this->assertStringContainsString('Biaya perbaikan', $history->note);
+        $this->assertStringContainsString('Biaya service', $history->note);
     }
 
     public function test_exports_return_success(): void

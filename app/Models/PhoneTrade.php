@@ -81,7 +81,6 @@ class PhoneTrade extends Model
 
             if ($trade->status === self::STATUS_STOK) {
                 $trade->tanggal_keluar = null;
-                $trade->harga_jual = null;
                 $trade->pembeli = null;
             }
         });
@@ -118,7 +117,7 @@ class PhoneTrade extends Model
     {
         $fields = [
             'harga_beli' => 'Harga beli',
-            'biaya_perbaikan' => 'Biaya perbaikan',
+            'biaya_perbaikan' => 'Biaya service',
             'harga_jual' => 'Harga jual',
         ];
 
