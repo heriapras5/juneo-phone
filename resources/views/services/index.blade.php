@@ -45,15 +45,23 @@ window._pageData = {
                         placeholder="No. service, tipe HP, pelanggan..."
                         class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 placeholder-gray-400 outline-none w-64">
                 </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-500 mb-1">Dari Tanggal</label>
+                <div class="relative" x-data="{ value: '{{ request('date_from') }}' }">
+                    <label class="block text-xs font-medium text-gray-700 mb-1.5">Dari Tanggal</label>
                     <input type="date" name="date_from" value="{{ request('date_from') }}"
-                        class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 text-gray-900 outline-none" autocomplete="off">
+                        @input="value = $event.target.value"
+                        :class="value ? 'text-gray-900' : 'text-transparent'"
+                        class="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 text-gray-900 outline-none w-full sm:w-40"
+                        aria-label="Dari Tanggal" title="Dari Tanggal" autocomplete="off">
+                    <span x-show="!value" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">dd/mm/yyyy</span>
                 </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-500 mb-1">Sampai Tanggal</label>
+                <div class="relative" x-data="{ value: '{{ request('date_to') }}' }">
+                    <label class="block text-xs font-medium text-gray-700 mb-1.5">Sampai Tanggal</label>
                     <input type="date" name="date_to" value="{{ request('date_to') }}"
-                        class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 text-gray-900 outline-none" autocomplete="off">
+                        @input="value = $event.target.value"
+                        :class="value ? 'text-gray-900' : 'text-transparent'"
+                        class="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 text-gray-900 outline-none w-full sm:w-40"
+                        aria-label="Sampai Tanggal" title="Sampai Tanggal" autocomplete="off">
+                    <span x-show="!value" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">dd/mm/yyyy</span>
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-gray-500 mb-1">Status</label>

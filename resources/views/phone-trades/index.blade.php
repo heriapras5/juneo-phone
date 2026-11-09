@@ -77,15 +77,23 @@ window._pageData = Object.assign(window._pageData || {}, { editTrade: {{ Js::fro
                             @endforeach
                         </select>
                     </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 mb-1">Dari Tanggal Masuk</label>
+                    <div class="relative" x-data="{ value: '{{ $filters['from'] ?? '' }}' }">
+                        <label class="block text-xs font-medium text-gray-700 mb-1.5">Dari Tanggal Masuk</label>
                         <input type="date" name="from" value="{{ $filters['from'] ?? '' }}"
-                            class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
+                            @input="value = $event.target.value"
+                            :class="value ? 'text-gray-900' : 'text-transparent'"
+                            class="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none w-full sm:w-44"
+                            aria-label="Dari Tanggal Masuk" title="Dari Tanggal Masuk" autocomplete="off">
+                        <span x-show="!value" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">dd/mm/yyyy</span>
                     </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-500 mb-1">Sampai</label>
+                    <div class="relative" x-data="{ value: '{{ $filters['to'] ?? '' }}' }">
+                        <label class="block text-xs font-medium text-gray-700 mb-1.5">Sampai</label>
                         <input type="date" name="to" value="{{ $filters['to'] ?? '' }}"
-                            class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
+                            @input="value = $event.target.value"
+                            :class="value ? 'text-gray-900' : 'text-transparent'"
+                            class="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none w-full sm:w-44"
+                            aria-label="Sampai Tanggal" title="Sampai Tanggal" autocomplete="off">
+                        <span x-show="!value" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">dd/mm/yyyy</span>
                     </div>
                     <button type="submit"
                         class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 text-white rounded-lg text-sm font-medium hover:from-yellow-400 hover:to-amber-400 shadow-sm">
