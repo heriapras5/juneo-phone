@@ -11,6 +11,7 @@
         \App\Models\PhoneTrade::STATUS_STOK => 'border-yellow-500',
         \App\Models\PhoneTrade::STATUS_TERJUAL => 'border-emerald-500',
     ];
+    $isSold = $phoneTrade->status === \App\Models\PhoneTrade::STATUS_TERJUAL;
 @endphp
 
 <div class="max-w-4xl mx-auto space-y-6">
@@ -165,11 +166,15 @@
                 <div>
                     <label class="block text-xs font-medium text-gray-500 mb-1.5">Status <span class="text-yellow-600">*</span></label>
                     <select name="status" x-model="status" required
-                        class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
-                        @foreach($statusLabels as $value => $label)
-                            <option value="{{ $value }}" {{ old('status', $phoneTrade->status) === $value ? 'selected' : '' }}>{{ $label }}</option>
-                        @endforeach
+                        class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 outline-none {{ $isSold ? 'bg-gray-100 text-gray-500' : 'text-gray-900' }}">
+                        @if(!$isSold)
+                            <option value="stok">Tersedia</option>
+                        @endif
+                        <option value="terjual">Terjual</option>
                     </select>
+                    @if($isSold)
+                        <p class="text-[11px] text-amber-600 mt-1">Status Terjual sudah final dan tidak dapat dikembalikan ke Tersedia.</p>
+                    @endif
                     @error('status') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
             </div>

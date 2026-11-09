@@ -45,23 +45,31 @@ window._pageData = {
                         placeholder="No. service, tipe HP, pelanggan..."
                         class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 placeholder-gray-400 outline-none w-64">
                 </div>
-                <div class="relative" x-data="{ value: '{{ request('date_from') }}' }">
+                <div class="w-full sm:w-auto">
                     <label class="block text-xs font-medium text-gray-700 mb-1.5">Dari Tanggal</label>
-                    <input type="date" name="date_from" value="{{ request('date_from') }}"
-                        @input="value = $event.target.value"
-                        :class="value ? 'text-gray-900' : 'text-transparent'"
-                        class="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 text-gray-900 outline-none w-full sm:w-40"
-                        aria-label="Dari Tanggal" title="Dari Tanggal" autocomplete="off">
-                    <span x-show="!value" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">dd/mm/yyyy</span>
+                    <div class="relative w-full sm:w-40" x-data="dateField('{{ request('date_from') }}')">
+                        <input type="date" name="date_from" x-ref="input" x-model="value"
+                            @focus="focused = true" @blur="focused = false" @click="openPicker()"
+                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                            aria-label="Dari Tanggal" title="Dari Tanggal" autocomplete="off">
+                        <div class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm text-left pointer-events-none"
+                            :class="[value ? 'text-gray-900' : 'text-gray-400', focused ? 'border-yellow-500 ring-2 ring-yellow-500/30' : '']">
+                            <span x-text="display">dd/mm/yyyy</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="relative" x-data="{ value: '{{ request('date_to') }}' }">
+                <div class="w-full sm:w-auto">
                     <label class="block text-xs font-medium text-gray-700 mb-1.5">Sampai Tanggal</label>
-                    <input type="date" name="date_to" value="{{ request('date_to') }}"
-                        @input="value = $event.target.value"
-                        :class="value ? 'text-gray-900' : 'text-transparent'"
-                        class="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 text-gray-900 outline-none w-full sm:w-40"
-                        aria-label="Sampai Tanggal" title="Sampai Tanggal" autocomplete="off">
-                    <span x-show="!value" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">dd/mm/yyyy</span>
+                    <div class="relative w-full sm:w-40" x-data="dateField('{{ request('date_to') }}')">
+                        <input type="date" name="date_to" x-ref="input" x-model="value"
+                            @focus="focused = true" @blur="focused = false" @click="openPicker()"
+                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                            aria-label="Sampai Tanggal" title="Sampai Tanggal" autocomplete="off">
+                        <div class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm text-left pointer-events-none"
+                            :class="[value ? 'text-gray-900' : 'text-gray-400', focused ? 'border-yellow-500 ring-2 ring-yellow-500/30' : '']">
+                            <span x-text="display">dd/mm/yyyy</span>
+                        </div>
+                    </div>
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-gray-500 mb-1">Status</label>

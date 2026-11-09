@@ -81,6 +81,12 @@ class PhoneTradeController extends Controller
     {
         $data = $this->validatedData($request);
 
+        if ($data['status'] !== $phoneTrade->status
+            && !PhoneTrade::isValidTransition($phoneTrade->status, $data['status'])) {
+            return redirect()->route('phone-trades.index', ['edit' => $phoneTrade->id])
+                ->with('error', 'Status Terjual tidak dapat dikembalikan ke Tersedia.');
+        }
+
         $phoneTrade->update($data);
 
         return redirect()->route('phone-trades.index')
@@ -104,7 +110,8 @@ class PhoneTradeController extends Controller
             'pembeli' => 'nullable|string|max:255',
         ]);
 
-        if ($phoneTrade->status === PhoneTrade::STATUS_TERJUAL && $validated['status'] === PhoneTrade::STATUS_STOK) {
+        if ($validated['status'] !== $phoneTrade->status
+            && !PhoneTrade::isValidTransition($phoneTrade->status, $validated['status'])) {
             return redirect()->back()
                 ->with('error', 'Status Terjual tidak dapat dikembalikan ke Tersedia.');
         }

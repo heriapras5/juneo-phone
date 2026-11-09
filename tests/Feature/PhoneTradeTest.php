@@ -108,6 +108,31 @@ class PhoneTradeTest extends TestCase
         $this->assertSame(1500000.0, $trade->keuntungan);
     }
 
+    public function test_sold_status_cannot_be_reverted_to_stock(): void
+    {
+        $this->post('/phone-trades', $this->payload([
+            'status' => 'terjual',
+            'tanggal_keluar' => now()->toDateString(),
+            'harga_jual' => '7.000.000',
+            'pembeli' => 'Siti',
+        ]));
+
+        $trade = PhoneTrade::firstOrFail();
+
+        $this->put('/phone-trades/' . $trade->id, $this->payload())
+            ->assertSessionHas('error');
+
+        $this->put('/phone-trades/' . $trade->id . '/status', ['status' => 'stok'])
+            ->assertSessionHas('error');
+
+        $trade->refresh();
+
+        $this->assertSame('terjual', $trade->status);
+        $this->assertSame(7000000.0, (float) $trade->harga_jual);
+        $this->assertSame('Siti', $trade->pembeli);
+        $this->assertSame(now()->toDateString(), $trade->tanggal_keluar?->toDateString());
+    }
+
     public function test_summary_separates_stock_and_sales(): void
     {
         PhoneTrade::create($this->payload([

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
 
 class PhoneTrade extends Model
 {
@@ -70,6 +71,14 @@ class PhoneTrade extends Model
         });
 
         static::saving(function (PhoneTrade $trade) {
+            if ($trade->exists
+                && $trade->isDirty('status')
+                && !static::isValidTransition((string) $trade->getOriginal('status'), $trade->status)) {
+                throw ValidationException::withMessages([
+                    'status' => 'Status Terjual tidak dapat dikembalikan ke Tersedia.',
+                ]);
+            }
+
             if ($trade->status === self::STATUS_STOK) {
                 $trade->tanggal_keluar = null;
                 $trade->harga_jual = null;

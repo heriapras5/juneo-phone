@@ -803,6 +803,8 @@ Alpine.data('phoneTradePage', () => ({
     showModal: false,
     editingId: null,
     loading: false,
+    originalStatus: '',
+    statusLocked: false,
     rowState: {},
     formData: {
         type_hp: '',
@@ -849,6 +851,9 @@ Alpine.data('phoneTradePage', () => ({
                 pembeli: old.pembeli || '',
                 keterangan: old.keterangan || '',
             };
+            this.originalStatus = old.original_status || '';
+            this.statusLocked = this.originalStatus === 'terjual';
+            if (this.statusLocked) this.formData.status = 'terjual';
         }
 
         if (pd.editTrade) {
@@ -883,6 +888,8 @@ Alpine.data('phoneTradePage', () => ({
     },
     openCreateModal() {
         this.editingId = null;
+        this.originalStatus = '';
+        this.statusLocked = false;
         this.formData = {
             type_hp: '',
             brand: '',
@@ -906,6 +913,8 @@ Alpine.data('phoneTradePage', () => ({
     },
     openEditModal(data, forcedStatus) {
         this.editingId = data.id;
+        this.originalStatus = data.status || '';
+        this.statusLocked = this.originalStatus === 'terjual';
         this.formData = {
             type_hp: data.type_hp || '',
             brand: data.brand || '',
@@ -970,6 +979,30 @@ Alpine.data('phoneTradePage', () => ({
         var perbaikan = parseInt(String(this.formData.biaya_perbaikan || '').replace(/\D/g, ''), 10) || 0;
         var jual = parseInt(String(this.formData.harga_jual || '').replace(/\D/g, ''), 10) || 0;
         return jual - beli - perbaikan;
+    },
+}));
+
+Alpine.data('dateField', (initial) => ({
+    value: initial ? String(initial).slice(0, 10) : '',
+    focused: false,
+    openPicker() {
+        var input = this.$refs.input;
+        if (!input) return;
+        if (typeof input.showPicker === 'function') {
+            try {
+                input.showPicker();
+            } catch (e) {
+                // Picker sudah terbuka / tidak diizinkan browser.
+            }
+        } else {
+            input.focus();
+        }
+    },
+    get display() {
+        var raw = String(this.value || '').slice(0, 10);
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(raw)) return 'dd/mm/yyyy';
+        var parts = raw.split('-');
+        return parts[2] + '/' + parts[1] + '/' + parts[0];
     },
 }));
 
