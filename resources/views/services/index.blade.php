@@ -45,7 +45,7 @@ window._pageData = {
                         placeholder="No. service, tipe HP, pelanggan..."
                         class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 placeholder-gray-400 outline-none w-64">
                 </div>
-                <div class="w-full sm:w-auto">
+                <div class="w-[calc(50%-0.5rem)] sm:w-auto">
                     <label class="block text-xs font-medium text-gray-700 mb-1.5">Dari Tanggal</label>
                     <div class="relative w-full sm:w-40" x-data="dateField('{{ request('date_from') }}')">
                         <input type="date" name="date_from" x-ref="input" x-model="value"
@@ -56,9 +56,10 @@ window._pageData = {
                             :class="[value ? 'text-gray-900' : 'text-gray-400', focused ? 'border-yellow-500 ring-2 ring-yellow-500/30' : '']">
                             <span x-text="display">dd/mm/yyyy</span>
                         </div>
+                        <i class="fas fa-chevron-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400"></i>
                     </div>
                 </div>
-                <div class="w-full sm:w-auto">
+                <div class="w-[calc(50%-0.5rem)] sm:w-auto">
                     <label class="block text-xs font-medium text-gray-700 mb-1.5">Sampai Tanggal</label>
                     <div class="relative w-full sm:w-40" x-data="dateField('{{ request('date_to') }}')">
                         <input type="date" name="date_to" x-ref="input" x-model="value"
@@ -69,6 +70,7 @@ window._pageData = {
                             :class="[value ? 'text-gray-900' : 'text-gray-400', focused ? 'border-yellow-500 ring-2 ring-yellow-500/30' : '']">
                             <span x-text="display">dd/mm/yyyy</span>
                         </div>
+                        <i class="fas fa-chevron-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400"></i>
                     </div>
                 </div>
                 <div>
