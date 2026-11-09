@@ -6,7 +6,39 @@
     <title>Login - Juneo Phone</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-    <style>[x-cloak] { display: none !important; }</style>
+    <style>
+        [x-cloak] { display: none !important; }
+
+        /* Border emas yang berputar mengelilingi kartu login saat hover / fokus */
+        .login-ring { overflow: hidden; }
+        .login-ring::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 200%;
+            aspect-ratio: 1 / 1;
+            transform: translate(-50%, -50%) rotate(0deg);
+            background: conic-gradient(from 0deg,
+                rgba(251, 191, 36, 0) 0deg,
+                rgba(253, 224, 71, 0.95) 40deg,
+                rgba(245, 158, 11, 0.65) 85deg,
+                rgba(251, 191, 36, 0) 140deg,
+                rgba(251, 191, 36, 0) 360deg);
+            animation: loginBorderSpin 3.5s linear infinite;
+            animation-play-state: paused;
+        }
+        .login-card:hover .login-ring::before,
+        .login-card:focus-within .login-ring::before {
+            animation-play-state: running;
+        }
+        @keyframes loginBorderSpin {
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .login-ring::before { animation: none; }
+        }
+    </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     @php $favicon = \App\Models\Setting::getValue('logo'); @endphp
     @if($favicon)
@@ -21,15 +53,18 @@
     <div class="fixed inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(255,215,0,0.07)_0%,_transparent_70%)] pointer-events-none"></div>
     <div class="fixed inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,215,0,0.03)_0%,_transparent_50%)] pointer-events-none"></div>
 
-    <div class="w-full max-w-[26rem] relative z-10">
-        <div class="bg-white/95 backdrop-blur-xl rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7),0_0_90px_-30px_rgba(245,158,11,0.55)] ring-1 ring-white/40 p-6 sm:p-7 relative overflow-hidden">
-            <div class="text-center mb-6">
+    <div class="login-card group w-full max-w-md relative z-10">
+        <div class="login-ring pointer-events-none absolute -inset-[3px] rounded-[27px] opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100"></div>
+
+        <div class="relative bg-gradient-to-b from-white/[0.97] via-white/[0.96] to-amber-50/[0.92] backdrop-blur-xl rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7),0_0_90px_-30px_rgba(245,158,11,0.55)] ring-1 ring-white/60 p-6 transition-shadow duration-300 group-hover:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.75),0_0_110px_-25px_rgba(245,158,11,0.85)]">
+
+            <div class="text-center mb-5">
                 <div class="relative inline-block">
                     @php $logoSetting = \App\Models\Setting::getValue('logo'); @endphp
                     @if($logoSetting)
-                        <img src="{{ asset('storage/' . $logoSetting) }}" alt="Logo" class="w-[72px] h-[72px] mx-auto rounded-full ring-2 ring-yellow-500/40 shadow-lg shadow-black/10 object-cover">
+                        <img src="{{ asset('storage/' . $logoSetting) }}" alt="Logo" class="w-16 h-16 mx-auto rounded-full ring-2 ring-yellow-500/40 shadow-lg shadow-black/10 object-cover">
                     @else
-                        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="w-[72px] h-[72px] mx-auto drop-shadow-lg rounded-full ring-2 ring-yellow-500/40 shadow-lg shadow-black/10 bg-black">
+                        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mx-auto drop-shadow-lg rounded-full ring-2 ring-yellow-500/40 shadow-lg shadow-black/10 bg-black">
                             <defs>
                                 <linearGradient id="goldGradL" x1="0%" y1="0%" x2="100%" y2="100%">
                                     <stop offset="0%" stop-color="#FFD700"/>
@@ -48,10 +83,10 @@
                             <text x="100" y="110" font-size="26" font-weight="900" fill="url(#goldGradL)" font-family="sans-serif" text-anchor="middle" letter-spacing="1">JP</text>
                         </svg>
                     @endif
-                    <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-16 h-0.5 bg-gradient-to-r from-transparent via-yellow-500 to-transparent rounded-full"></div>
+                    <div class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-14 h-0.5 bg-gradient-to-r from-transparent via-yellow-500 to-transparent rounded-full"></div>
                 </div>
-                <h1 class="text-lg font-bold mt-3 tracking-wide text-gray-900">{{ \App\Models\Setting::getValue('nama_toko', 'Juneo Phone') }}</h1>
-                <p class="text-[11px] mt-1 text-amber-600 font-semibold tracking-wide">{{ \App\Models\Setting::getValue('subtitle', 'Service Hp Android & iPhone') }}</p>
+                <h1 class="text-lg font-bold mt-2.5 tracking-wide text-gray-900">{{ \App\Models\Setting::getValue('nama_toko', 'Juneo Phone') }}</h1>
+                <p class="text-[11px] mt-0.5 text-amber-600 font-semibold tracking-wide">{{ \App\Models\Setting::getValue('subtitle', 'Service Hp Android & iPhone') }}</p>
             </div>
 
             @if(session('success'))
@@ -80,17 +115,17 @@
             </div>
             @endif
 
-            <h2 class="text-[11px] font-semibold uppercase tracking-[0.18em] text-gray-400 mb-4 text-center">Masuk ke Akun</h2>
+            <h2 class="text-[11px] font-semibold uppercase tracking-[0.18em] text-gray-400 mb-3 text-center">Masuk ke Akun</h2>
 
             <form method="POST" action="{{ route('login') }}" x-data="{ loading: false }" @submit="loading = true">
                 @csrf
-                <div class="space-y-4">
+                <div class="space-y-3.5">
                     <div>
                         <label class="block text-xs font-semibold text-gray-600 mb-1.5">Email</label>
                         <div class="relative">
                             <i class="fas fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
                             <input type="email" name="email" value="{{ old('email') }}" required autofocus
-                                class="w-full pl-9 pr-3.5 py-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 text-gray-900 placeholder-gray-400 outline-none text-sm transition-colors @error('email') border-red-400 ring-red-500/30 @enderror"
+                                class="w-full pl-9 pr-3.5 py-2.5 bg-white border border-gray-300 rounded-xl hover:border-amber-300 focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 text-gray-900 placeholder-gray-400 outline-none text-sm transition-colors @error('email') border-red-400 ring-red-500/30 @enderror"
                                 placeholder="nama@email.com">
                         </div>
                         @error('email') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
@@ -101,7 +136,7 @@
                         <div class="relative">
                             <i class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
                             <input type="password" name="password" required
-                                class="w-full pl-9 pr-3.5 py-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 text-gray-900 placeholder-gray-400 outline-none text-sm transition-colors">
+                                class="w-full pl-9 pr-3.5 py-2.5 bg-white border border-gray-300 rounded-xl hover:border-amber-300 focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 text-gray-900 placeholder-gray-400 outline-none text-sm transition-colors">
                         </div>
                     </div>
 
@@ -121,14 +156,14 @@
                 </div>
             </form>
 
-            <div class="flex items-center gap-3 my-5">
-                <div class="flex-1 h-px bg-gray-200"></div>
+            <div class="flex items-center gap-3 my-4">
+                <div class="flex-1 h-px bg-gray-200 transition-colors duration-300 group-hover:bg-amber-300/70"></div>
                 <span class="text-[11px] font-semibold uppercase tracking-[0.15em] text-gray-400">atau</span>
-                <div class="flex-1 h-px bg-gray-200"></div>
+                <div class="flex-1 h-px bg-gray-200 transition-colors duration-300 group-hover:bg-amber-300/70"></div>
             </div>
 
             <a href="{{ route('auth.google') }}"
-               class="w-full bg-white hover:bg-gray-50 text-gray-700 font-medium py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 border border-gray-300 shadow-sm text-sm transition-colors duration-200">
+               class="w-full bg-white hover:bg-amber-50/70 text-gray-700 font-medium py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 border border-gray-300 hover:border-amber-300 shadow-sm text-sm transition-colors duration-200">
                 <svg class="w-4 h-4" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
                     <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -138,15 +173,9 @@
                 <span>Masuk dengan Google</span>
             </a>
 
-            <div class="mt-5 text-center">
-                <p class="text-[11px] text-gray-500">
-                    Akses terbatas untuk pengguna yang berwenang.
-                </p>
-            </div>
-
             <div class="mt-4 pt-3 border-t border-gray-200/80 text-center">
                 <p class="text-[11px] text-gray-400">
-                    &copy; {{ date('Y') }} {{ \App\Models\Setting::getValue('nama_toko', 'Juneo Phone') }}
+                    &copy; {{ date('Y') }} {{ \App\Models\Setting::getValue('nama_toko', 'Juneo Phone') }} &middot; Akses terbatas untuk pengguna yang berwenang.
                 </p>
             </div>
         </div>
