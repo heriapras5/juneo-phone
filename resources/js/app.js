@@ -803,6 +803,7 @@ Alpine.data('phoneTradePage', () => ({
     showModal: false,
     editingId: null,
     loading: false,
+    rowState: {},
     formData: {
         type_hp: '',
         brand: '',
@@ -853,6 +854,25 @@ Alpine.data('phoneTradePage', () => ({
         if (pd.editTrade) {
             this.openEditModal(pd.editTrade);
         }
+
+        var self = this;
+        document.addEventListener('click', function(e) {
+            for (var id in self.rowState) {
+                if (!self.rowState[id] || !self.rowState[id].openStatus) continue;
+                var el = document.querySelector('[data-row="' + id + '"]');
+                var statusDropdown = el ? el.querySelector('[data-status-dropdown]') : null;
+                if (el && !el.contains(e.target) && !statusDropdown?.contains(e.target)) {
+                    self.closeRowDropdowns(id);
+                }
+            }
+        });
+        document.addEventListener('scroll', function() {
+            for (var id in self.rowState) {
+                if (self.rowState[id] && self.rowState[id].openStatus) {
+                    self.closeRowDropdowns(id);
+                }
+            }
+        }, true);
     },
     todayLocal() {
         var d = new Date();
@@ -884,7 +904,7 @@ Alpine.data('phoneTradePage', () => ({
         this.showModal = true;
         this.$nextTick(() => { if (this.$refs.firstField) this.$refs.firstField.focus(); });
     },
-    openEditModal(data) {
+    openEditModal(data, forcedStatus) {
         this.editingId = data.id;
         this.formData = {
             type_hp: data.type_hp || '',
@@ -898,14 +918,36 @@ Alpine.data('phoneTradePage', () => ({
             harga_beli: data.harga_beli !== null && data.harga_beli !== undefined ? String(Math.round(Number(data.harga_beli))) : '',
             biaya_perbaikan: data.biaya_perbaikan !== null && data.biaya_perbaikan !== undefined ? String(Math.round(Number(data.biaya_perbaikan))) : '',
             penjual: data.penjual || '',
-            status: data.status || 'stok',
+            status: forcedStatus || data.status || 'stok',
             tanggal_keluar: String(data.tanggal_keluar || '').slice(0, 10),
             harga_jual: data.harga_jual !== null && data.harga_jual !== undefined ? String(Math.round(Number(data.harga_jual))) : '',
             pembeli: data.pembeli || '',
             keterangan: data.keterangan || '',
         };
+        if (this.formData.status === 'terjual' && !this.formData.tanggal_keluar) {
+            this.formData.tanggal_keluar = this.todayLocal();
+        }
         this.showModal = true;
         this.$nextTick(() => { if (this.$refs.firstField) this.$refs.firstField.focus(); });
+    },
+    toggleStatus(id, event) {
+        if (!this.rowState[id]) this.rowState[id] = { openStatus: false, statusStyle: '' };
+        if (!this.rowState[id].openStatus) {
+            this.rowState[id].openStatus = true;
+            this.$nextTick(() => { this.positionDropdown(id, 'status', event.target); });
+        } else {
+            this.rowState[id].openStatus = false;
+        }
+    },
+    closeRowDropdowns(id) {
+        if (this.rowState[id]) {
+            this.rowState[id].openStatus = false;
+        }
+    },
+    positionDropdown(id, type, btn) {
+        var rect = btn.getBoundingClientRect();
+        if (!this.rowState[id]) this.rowState[id] = {};
+        this.rowState[id].statusStyle = 'position:fixed;left:' + (rect.left - 40) + 'px;top:' + (rect.bottom + 4) + 'px;';
     },
     closeModal() {
         this.showModal = false;

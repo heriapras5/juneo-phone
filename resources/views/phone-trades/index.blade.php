@@ -118,8 +118,8 @@ window._pageData = Object.assign(window._pageData || {}, { editTrade: {{ Js::fro
                                 <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">HP</th>
                                 <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap">Kondisi</th>
                                 <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap">Sumber</th>
-                                <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Masuk</th>
-                                <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Keluar</th>
+                                <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Tgl Masuk</th>
+                                <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left whitespace-nowrap">Tgl Keluar</th>
                                 <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap">Status</th>
                                 <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right whitespace-nowrap">Profit</th>
                                 <th class="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center whitespace-nowrap w-28 sticky right-0 z-10 bg-gray-50">Aksi</th>
@@ -127,7 +127,28 @@ window._pageData = Object.assign(window._pageData || {}, { editTrade: {{ Js::fro
                         </thead>
                         <tbody class="divide-y divide-gray-100">
                             @forelse($trades as $trade)
-                            <tr class="hover:bg-gray-50/50">
+                            @php
+                                $tradePayload = [
+                                    'id' => $trade->id,
+                                    'type_hp' => $trade->type_hp,
+                                    'brand' => $trade->brand,
+                                    'storage' => $trade->storage,
+                                    'warna' => $trade->warna,
+                                    'kondisi' => $trade->kondisi,
+                                    'sumber' => $trade->sumber,
+                                    'kelengkapan' => $trade->kelengkapan,
+                                    'tanggal_masuk' => $trade->tanggal_masuk?->format('Y-m-d'),
+                                    'harga_beli' => (float) $trade->harga_beli,
+                                    'biaya_perbaikan' => (float) $trade->biaya_perbaikan,
+                                    'penjual' => $trade->penjual,
+                                    'status' => $trade->status,
+                                    'tanggal_keluar' => $trade->tanggal_keluar?->format('Y-m-d'),
+                                    'harga_jual' => $trade->harga_jual !== null ? (float) $trade->harga_jual : null,
+                                    'pembeli' => $trade->pembeli,
+                                    'keterangan' => $trade->keterangan,
+                                ];
+                            @endphp
+                            <tr class="hover:bg-gray-50/50" data-row="{{ $trade->id }}">
                                 <td class="px-4 py-3 text-sm text-gray-500 text-center whitespace-nowrap">{{ $loop->iteration + ($trades->currentPage() - 1) * $trades->perPage() }}</td>
                                 <td class="px-4 py-3 text-xs font-semibold whitespace-nowrap">
                                     <a href="{{ route('phone-trades.show', $trade) }}" class="text-yellow-600 hover:text-yellow-700 hover:underline">
@@ -137,7 +158,7 @@ window._pageData = Object.assign(window._pageData || {}, { editTrade: {{ Js::fro
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     <a href="{{ route('phone-trades.show', $trade) }}" class="block group">
                                         <div class="text-sm font-semibold text-gray-900 group-hover:text-yellow-600">{{ $trade->type_hp }}</div>
-                                        <div class="text-xs text-gray-400">
+                                        <div class="text-[13px] text-gray-600 font-medium">
                                             {{ collect([$trade->brand, $trade->storage, $trade->warna])->filter()->implode(' · ') ?: '-' }}
                                         </div>
                                     </a>
@@ -157,30 +178,74 @@ window._pageData = Object.assign(window._pageData || {}, { editTrade: {{ Js::fro
                                 </td>
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     <div class="text-sm text-gray-900">{{ $trade->tanggal_masuk?->format('d/m/Y') }}</div>
-                                    <div class="text-xs text-gray-500 tabular-nums">Rp {{ number_format($trade->harga_beli, 0, ',', '.') }}</div>
+                                    <div class="text-[13px] text-gray-700 font-medium tabular-nums">Rp {{ number_format($trade->harga_beli, 0, ',', '.') }}</div>
                                     @if((float) $trade->biaya_perbaikan > 0)
-                                        <div class="text-[11px] text-amber-600 tabular-nums">+ Perbaikan Rp {{ number_format($trade->biaya_perbaikan, 0, ',', '.') }}</div>
-                                        <div class="text-[11px] text-gray-400 tabular-nums">Modal Rp {{ number_format($trade->total_modal, 0, ',', '.') }}</div>
+                                        <div class="text-[11px] text-amber-700 font-medium tabular-nums">+ Perbaikan Rp {{ number_format($trade->biaya_perbaikan, 0, ',', '.') }}</div>
+                                        <div class="text-[11px] text-gray-600 font-medium tabular-nums">Modal Rp {{ number_format($trade->total_modal, 0, ',', '.') }}</div>
                                     @endif
                                     @if($trade->penjual)
-                                        <div class="text-xs text-gray-400">{{ $trade->penjual }}</div>
+                                        <div class="text-xs text-gray-600 font-medium">{{ $trade->penjual }}</div>
                                     @endif
                                 </td>
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     @if($trade->status === \App\Models\PhoneTrade::STATUS_TERJUAL)
                                         <div class="text-sm text-gray-900">{{ $trade->tanggal_keluar?->format('d/m/Y') }}</div>
-                                        <div class="text-xs text-gray-500 tabular-nums">Rp {{ number_format($trade->harga_jual, 0, ',', '.') }}</div>
+                                        <div class="text-[13px] text-gray-700 font-medium tabular-nums">Rp {{ number_format($trade->harga_jual, 0, ',', '.') }}</div>
                                         @if($trade->pembeli)
-                                            <div class="text-xs text-gray-400">{{ $trade->pembeli }}</div>
+                                            <div class="text-xs text-gray-600 font-medium">{{ $trade->pembeli }}</div>
                                         @endif
                                     @else
                                         <span class="text-sm text-gray-300">-</span>
                                     @endif
                                 </td>
                                 <td class="px-4 py-3 text-center whitespace-nowrap">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border {{ $trade->status_class }}">
-                                        {{ $trade->status_label }}
-                                    </span>
+                                    <div class="inline-flex flex-col items-center">
+                                        <button type="button" data-status-badge
+                                            @click="toggleStatus({{ $trade->id }}, $event)"
+                                            class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold border {{ $trade->status_class }} cursor-pointer hover:opacity-80">
+                                            {{ $trade->status_label }}
+                                            <i class="fas fa-chevron-down text-[10px]"></i>
+                                        </button>
+                                        <div x-show="rowState[{{ $trade->id }}]?.openStatus"
+                                            data-status-dropdown
+                                            x-transition:enter="transition-opacity duration-75"
+                                            x-transition:enter-start="opacity-0 scale-95"
+                                            x-transition:enter-end="opacity-100 scale-100"
+                                            x-transition:leave="transition-opacity duration-75"
+                                            x-transition:leave-start="opacity-100 scale-100"
+                                            x-transition:leave-end="opacity-0 scale-95"
+                                            :style="rowState[{{ $trade->id }}]?.statusStyle"
+                                            class="fixed z-[9999] bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[140px] text-left">
+                                            @php
+                                                $allowedNext = \App\Models\PhoneTrade::allowedTransitions()[$trade->status] ?? [];
+                                                $hasOptions = !empty($allowedNext);
+                                            @endphp
+                                            @foreach($allowedNext as $key)
+                                                @if($key === \App\Models\PhoneTrade::STATUS_TERJUAL)
+                                                    <button type="button"
+                                                        @click.stop="closeRowDropdowns({{ $trade->id }}); openEditModal({{ Js::from($tradePayload) }}, '{{ $key }}')"
+                                                        class="block w-full text-left px-3 py-1.5 text-sm hover:bg-gray-100 text-gray-700">
+                                                        {{ \App\Models\PhoneTrade::statusLabels()[$key] ?? $key }}
+                                                    </button>
+                                                @else
+                                                    <button type="submit" form="status-form-{{ $trade->id }}"
+                                                        onclick="return confirm('Ubah status kembali ke Tersedia? Data penjualan (tanggal keluar, harga jual, pembeli) akan dikosongkan.')"
+                                                        class="block w-full text-left px-3 py-1.5 text-sm hover:bg-gray-100 text-gray-700">
+                                                        {{ \App\Models\PhoneTrade::statusLabels()[$key] ?? $key }}
+                                                    </button>
+                                                @endif
+                                            @endforeach
+                                            @unless($hasOptions)
+                                                <div class="px-3 py-2 text-xs text-gray-400 italic">Tidak ada aksi tersedia</div>
+                                            @endunless
+                                        </div>
+                                    </div>
+                                    <form id="status-form-{{ $trade->id }}" method="POST" action="{{ route('phone-trades.update-status', $trade) }}" class="hidden">
+                                        @csrf
+                                        @method('PUT')
+                                        <input type="hidden" name="status" value="{{ \App\Models\PhoneTrade::STATUS_STOK }}">
+                                        <input type="hidden" name="redirect_to" value="index">
+                                    </form>
                                 </td>
                                 <td class="px-4 py-3 text-right whitespace-nowrap tabular-nums">
                                     @if($trade->status === \App\Models\PhoneTrade::STATUS_TERJUAL)
@@ -198,25 +263,7 @@ window._pageData = Object.assign(window._pageData || {}, { editTrade: {{ Js::fro
                                             <i class="fas fa-eye"></i>
                                         </a>
                                         <button type="button"
-                                            @click="openEditModal({{ Js::from([
-                                                'id' => $trade->id,
-                                                'type_hp' => $trade->type_hp,
-                                                'brand' => $trade->brand,
-                                                'storage' => $trade->storage,
-                                                'warna' => $trade->warna,
-                                                'kondisi' => $trade->kondisi,
-                                                'sumber' => $trade->sumber,
-                                                'kelengkapan' => $trade->kelengkapan,
-                                                'tanggal_masuk' => $trade->tanggal_masuk?->format('Y-m-d'),
-                                                'harga_beli' => (float) $trade->harga_beli,
-                                                'biaya_perbaikan' => (float) $trade->biaya_perbaikan,
-                                                'penjual' => $trade->penjual,
-                                                'status' => $trade->status,
-                                                'tanggal_keluar' => $trade->tanggal_keluar?->format('Y-m-d'),
-                                                'harga_jual' => $trade->harga_jual !== null ? (float) $trade->harga_jual : null,
-                                                'pembeli' => $trade->pembeli,
-                                                'keterangan' => $trade->keterangan,
-                                            ]) }})"
+                                            @click="openEditModal({{ Js::from($tradePayload) }})"
                                             class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </button>

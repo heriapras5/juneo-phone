@@ -106,6 +106,11 @@ class PhoneTradeController extends Controller
 
         $phoneTrade->update($validated);
 
+        if ($request->input('redirect_to') === 'index') {
+            return redirect()->route('phone-trades.index')
+                ->with('success', "Status HP {$phoneTrade->type_hp} ({$phoneTrade->kode}) berhasil diubah.");
+        }
+
         return redirect()->route('phone-trades.show', $phoneTrade)
             ->with('success', "Status HP {$phoneTrade->type_hp} ({$phoneTrade->kode}) berhasil diubah.");
     }

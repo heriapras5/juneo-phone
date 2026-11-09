@@ -177,6 +177,19 @@ class PhoneTrade extends Model
             });
     }
 
+    public static function allowedTransitions(): array
+    {
+        return [
+            self::STATUS_STOK => [self::STATUS_TERJUAL],
+            self::STATUS_TERJUAL => [self::STATUS_STOK],
+        ];
+    }
+
+    public static function isValidTransition(string $from, string $to): bool
+    {
+        return in_array($to, static::allowedTransitions()[$from] ?? [], true);
+    }
+
     public static function statusLabels(): array
     {
         return [
