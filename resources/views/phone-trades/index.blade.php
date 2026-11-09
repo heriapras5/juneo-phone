@@ -344,11 +344,11 @@ window._pageData = Object.assign(window._pageData || {}, { editTrade: {{ Js::fro
                     </p>
                 </div>
                 <div class="flex items-center gap-2">
-                    <a href="{{ route('phone-trades.export-pdf', $exportFilters) }}"
+                    <a href="{{ route('phone-trades.export-pdf', $exportFilters) }}" target="_blank" rel="noopener noreferrer"
                         class="px-3 py-2 bg-red-50 text-red-600 border border-red-200 rounded-lg text-xs font-medium hover:bg-red-100 flex items-center gap-1.5">
                         <i class="fas fa-file-pdf"></i> Laporan PDF
                     </a>
-                    <a href="{{ route('phone-trades.export-excel', $exportFilters) }}"
+                    <a href="{{ route('phone-trades.export-excel', $exportFilters) }}" target="_blank" rel="noopener noreferrer"
                         class="px-3 py-2 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg text-xs font-medium hover:bg-emerald-100 flex items-center gap-1.5">
                         <i class="fas fa-file-excel"></i> Laporan Excel
                     </a>
