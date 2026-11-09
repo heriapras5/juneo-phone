@@ -34,25 +34,30 @@
         }
         .login-logo:hover,
         .login-logo-wrap:hover .login-logo {
-            filter: drop-shadow(0 16px 22px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 28px rgba(245, 158, 11, 0.85));
+            filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 32px rgba(245, 158, 11, 0.95));
         }
-        .login-border {
+        .login-logo-wrap:hover .login-logo-spin {
+            animation-play-state: paused;
+        }
+        .login-card-shell {
             position: relative;
             overflow: hidden;
+            background: #e2e8f0;
         }
-        .login-border::before {
+        .login-card-shell::before {
             content: '';
             position: absolute;
             inset: -150%;
             background: conic-gradient(
                 from 0deg,
                 rgba(253, 224, 71, 0) 0deg,
-                rgba(253, 224, 71, 0.95) 40deg,
-                rgba(245, 158, 11, 0.7) 90deg,
-                rgba(251, 191, 36, 0) 150deg,
-                rgba(251, 191, 36, 0) 360deg
+                rgba(253, 224, 71, 0) 300deg,
+                rgba(253, 224, 71, 0) 310deg,
+                rgba(253, 224, 71, 0.95) 332deg,
+                rgba(245, 158, 11, 0.95) 346deg,
+                rgba(253, 224, 71, 0) 360deg
             );
-            animation: loginBorderSpin 5s linear infinite;
+            animation: loginBorderSpin 4.5s linear infinite;
         }
         .login-card-inner {
             position: relative;
@@ -63,7 +68,7 @@
         }
         @media (prefers-reduced-motion: reduce) {
             .login-logo-spin,
-            .login-border::before {
+            .login-card-shell::before {
                 animation: none;
             }
         }
@@ -79,25 +84,28 @@
 
     <main class="relative z-10 flex min-h-dvh w-full items-center justify-center px-4 py-8 sm:px-6">
         <div class="w-full max-w-[22rem] sm:max-w-[24rem]">
-            <div class="login-border group rounded-[1.65rem] bg-gradient-to-br from-yellow-300 via-amber-500 to-yellow-300 p-[2px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.65),0_0_50px_-20px_rgba(245,158,11,0.55)] transition-shadow duration-300 hover:shadow-[0_30px_70px_-15px_rgba(0,0,0,0.7),0_0_65px_-18px_rgba(245,158,11,0.75)] focus-within:shadow-[0_30px_70px_-15px_rgba(0,0,0,0.7),0_0_65px_-18px_rgba(245,158,11,0.75)]">
-                <div class="login-card-inner rounded-[1.55rem] bg-white p-5 sm:p-6">
+            <div class="login-card-shell group rounded-[1.65rem] p-[2px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.65),0_0_50px_-20px_rgba(245,158,11,0.55)] transition-shadow duration-300 hover:shadow-[0_30px_70px_-15px_rgba(0,0,0,0.7),0_0_65px_-18px_rgba(245,158,11,0.75)] focus-within:shadow-[0_30px_70px_-15px_rgba(0,0,0,0.7),0_0_65px_-18px_rgba(245,158,11,0.75)]">
+                <div class="login-card-inner rounded-[1.6rem] bg-white p-5 sm:p-6">
                     {{-- Logo --}}
                     <div class="mb-4 flex justify-center">
-                        @if($logoUrl)
-                            <div class="login-logo-wrap relative rounded-full transition-all duration-300 hover:-translate-y-1 hover:scale-105">
-                                <div class="pointer-events-none absolute -inset-2 rounded-full bg-amber-400/20 blur-xl"></div>
+                        <div class="login-logo-wrap relative rounded-full transition-all duration-300 hover:-translate-y-1 hover:scale-105">
+                            <div class="pointer-events-none absolute -inset-2 rounded-full bg-amber-400/20 blur-xl"></div>
+                            <div class="pointer-events-none absolute -bottom-3 left-1/2 h-3 w-16 -translate-x-1/2 rounded-full bg-black/40 blur-md sm:w-20"></div>
+
+                            @if($logoUrl)
                                 <img src="{{ $logoUrl }}" alt="Logo {{ $namaToko }}"
                                     class="login-logo login-logo-spin relative h-20 w-20 rounded-full object-cover sm:h-24 sm:w-24"
                                     onerror="this.onerror=null;this.src='{{ asset('favicon.png') }}';">
-                            </div>
-                        @else
-                            <div class="login-logo-wrap relative rounded-full transition-all duration-300 hover:-translate-y-1 hover:scale-105">
-                                <div class="pointer-events-none absolute -inset-2 rounded-full bg-amber-400/20 blur-xl"></div>
+                            @else
                                 <span class="login-logo login-logo-spin relative flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 to-amber-600 text-slate-950 sm:h-24 sm:w-24">
                                     <i class="fas fa-mobile-screen-button text-xl"></i>
                                 </span>
-                            </div>
-                        @endif
+                            @endif
+
+                            <span class="pointer-events-none absolute -right-2 -top-2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-yellow-200 via-amber-400 to-yellow-600 text-[10px] text-slate-950 shadow-[0_0_14px_rgba(245,158,11,0.85)]">
+                                <i class="fas fa-star"></i>
+                            </span>
+                        </div>
                     </div>
 
                     <div class="mb-5 text-center">
