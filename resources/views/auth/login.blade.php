@@ -20,6 +20,7 @@
         $faviconIcoPath = public_path('favicon.ico');
         $faviconIcoUrl = asset('favicon.ico') . '?v=' . (file_exists($faviconIcoPath) ? filemtime($faviconIcoPath) : time());
         $namaToko = \App\Models\Setting::getValue('nama_toko', 'Juneo Phone');
+        $subtitle = \App\Models\Setting::getValue('subtitle', 'Service Hp Android & iPhone');
     @endphp
 
     <link rel="icon" type="image/x-icon" href="{{ $faviconIcoUrl }}" sizes="any">
@@ -74,14 +75,14 @@
     <div class="pointer-events-none fixed -bottom-40 -left-40 h-[26rem] w-[26rem] rounded-full bg-yellow-400/10 blur-3xl"></div>
 
     <main class="relative z-10 flex min-h-dvh w-full items-center justify-center px-4 py-8 sm:px-6">
-        <div class="w-full max-w-[22rem] sm:max-w-[24rem]">
+        <div class="w-full max-w-[20rem] sm:max-w-[22rem]">
             <div class="login-card-shell group rounded-[1.65rem] p-[4px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.65),0_0_50px_-20px_rgba(245,158,11,0.55)] transition-shadow duration-300 hover:shadow-[0_30px_70px_-15px_rgba(0,0,0,0.7),0_0_65px_-18px_rgba(245,158,11,0.75)] focus-within:shadow-[0_30px_70px_-15px_rgba(0,0,0,0.7),0_0_65px_-18px_rgba(245,158,11,0.75)]">
-                <div class="login-card-inner rounded-[1.55rem] bg-white p-5 sm:p-6">
+                <div class="login-card-inner rounded-[1.55rem] bg-white p-4 sm:p-5">
                     {{-- Logo --}}
-                    <div class="mb-4 flex justify-center">
+                    <div class="mb-3 flex justify-center">
                         <div class="brand-logo-wrap relative rounded-full transition-all duration-300 hover:-translate-y-1 hover:scale-105">
-                            <div class="brand-logo-scene relative h-20 w-20 rounded-full sm:h-24 sm:w-24">
-                                <div class="pointer-events-none absolute -bottom-4 left-1/2 z-0 h-4 w-20 -translate-x-1/2 rounded-full bg-black/55 blur-lg sm:w-24"></div>
+                            <div class="brand-logo-scene relative h-16 w-16 rounded-full sm:h-20 sm:w-20">
+                                <div class="pointer-events-none absolute -bottom-3 left-1/2 z-0 h-3 w-16 -translate-x-1/2 rounded-full bg-black/55 blur-md sm:w-20"></div>
 
                                 @if($logoDisplayUrl)
                                     <img src="{{ $logoDisplayUrl }}" alt="Logo {{ $namaToko }}" loading="eager" decoding="async"
@@ -89,16 +90,16 @@
                                         onerror="this.onerror=null;this.src='{{ asset('favicon.png') }}';">
                                 @else
                                     <span class="absolute inset-0 z-10 flex items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 to-amber-600 text-slate-950">
-                                        <i class="fas fa-mobile-screen-button text-xl"></i>
+                                        <i class="fas fa-mobile-screen-button text-lg"></i>
                                     </span>
                                 @endif
                             </div>
                         </div>
                     </div>
 
-                    <div class="mb-5 text-center">
-                        <h1 class="text-xl font-bold tracking-tight text-slate-900">Masuk ke akun</h1>
-                        <p class="mt-1 text-sm text-slate-600">Gunakan email dan password yang terdaftar.</p>
+                    <div class="mb-4 text-center">
+                        <h1 class="text-lg font-bold tracking-tight text-slate-900">{{ $namaToko }}</h1>
+                        <p class="mt-1 text-xs text-slate-600">{{ $subtitle }}</p>
                     </div>
 
                 @if(session('success'))
@@ -130,7 +131,7 @@
                 @endif
 
                 <form method="POST" action="{{ route('login') }}" x-data="{ loading: false, showPassword: false }"
-                    @submit="loading = true" class="space-y-4">
+                    @submit="loading = true" class="space-y-3.5">
                     @csrf
 
                     <div>
@@ -138,7 +139,7 @@
                         <div class="relative">
                             <i class="fas fa-envelope pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-slate-500"></i>
                             <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus
-                                autocomplete="email" placeholder="nama@email.com"
+                                autocomplete="email" placeholder="Masukkan email"
                                 class="h-10 w-full rounded-xl border bg-white pl-10 pr-3.5 text-sm text-slate-900 placeholder-slate-500 outline-none transition focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 @error('email') border-red-400 @else border-slate-300 @enderror">
                         </div>
                         @error('email')
@@ -185,7 +186,7 @@
                     </button>
                 </form>
 
-                <div class="my-4 flex items-center gap-3">
+                <div class="my-3.5 flex items-center gap-3">
                     <div class="h-px flex-1 bg-slate-200"></div>
                     <span class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">atau</span>
                     <div class="h-px flex-1 bg-slate-200"></div>
@@ -202,7 +203,7 @@
                     <span>Masuk dengan Google</span>
                 </a>
 
-                <div class="mt-5 border-t border-slate-200 pt-3 text-center">
+                <div class="mt-4 border-t border-slate-200 pt-3 text-center">
                     <p class="text-xs leading-relaxed text-slate-500">
                         &copy; {{ date('Y') }} {{ $namaToko }}
                     </p>
