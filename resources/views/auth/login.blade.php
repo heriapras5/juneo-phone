@@ -22,7 +22,7 @@
     <div class="fixed inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,215,0,0.03)_0%,_transparent_50%)] pointer-events-none"></div>
 
     <div class="w-full max-w-sm relative z-10">
-        <div class="bg-white rounded-2xl shadow-2xl shadow-black/40 p-5 relative overflow-hidden border border-white/10">
+        <div class="bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl shadow-black/40 p-5 relative overflow-hidden border border-white/50">
             <div class="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-400"></div>
 
             <div class="text-center mb-3">
@@ -129,7 +129,7 @@
                     <div class="w-full border-t border-gray-200"></div>
                 </div>
                 <div class="relative flex justify-center text-xs">
-                    <span class="bg-white px-3 text-gray-400 font-medium">atau</span>
+                    <span class="bg-white/80 backdrop-blur-md px-3 py-0.5 rounded text-gray-400 font-medium">atau</span>
                 </div>
             </div>
 
