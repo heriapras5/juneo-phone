@@ -19,32 +19,40 @@
     <link rel="icon" href="{{ $faviconUrl }}">
 </head>
 <body class="min-h-dvh bg-slate-950 font-sans text-slate-900 antialiased">
-    <div class="fixed inset-0 bg-cover bg-center bg-no-repeat" style="background-image: url('{{ asset('bg-login.png') }}');"></div>
-    <div class="fixed inset-0 bg-slate-950/80"></div>
-    <div class="fixed inset-0 bg-gradient-to-br from-slate-950 via-slate-950/70 to-amber-950/40"></div>
+    <div class="fixed inset-0 bg-cover bg-center bg-no-repeat brightness-110 saturate-110" style="background-image: url('{{ asset('bg-login.png') }}');"></div>
+    <div class="fixed inset-0 bg-slate-950/35"></div>
+    <div class="fixed inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_20%,_rgba(2,6,23,0.70)_100%)]"></div>
+    <div class="fixed inset-0 bg-gradient-to-br from-slate-950/40 via-transparent to-amber-950/30"></div>
     <div class="pointer-events-none fixed -right-40 -top-40 h-[26rem] w-[26rem] rounded-full bg-amber-500/10 blur-3xl"></div>
     <div class="pointer-events-none fixed -bottom-40 -left-40 h-[26rem] w-[26rem] rounded-full bg-yellow-400/10 blur-3xl"></div>
 
     <main class="relative z-10 flex min-h-dvh w-full items-center justify-center px-4 py-8 sm:px-6">
-        <div class="w-full max-w-md">
-            <div class="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-2xl shadow-black/30 sm:p-8">
-                {{-- Logo --}}
-                <div class="mb-6 flex justify-center">
-                    @if($logoUrl)
-                        <img src="{{ $logoUrl }}" alt="Logo {{ $namaToko }}"
-                            class="h-20 w-20 rounded-2xl object-contain ring-1 ring-slate-200"
-                            onerror="this.onerror=null;this.src='{{ asset('favicon.png') }}';">
-                    @else
-                        <span class="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-yellow-300 to-amber-600 text-slate-950 shadow-md">
-                            <i class="fas fa-mobile-screen-button text-2xl"></i>
-                        </span>
-                    @endif
-                </div>
+        <div class="w-full max-w-[26rem] sm:max-w-[28rem]">
+            <div class="group rounded-[1.8rem] bg-gradient-to-br from-yellow-300 via-amber-500 to-yellow-300 p-[2px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.65),0_0_50px_-20px_rgba(245,158,11,0.55)] transition-shadow duration-300 hover:shadow-[0_30px_70px_-15px_rgba(0,0,0,0.7),0_0_65px_-18px_rgba(245,158,11,0.75)] focus-within:shadow-[0_30px_70px_-15px_rgba(0,0,0,0.7),0_0_65px_-18px_rgba(245,158,11,0.75)]">
+                <div class="rounded-[1.7rem] bg-white p-6 sm:p-7">
+                    {{-- Logo --}}
+                    <div class="mb-5 flex justify-center">
+                        @if($logoUrl)
+                            <div class="relative rounded-full bg-gradient-to-br from-yellow-200 via-amber-500 to-yellow-600 p-[3px] shadow-[0_16px_30px_-10px_rgba(0,0,0,0.45),0_0_25px_-5px_rgba(245,158,11,0.55)] transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:shadow-[0_22px_40px_-12px_rgba(0,0,0,0.55),0_0_38px_-4px_rgba(245,158,11,0.75)]">
+                                <div class="rounded-full bg-white p-1 ring-1 ring-white/70">
+                                    <img src="{{ $logoUrl }}" alt="Logo {{ $namaToko }}"
+                                        class="h-20 w-20 rounded-full object-cover"
+                                        onerror="this.onerror=null;this.src='{{ asset('favicon.png') }}';">
+                                </div>
+                            </div>
+                        @else
+                            <div class="rounded-full bg-gradient-to-br from-yellow-200 via-amber-500 to-yellow-600 p-[3px] shadow-[0_16px_30px_-10px_rgba(0,0,0,0.45),0_0_25px_-5px_rgba(245,158,11,0.55)] transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:shadow-[0_22px_40px_-12px_rgba(0,0,0,0.55),0_0_38px_-4px_rgba(245,158,11,0.75)]">
+                                <span class="flex h-20 w-20 items-center justify-center rounded-full bg-white text-slate-950">
+                                    <i class="fas fa-mobile-screen-button text-2xl"></i>
+                                </span>
+                            </div>
+                        @endif
+                    </div>
 
-                <div class="mb-6 text-center">
-                    <h1 class="text-2xl font-bold tracking-tight text-slate-900">Masuk ke akun</h1>
-                    <p class="mt-1.5 text-sm text-slate-600">Gunakan email dan password yang terdaftar.</p>
-                </div>
+                    <div class="mb-6 text-center">
+                        <h1 class="text-2xl font-bold tracking-tight text-slate-900">Masuk ke akun</h1>
+                        <p class="mt-1.5 text-sm text-slate-600">Gunakan email dan password yang terdaftar.</p>
+                    </div>
 
                 @if(session('success'))
                 <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 5000)" x-show="show" x-cloak
@@ -156,6 +164,7 @@
                 </div>
             </div>
         </div>
+    </div>
     </main>
 </body>
 </html>
