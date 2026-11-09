@@ -120,7 +120,7 @@ window._pageData = Object.assign(window._pageData || {}, { editTrade: {{ Js::fro
 
                 <button type="button" @click="openCreateModal()"
                     class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm ml-auto flex-shrink-0">
-                    <i class="fas fa-plus"></i> Tambah HP
+                    <i class="fas fa-plus"></i> Tambah
                 </button>
             </div>
         </div>

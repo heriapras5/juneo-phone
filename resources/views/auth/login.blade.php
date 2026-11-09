@@ -16,6 +16,8 @@
     @endif
 </head>
 <body class="bg-black min-h-screen flex items-center justify-center px-4 py-6 md:py-10 relative overflow-y-auto">
+    <div class="fixed inset-0 bg-cover bg-center bg-no-repeat" style="background-image: url('{{ asset('bg-login.png') }}');"></div>
+    <div class="fixed inset-0 bg-black/60"></div>
     <div class="fixed inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(255,215,0,0.07)_0%,_transparent_70%)] pointer-events-none"></div>
     <div class="fixed inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,215,0,0.03)_0%,_transparent_50%)] pointer-events-none"></div>
 
