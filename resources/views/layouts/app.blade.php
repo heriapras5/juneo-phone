@@ -5,16 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Juneo Phone') - Sistem Manajemen Service</title>
-    @php $favicon = \App\Models\Setting::getValue('logo'); @endphp
-    @if($favicon)
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('storage/' . $favicon) }}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('storage/' . $favicon) }}">
-    <link rel="shortcut icon" href="{{ asset('storage/' . $favicon) }}">
-    <link rel="apple-touch-icon" href="{{ asset('storage/' . $favicon) }}">
-    @else
-    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
-    <link rel="shortcut icon" href="{{ asset('favicon.png') }}">
-    @endif
+    @php
+        $faviconPath = public_path('favicon.png');
+        $faviconUrl = asset('favicon.png') . '?v=' . (file_exists($faviconPath) ? filemtime($faviconPath) : time());
+        $faviconIcoPath = public_path('favicon.ico');
+        $faviconIcoUrl = asset('favicon.ico') . '?v=' . (file_exists($faviconIcoPath) ? filemtime($faviconIcoPath) : time());
+    @endphp
+    <link rel="icon" type="image/x-icon" href="{{ $faviconIcoUrl }}" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ $faviconUrl }}">
+    <link rel="shortcut icon" type="image/png" href="{{ $faviconUrl }}">
+    <link rel="apple-touch-icon" href="{{ $faviconUrl }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -81,45 +81,23 @@ x-init="
             {{-- Logo Area --}}
             <a href="{{ route('dashboard') }}"
                 class="flex-shrink-0 flex justify-center flex-row items-center gap-3 px-3 pt-5 pb-5">
-                @php $logoSetting = \App\Models\Setting::getValue('logo'); @endphp
-                <div :class="{ 'w-16 h-16': sidebarOpen, 'w-10 h-10': !sidebarOpen }" class="flex-shrink-0 overflow-hidden rounded-full ring-4 ring-yellow-500/30 shadow-2xl shadow-yellow-500/30 w-16 h-16 transition-all duration-150 ease-in-out" style="filter: drop-shadow(0 4px 8px rgba(255,215,0,0.25));">
-                    @if($logoSetting)
-                        <img src="{{ asset('storage/' . $logoSetting) }}" alt="Logo" width="64" height="64" class="w-full h-full object-cover">
-                    @else
-                    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
-                        <defs>
-                            <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stop-color="#FFD700"/>
-                                <stop offset="50%" stop-color="#FFA500"/>
-                                <stop offset="100%" stop-color="#FFD700"/>
-                            </linearGradient>
-                            <linearGradient id="goldGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stop-color="#FFC107"/>
-                                <stop offset="100%" stop-color="#FF8F00"/>
-                            </linearGradient>
-                            <path id="topArc" d="M 40 100 A 60 60 0 0 1 160 100" fill="none"/>
-                            <path id="botArc" d="M 40 105 A 60 60 0 0 0 160 105" fill="none"/>
-                        </defs>
-                        <circle cx="100" cy="100" r="88" fill="none" stroke="url(#goldGrad)" stroke-width="3"/>
-                        <circle cx="100" cy="100" r="82" fill="none" stroke="url(#goldGrad)" stroke-width="1" opacity="0.5"/>
-                        <text font-size="12" font-weight="bold" fill="url(#goldGrad)" font-family="sans-serif" letter-spacing="2">
-                            <textPath href="#topArc" startOffset="50%" text-anchor="middle">JUNEO PHONE</textPath>
-                        </text>
-                        <text font-size="5.5" fill="url(#goldGrad)" opacity="0.8" font-family="sans-serif" letter-spacing="1">
-                            <textPath href="#botArc" startOffset="50%" text-anchor="middle">SERVICE HP | ANDROID &amp; iPHONE</textPath>
-                        </text>
-                        <g transform="translate(100, 52)" fill="url(#goldGrad2)">
-                            <polygon points="0,-18 6,-8 12,-14 18,-4 24,-10 30,2 -30,2 -24,-10 -18,-4 -12,-14 -6,-8"/>
-                            <rect x="-22" y="2" width="44" height="5" rx="2"/>
-                        </g>
-                        <path d="M 100 68 L 130 80 L 130 105 Q 130 130 100 142 Q 70 130 70 105 L 70 80 Z"
-                            fill="#111" stroke="url(#goldGrad2)" stroke-width="1.5"/>
-                        <path d="M 100 72 L 125 82 L 125 105 Q 125 126 100 137 Q 75 126 75 105 L 75 82 Z"
-                            fill="url(#goldGrad)" opacity="0.15"/>
-                        <text x="100" y="110" font-size="26" font-weight="900" fill="url(#goldGrad)"
-                            font-family="sans-serif" text-anchor="middle" letter-spacing="1">JP</text>
-                    </svg>
-                    @endif
+                @php
+                    $logoSetting = \App\Models\Setting::getValue('logo');
+                    $logoUrl = $logoSetting ? route('storage.file', $logoSetting) : null;
+                @endphp
+                <div :class="{ 'w-16 h-16': sidebarOpen, 'w-10 h-10': !sidebarOpen }" class="brand-logo-wrap relative flex-shrink-0 rounded-full w-16 h-16 transition-all duration-150 ease-in-out">
+                    <div class="brand-logo-scene relative h-full w-full">
+                        <div class="pointer-events-none absolute -bottom-2 left-1/2 z-0 h-2 w-3/4 -translate-x-1/2 rounded-full bg-black/50 blur-md"></div>
+                        @if($logoUrl)
+                            <img src="{{ $logoUrl }}" alt="Logo" width="64" height="64"
+                                class="absolute inset-0 z-10 h-full w-full rounded-full object-cover"
+                                onerror="this.onerror=null;this.src='{{ asset('favicon.png') }}';">
+                        @else
+                            <span class="absolute inset-0 z-10 flex items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 to-amber-600 text-slate-950">
+                                <i class="fas fa-mobile-screen-button"></i>
+                            </span>
+                        @endif
+                    </div>
                 </div>
 
                 <div class="sidebar-text flex-1 min-w-0">
@@ -251,14 +229,24 @@ x-init="
             class="md:hidden fixed inset-y-0 left-0 z-40 w-64 bg-gradient-to-b from-gray-900 via-gray-950 to-black text-white flex flex-col border-r border-gray-800/50">
 
             <div class="flex-shrink-0 flex items-center justify-between h-16 px-4 border-b border-gray-800">
-                @php $logoSetting = \App\Models\Setting::getValue('logo'); @endphp
+                @php
+                    $logoSetting = \App\Models\Setting::getValue('logo');
+                    $logoUrl = $logoSetting ? route('storage.file', $logoSetting) : null;
+                @endphp
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-full ring-2 ring-yellow-500/30 shadow-xl shadow-yellow-500/20 bg-black flex items-center justify-center flex-shrink-0 overflow-hidden" style="filter: drop-shadow(0 2px 4px rgba(255,215,0,0.2));">
-                        @if($logoSetting)
-                            <img src="{{ asset('storage/' . $logoSetting) }}" alt="Logo" class="w-full h-full object-cover">
-                        @else
-                            <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="w-full h-full"><defs><linearGradient id="mg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FFD700"/><stop offset="100%" stop-color="#F59E0B"/></linearGradient></defs><circle cx="100" cy="100" r="92" fill="#111" stroke="url(#mg)" stroke-width="6"/><text x="100" y="138" font-size="85" font-weight="900" fill="url(#mg)" font-family="sans-serif" text-anchor="middle">JP</text></svg>
-                        @endif
+                    <div class="brand-logo-wrap relative w-9 h-9 rounded-full flex-shrink-0">
+                        <div class="brand-logo-scene relative h-full w-full">
+                            <div class="pointer-events-none absolute -bottom-1.5 left-1/2 z-0 h-1.5 w-3/4 -translate-x-1/2 rounded-full bg-black/50 blur-sm"></div>
+                            @if($logoUrl)
+                                <img src="{{ $logoUrl }}" alt="Logo"
+                                    class="absolute inset-0 z-10 h-full w-full rounded-full object-cover"
+                                    onerror="this.onerror=null;this.src='{{ asset('favicon.png') }}';">
+                            @else
+                                <span class="absolute inset-0 z-10 flex items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 to-amber-600 text-slate-950">
+                                    <i class="fas fa-mobile-screen-button text-xs"></i>
+                                </span>
+                            @endif
+                        </div>
                     </div>
                     <div>
                         <span class="font-bold text-sm tracking-wider" style="color:#FFD700; text-shadow: 0 2px 6px rgba(255,215,0,0.3), 0 1px 2px rgba(0,0,0,0.5);">{{ \App\Models\Setting::getValue('nama_toko', 'Juneo Phone') }}</span>

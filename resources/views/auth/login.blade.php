@@ -13,37 +13,17 @@
         $logoUrl = $logoSetting ? route('storage.file', $logoSetting) : null;
         $faviconPath = public_path('favicon.png');
         $faviconUrl = asset('favicon.png') . '?v=' . (file_exists($faviconPath) ? filemtime($faviconPath) : time());
+        $faviconIcoPath = public_path('favicon.ico');
+        $faviconIcoUrl = asset('favicon.ico') . '?v=' . (file_exists($faviconIcoPath) ? filemtime($faviconIcoPath) : time());
         $namaToko = \App\Models\Setting::getValue('nama_toko', 'Juneo Phone');
     @endphp
 
+    <link rel="icon" type="image/x-icon" href="{{ $faviconIcoUrl }}" sizes="any">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ $faviconUrl }}">
     <link rel="shortcut icon" type="image/png" href="{{ $faviconUrl }}">
     <link rel="apple-touch-icon" href="{{ $faviconUrl }}">
 
     <style>
-        @keyframes loginLogoSpin {
-            0%, 8% { transform: perspective(700px) rotateY(0deg); }
-            28%, 36% { transform: perspective(700px) rotateY(-16deg); }
-            56%, 64% { transform: perspective(700px) rotateY(16deg); }
-            84%, 100% { transform: perspective(700px) rotateY(0deg); }
-        }
-        .login-logo-spin {
-            animation: loginLogoSpin 7s cubic-bezier(.65,.05,.36,1) infinite;
-            will-change: transform;
-            transform: translateZ(0);
-            transition: transform 0.25s ease;
-        }
-        .login-logo-wrap {
-            box-shadow: 0 14px 24px -12px rgba(0, 0, 0, 0.55), 0 0 18px -4px rgba(245, 158, 11, 0.45);
-            transition: box-shadow 0.3s ease, transform 0.3s ease;
-        }
-        .login-logo-wrap:hover {
-            box-shadow: 0 0 0 1.5px rgba(245, 158, 11, 0.95), 0 0 0 4px rgba(245, 158, 11, 0.15), 0 18px 30px -12px rgba(0, 0, 0, 0.6), 0 0 24px -4px rgba(245, 158, 11, 0.65);
-        }
-        .login-logo-wrap:hover .login-logo-spin {
-            animation: none;
-            transform: perspective(700px) rotateY(0deg) scale(1.02);
-        }
         .login-card-shell {
             position: relative;
             overflow: hidden;
@@ -74,7 +54,7 @@
             to { transform: rotate(360deg); }
         }
         @media (prefers-reduced-motion: reduce) {
-            .login-logo-spin,
+            .brand-logo-scene,
             .login-card-shell::before {
                 animation: none;
             }
@@ -95,8 +75,8 @@
                 <div class="login-card-inner rounded-[1.55rem] bg-white p-5 sm:p-6">
                     {{-- Logo --}}
                     <div class="mb-4 flex justify-center">
-                        <div class="login-logo-wrap relative rounded-full transition-all duration-300 hover:-translate-y-1 hover:scale-105">
-                            <div class="login-logo login-logo-spin relative h-20 w-20 rounded-full sm:h-24 sm:w-24">
+                        <div class="brand-logo-wrap relative rounded-full transition-all duration-300 hover:-translate-y-1 hover:scale-105">
+                            <div class="brand-logo-scene relative h-20 w-20 rounded-full sm:h-24 sm:w-24">
                                 <div class="pointer-events-none absolute -bottom-4 left-1/2 z-0 h-4 w-20 -translate-x-1/2 rounded-full bg-black/55 blur-lg sm:w-24"></div>
 
                                 @if($logoUrl)

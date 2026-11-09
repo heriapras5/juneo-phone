@@ -13,6 +13,36 @@
 
 [x-cloak] { display: none !important; }
 
+/* ── Brand logo (login & sidebar) ── */
+@keyframes brandLogoSpin {
+    0%, 8% { transform: perspective(700px) rotateY(0deg); }
+    28%, 36% { transform: perspective(700px) rotateY(-16deg); }
+    56%, 64% { transform: perspective(700px) rotateY(16deg); }
+    84%, 100% { transform: perspective(700px) rotateY(0deg); }
+}
+.brand-logo-wrap {
+    box-shadow: 0 14px 24px -12px rgba(0, 0, 0, 0.55), 0 0 18px -4px rgba(245, 158, 11, 0.45);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+.brand-logo-wrap:hover {
+    box-shadow: 0 0 0 1.5px rgba(245, 158, 11, 0.95), 0 0 0 4px rgba(245, 158, 11, 0.15), 0 18px 30px -12px rgba(0, 0, 0, 0.6), 0 0 24px -4px rgba(245, 158, 11, 0.65);
+}
+.brand-logo-scene {
+    animation: brandLogoSpin 7s cubic-bezier(.65,.05,.36,1) infinite;
+    will-change: transform;
+    transform: translateZ(0);
+    transition: transform 0.25s ease;
+}
+.brand-logo-wrap:hover .brand-logo-scene {
+    animation: none;
+    transform: perspective(700px) rotateY(0deg) scale(1.02);
+}
+@media (prefers-reduced-motion: reduce) {
+    .brand-logo-scene {
+        animation: none;
+    }
+}
+
 /* ── KPI breakdown alternating rows ── */
 .kpi-breakdown > div:nth-child(even) { background: rgba(249,250,251,0.5); border-radius: 4px; }
 
