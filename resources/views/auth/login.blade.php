@@ -21,8 +21,9 @@
     <style>
         @keyframes loginLogoSpin {
             0%, 8% { transform: perspective(700px) rotateY(0deg); }
-            45%, 62% { transform: perspective(700px) rotateY(360deg); }
-            100% { transform: perspective(700px) rotateY(360deg); }
+            28%, 36% { transform: perspective(700px) rotateY(-16deg); }
+            56%, 64% { transform: perspective(700px) rotateY(16deg); }
+            84%, 100% { transform: perspective(700px) rotateY(0deg); }
         }
         .login-logo-spin {
             animation: loginLogoSpin 7s cubic-bezier(.65,.05,.36,1) infinite;
@@ -94,8 +95,6 @@
                     {{-- Logo --}}
                     <div class="mb-4 flex justify-center">
                         <div class="login-logo-wrap relative rounded-full transition-all duration-300 hover:-translate-y-1 hover:scale-105">
-                            <div class="pointer-events-none absolute -inset-0.5 rounded-full bg-slate-950"></div>
-
                             <div class="login-logo login-logo-spin relative h-20 w-20 rounded-full sm:h-24 sm:w-24">
                                 <div class="pointer-events-none absolute -bottom-4 left-1/2 h-4 w-20 -translate-x-1/2 rounded-full bg-black/55 blur-lg sm:w-24"></div>
 
