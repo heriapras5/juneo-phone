@@ -799,6 +799,138 @@ Alpine.data('sparepartPage', () => ({
     }
 }));
 
+Alpine.data('phoneTradePage', () => ({
+    showModal: false,
+    editingId: null,
+    loading: false,
+    formData: {
+        type_hp: '',
+        brand: '',
+        storage: '',
+        warna: '',
+        kondisi: 'bekas',
+        sumber: 'langsung',
+        kelengkapan: '',
+        tanggal_masuk: '',
+        harga_beli: '',
+        biaya_perbaikan: '',
+        penjual: '',
+        status: 'stok',
+        tanggal_keluar: '',
+        harga_jual: '',
+        pembeli: '',
+        keterangan: '',
+    },
+    init() {
+        this.$watch('showModal', function(val) {
+            document.body.style.overflow = val ? 'hidden' : '';
+        });
+        var pd = window._pageData || {};
+        if (pd.hasErrors) {
+            var old = pd.old || {};
+            this.showModal = true;
+            this.editingId = pd.editing_id || null;
+            this.formData = {
+                type_hp: old.type_hp || '',
+                brand: old.brand || '',
+                storage: old.storage || '',
+                warna: old.warna || '',
+                kondisi: old.kondisi || 'bekas',
+                sumber: old.sumber || 'langsung',
+                kelengkapan: old.kelengkapan || '',
+                tanggal_masuk: String(old.tanggal_masuk || '').slice(0, 10),
+                harga_beli: old.harga_beli ? String(old.harga_beli).replace(/\D/g, '') : '',
+                biaya_perbaikan: old.biaya_perbaikan ? String(old.biaya_perbaikan).replace(/\D/g, '') : '',
+                penjual: old.penjual || '',
+                status: old.status || 'stok',
+                tanggal_keluar: String(old.tanggal_keluar || '').slice(0, 10),
+                harga_jual: old.harga_jual ? String(old.harga_jual).replace(/\D/g, '') : '',
+                pembeli: old.pembeli || '',
+                keterangan: old.keterangan || '',
+            };
+        }
+
+        if (pd.editTrade) {
+            this.openEditModal(pd.editTrade);
+        }
+    },
+    todayLocal() {
+        var d = new Date();
+        var y = d.getFullYear();
+        var m = String(d.getMonth() + 1).padStart(2, '0');
+        var day = String(d.getDate()).padStart(2, '0');
+        return y + '-' + m + '-' + day;
+    },
+    openCreateModal() {
+        this.editingId = null;
+        this.formData = {
+            type_hp: '',
+            brand: '',
+            storage: '',
+            warna: '',
+            kondisi: 'bekas',
+            sumber: 'langsung',
+            kelengkapan: '',
+            tanggal_masuk: this.todayLocal(),
+            harga_beli: '',
+            biaya_perbaikan: '',
+            penjual: '',
+            status: 'stok',
+            tanggal_keluar: '',
+            harga_jual: '',
+            pembeli: '',
+            keterangan: '',
+        };
+        this.showModal = true;
+        this.$nextTick(() => { if (this.$refs.firstField) this.$refs.firstField.focus(); });
+    },
+    openEditModal(data) {
+        this.editingId = data.id;
+        this.formData = {
+            type_hp: data.type_hp || '',
+            brand: data.brand || '',
+            storage: data.storage || '',
+            warna: data.warna || '',
+            kondisi: data.kondisi || 'bekas',
+            sumber: data.sumber || 'langsung',
+            kelengkapan: data.kelengkapan || '',
+            tanggal_masuk: String(data.tanggal_masuk || '').slice(0, 10),
+            harga_beli: data.harga_beli !== null && data.harga_beli !== undefined ? String(Math.round(Number(data.harga_beli))) : '',
+            biaya_perbaikan: data.biaya_perbaikan !== null && data.biaya_perbaikan !== undefined ? String(Math.round(Number(data.biaya_perbaikan))) : '',
+            penjual: data.penjual || '',
+            status: data.status || 'stok',
+            tanggal_keluar: String(data.tanggal_keluar || '').slice(0, 10),
+            harga_jual: data.harga_jual !== null && data.harga_jual !== undefined ? String(Math.round(Number(data.harga_jual))) : '',
+            pembeli: data.pembeli || '',
+            keterangan: data.keterangan || '',
+        };
+        this.showModal = true;
+        this.$nextTick(() => { if (this.$refs.firstField) this.$refs.firstField.focus(); });
+    },
+    closeModal() {
+        this.showModal = false;
+    },
+    formatNumber(val) {
+        if (val === null || val === undefined || val === '') return '';
+        var str = String(val).trim();
+        var negative = str.charAt(0) === '-';
+        var raw = str.replace(/\D/g, '');
+        if (!raw) return '';
+        return (negative ? '-' : '') + Number(raw).toLocaleString('id-ID');
+    },
+    onCurrencyInput(field, event) {
+        var raw = event.target.value.replace(/\D/g, '');
+        this.formData[field] = raw;
+        event.target.value = raw ? Number(raw).toLocaleString('id-ID') : '';
+    },
+    get labaPreview() {
+        var beli = parseInt(String(this.formData.harga_beli || '').replace(/\D/g, ''), 10) || 0;
+        var perbaikan = parseInt(String(this.formData.biaya_perbaikan || '').replace(/\D/g, ''), 10) || 0;
+        var jual = parseInt(String(this.formData.harga_jual || '').replace(/\D/g, ''), 10) || 0;
+        return jual - beli - perbaikan;
+    },
+}));
+
 Alpine.data('scrollSync', () => ({
     syncFromTable(el) {
         const mirror = this.$refs.mirror;

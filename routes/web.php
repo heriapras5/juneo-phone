@@ -7,6 +7,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DataController;
 use App\Http\Controllers\HelperController;
+use App\Http\Controllers\PhoneTradeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ServiceController;
@@ -71,6 +72,11 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/tokos', [TokoController::class, 'store'])->name('tokos.store');
         Route::put('/tokos/{toko}', [TokoController::class, 'update'])->name('tokos.update');
         Route::delete('/tokos/{toko}', [TokoController::class, 'destroy'])->name('tokos.destroy');
+
+        Route::get('/phone-trades/export-excel', [PhoneTradeController::class, 'exportExcel'])->name('phone-trades.export-excel');
+        Route::get('/phone-trades/export-pdf', [PhoneTradeController::class, 'exportPdf'])->name('phone-trades.export-pdf');
+        Route::put('/phone-trades/{phoneTrade}/status', [PhoneTradeController::class, 'updateStatus'])->name('phone-trades.update-status');
+        Route::resource('phone-trades', PhoneTradeController::class)->except(['create', 'edit']);
 
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
         Route::get('/reports/export-excel', [ReportController::class, 'exportExcel'])->name('reports.export-excel');
