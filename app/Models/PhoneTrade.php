@@ -236,7 +236,7 @@ class PhoneTrade extends Model
         return [
             self::KONDISI_BARU => 'Baru',
             self::KONDISI_BEKAS => 'Bekas',
-            self::KONDISI_MINUS => 'Minus / Perlu Perbaikan',
+            self::KONDISI_MINUS => 'Minus',
         ];
     }
 

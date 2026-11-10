@@ -240,10 +240,7 @@
                         <div class="relative pl-10">
                             <div class="absolute left-2.5 top-1.5 w-3 h-3 rounded-full border-2 bg-white {{ $dotClass }}"></div>
                             <div class="bg-gray-50 rounded-lg p-3">
-                                <div class="flex flex-wrap items-center gap-2">
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{ \App\Models\PhoneTradeHistory::tipeClasses()[$history->tipe] ?? 'bg-gray-100 text-gray-600' }}">
-                                        {{ $history->tipe_label }}
-                                    </span>
+                                <div class="flex items-center gap-2 flex-wrap">
                                     @if(!$isUpdate && $history->status_to)
                                         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border {{ \App\Models\PhoneTrade::statusClasses()[$history->status_to] ?? 'bg-gray-100 text-gray-600 border-gray-200' }}">
                                             {{ $statusLabels[$history->status_to] ?? $history->status_to }}
@@ -258,7 +255,7 @@
                                 <p class="text-xs text-gray-500 mt-1">
                                     {{ $history->created_at->format('d M Y H:i') }}
                                     @if($history->user)
-                                        - oleh {{ $history->user->name }}
+                                        &mdash; oleh {{ $history->user->name }}
                                     @endif
                                 </p>
                                 @if($history->note)
