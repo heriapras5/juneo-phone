@@ -255,11 +255,24 @@
                                 <p class="text-xs text-gray-500 mt-1">
                                     {{ $history->created_at->format('d M Y H:i') }}
                                     @if($history->user)
-                                        &mdash; oleh {{ $history->user->name }}
+                                        - oleh {{ $history->user->name }}
                                     @endif
                                 </p>
                                 @if($history->note)
-                                    <p class="text-sm text-gray-600 mt-1">{{ $history->note }}</p>
+                                    @php
+                                        $note = preg_replace('/:\s*Rp\s*[\d\.]+\s*->\s*(Rp\s*[\d\.]+)/u', ': $1', (string) $history->note);
+                                        $note = preg_replace('/\s+(?:diubah menjadi|ditetapkan):\s*/u', ': ', $note);
+                                        $noteLines = array_values(array_filter(array_map('trim', preg_split('/;\s*|\R|(?<=\.)\s+(?=[A-Z])/', $note))));
+                                    @endphp
+                                    @if(count($noteLines) === 1)
+                                        <p class="text-sm text-gray-600 mt-1">{{ $noteLines[0] }}</p>
+                                    @elseif(count($noteLines) > 1)
+                                        <ul class="mt-1 list-disc pl-4 space-y-0.5 text-sm text-gray-600">
+                                            @foreach($noteLines as $line)
+                                                <li>{{ $line }}</li>
+                                            @endforeach
+                                        </ul>
+                                    @endif
                                 @endif
                             </div>
                         </div>

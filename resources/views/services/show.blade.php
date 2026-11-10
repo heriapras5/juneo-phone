@@ -249,7 +249,7 @@
                                 <p class="text-xs text-gray-500 mt-1">
                                     {{ $history->created_at->format('d M Y H:i') }}
                                     @if($history->user)
-                                        &mdash; oleh {{ $history->user->name }}
+                                        - oleh {{ $history->user->name }}
                                     @endif
                                 </p>
                                 @if($history->note)

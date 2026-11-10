@@ -93,7 +93,7 @@ class PhoneTrade extends Model
                 $note = 'Status diubah menjadi ' . $trade->status_label . '.';
 
                 if (!empty($changes)) {
-                    $note .= ' ' . implode('; ', $changes) . '.';
+                    $note .= "\n" . implode("\n", $changes);
                 }
 
                 $trade->histories()->create([
@@ -112,7 +112,7 @@ class PhoneTrade extends Model
                     'tipe' => self::TIPE_UPDATE,
                     'status_from' => null,
                     'status_to' => null,
-                    'note' => implode('; ', $changes) . '.',
+                    'note' => implode("\n", $changes),
                     'user_id' => auth()->id(),
                 ]);
             }
@@ -152,12 +152,10 @@ class PhoneTrade extends Model
                 continue;
             }
 
-            if (($from === null || $from == 0.0) && $to !== null && $to > 0) {
-                $changes[] = $label . ' ditetapkan: Rp ' . number_format($to, 0, ',', '.');
-            } elseif ($to === null || $to == 0.0) {
+            if ($to === null || $to == 0.0) {
                 $changes[] = $label . ' dikosongkan';
             } else {
-                $changes[] = $label . ' diubah menjadi: Rp ' . number_format($to, 0, ',', '.');
+                $changes[] = $label . ': Rp ' . number_format($to, 0, ',', '.');
             }
         }
 

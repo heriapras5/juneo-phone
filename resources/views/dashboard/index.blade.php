@@ -53,7 +53,7 @@ $hasCustomRange = request()->has('from') && request()->has('to');
         @endforeach
         </div>
 
-        <span class="hidden lg:inline text-gray-200">|</span>
+        <span class="hidden lg:inline text-gray-400">|</span>
 
         <div class="flex items-center gap-2 flex-nowrap">
             <span class="text-[11px] text-gray-500 font-medium whitespace-nowrap">Dari</span>
@@ -77,7 +77,7 @@ $hasCustomRange = request()->has('from') && request()->has('to');
             </span>
             <div class="leading-tight min-w-0">
                 <span class="text-xs sm:text-sm font-semibold" id="infoFromDate">{{ $fromDate->format('d M Y') }}</span>
-                <span class="text-gray-300 mx-0.5 sm:mx-1">-</span>
+                <span class="text-gray-600 font-semibold mx-1 sm:mx-2">-</span>
                 <span class="text-xs sm:text-sm font-semibold" id="infoToDate">{{ $toDate->format('d M Y') }}</span>
                 <div class="text-[10px] sm:text-[11px] text-gray-400 mt-0.5" id="infoPeriodLabel">{{ $hasCustomRange ? 'Rentang Kustom' : ($periodLabels[$period] ?? 'Rentang Kustom') }}</div>
             </div>
