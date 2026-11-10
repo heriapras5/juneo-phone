@@ -212,9 +212,8 @@
             <div class="flex items-center gap-3 pt-2">
                 <button type="submit"
                     class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm">
-                    <i class="fas fa-save"></i> Simpan Perubahan
+                    <i class="fas fa-save"></i> Simpan
                 </button>
-                <p class="text-xs text-gray-400">Perubahan status dan nominal otomatis tercatat di riwayat.</p>
             </div>
         </form>
     </div>
