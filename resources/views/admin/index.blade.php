@@ -43,7 +43,7 @@
             <div>
                 <h3 class="text-sm font-semibold text-gray-700">Daftar Pengguna</h3>
                 @unless(auth()->user()->isSuperAdmin())
-                <p class="text-xs text-gray-500 mt-0.5">Hanya Super Admin yang dapat mengelola pengguna.</p>
+                <p class="text-xs text-gray-500 mt-0.5">Anda hanya dapat mengelola akun Anda sendiri.</p>
                 @endunless
             </div>
             @if(auth()->user()->isSuperAdmin())
@@ -79,21 +79,23 @@
                         </td>
                         <td class="px-5 py-4 text-right whitespace-nowrap">
                             <div class="flex items-center justify-end gap-1">
-                                @if(auth()->user()->isSuperAdmin())
+                                @if(auth()->user()->isSuperAdmin() || $user->id === auth()->id())
                                 <button @click="openEditModal({{ Js::from($user->only(['id', 'name', 'email', 'role', 'status'])) }})"
+                                    data-edit-user="{{ $user->id }}"
                                     title="Edit Data"
                                     class="p-2 text-gray-400 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg ">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                @if($user->id !== auth()->id())
+                                @endif
+                                @if(auth()->user()->isSuperAdmin() && $user->id !== auth()->id())
                                 <button @click="confirmDelete = { url: '{{ route('admin.destroy', $user) }}', message: 'Yakin ingin menghapus {{ $user->role }} {{ $user->name }}?' }"
                                     title="Hapus Data"
                                     class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg ">
                                     <i class="fas fa-trash"></i>
                                 </button>
                                 @endif
-                                @else
-                                <span title="Hanya Super Admin yang dapat mengelola pengguna"
+                                @if(!auth()->user()->isSuperAdmin() && $user->id !== auth()->id())
+                                <span title="Anda hanya dapat mengelola akun Anda sendiri"
                                     class="p-2 text-gray-300 cursor-not-allowed">
                                     <i class="fas fa-lock"></i>
                                 </span>
@@ -154,12 +156,17 @@
                     <input type="hidden" name="role" :value="selectedRole" :disabled="!editingId">
                     <div x-show="editingId">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Status <span class="text-yellow-600">*</span></label>
+                        @if(auth()->user()->isSuperAdmin())
                         <select name="status" x-model="formData.status" :disabled="!editingId"
                             class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
                             <option value="active">Aktif</option>
                             <option value="pending">Pending</option>
                             <option value="rejected">Ditolak</option>
                         </select>
+                        @else
+                        <input type="hidden" name="status" :value="formData.status">
+                        <p class="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-500 capitalize" x-text="formData.status"></p>
+                        @endif
                         @error('status') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>

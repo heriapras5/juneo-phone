@@ -117,11 +117,15 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/helpers/{helper}', [HelperController::class, 'destroy'])->name('helpers.destroy');
 
         Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
+        Route::put('/admin/{admin}', [AdminController::class, 'update'])->name('admin.update');
     });
 
     // SuperAdmin-only routes
     Route::middleware(['role:superadmin'])->group(function () {
-        Route::resource('admin', AdminController::class)->except(['index', 'show']);
+        Route::post('/admin', [AdminController::class, 'store'])->name('admin.store');
+        Route::get('/admin/create', [AdminController::class, 'create'])->name('admin.create');
+        Route::get('/admin/{admin}/edit', [AdminController::class, 'edit'])->name('admin.edit');
+        Route::delete('/admin/{admin}', [AdminController::class, 'destroy'])->name('admin.destroy');
     });
 });
 

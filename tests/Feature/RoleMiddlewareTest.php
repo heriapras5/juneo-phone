@@ -77,10 +77,51 @@ class RoleMiddlewareTest extends TestCase
             ->assertStatus(200)
             ->assertSee($this->owner->name)
             ->assertSee($otherAdmin->name)
-            ->assertSee('Hanya Super Admin yang dapat mengelola pengguna.')
+            ->assertSee('Anda hanya dapat mengelola akun Anda sendiri.')
+            ->assertSee('data-edit-user="' . $this->admin->id . '"', false)
+            ->assertDontSee('data-edit-user="' . $otherAdmin->id . '"', false)
+            ->assertDontSee('data-edit-user="' . $this->owner->id . '"', false)
             ->assertDontSee(route('admin.destroy', $this->owner), false)
             ->assertDontSee(route('admin.destroy', $otherAdmin), false)
             ->assertDontSee(route('admin.destroy', $this->admin), false);
+    }
+
+    public function test_admin_can_update_own_account(): void
+    {
+        $this->actingAs($this->admin);
+
+        $this->put('/admin/' . $this->admin->id, [
+            'name' => 'Admin Diperbarui',
+            'email' => 'admin-diperbarui@example.com',
+            'role' => 'admin',
+            'status' => 'active',
+        ])->assertRedirect(route('admin.index'));
+
+        $this->assertDatabaseHas('users', [
+            'id' => $this->admin->id,
+            'name' => 'Admin Diperbarui',
+            'email' => 'admin-diperbarui@example.com',
+            'role' => 'admin',
+            'status' => 'active',
+        ]);
+    }
+
+    public function test_admin_cannot_escalate_own_role_or_status(): void
+    {
+        $this->actingAs($this->admin);
+
+        $this->put('/admin/' . $this->admin->id, [
+            'name' => $this->admin->name,
+            'email' => $this->admin->email,
+            'role' => 'superadmin',
+            'status' => 'pending',
+        ])->assertRedirect(route('admin.index'));
+
+        $this->assertDatabaseHas('users', [
+            'id' => $this->admin->id,
+            'role' => 'admin',
+            'status' => 'active',
+        ]);
     }
 
     public function test_admin_cannot_create_users(): void

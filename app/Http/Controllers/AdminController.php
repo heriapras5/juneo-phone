@@ -51,7 +51,14 @@ class AdminController extends Controller
 
     public function update(Request $request, User $admin)
     {
-        $this->ensureSuperAdmin();
+        $currentUser = auth()->user();
+        $isSuperAdmin = $currentUser->isSuperAdmin();
+
+        abort_unless(
+            $isSuperAdmin || $admin->id === $currentUser->id,
+            403,
+            'Anda hanya dapat mengelola akun Anda sendiri.'
+        );
 
         $data = $request->validate([
             'name' => 'required|string|max:255',
@@ -60,6 +67,12 @@ class AdminController extends Controller
             'role' => 'required|in:admin,superadmin',
             'status' => 'required|in:active,pending,rejected',
         ]);
+
+        // Admin hanya boleh mengubah data akunnya sendiri, bukan role/status.
+        if (!$isSuperAdmin) {
+            $data['role'] = $admin->role;
+            $data['status'] = $admin->status;
+        }
 
         $admin->name = $data['name'];
         $admin->email = $data['email'];
