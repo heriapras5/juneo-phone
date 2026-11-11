@@ -23,7 +23,11 @@
         this.showModal = true;
     }
 }" x-init="
-    $watch('showModal', val => { document.body.style.overflow = val ? 'hidden' : ''; });
+    $watch('showModal', val => {
+        document.body.style.overflow = val ? 'hidden' : '';
+        const main = document.querySelector('main');
+        if (main) main.style.overflow = val ? 'hidden' : '';
+    });
     @if($errors->any())
         showModal = true;
         if ({{ Js::from(old('_method')) }} === 'PUT') {
@@ -123,12 +127,10 @@
         x-transition:leave-start="opacity-100"
         x-transition:leave-end="opacity-0"
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-        <div @click.stop class="bg-white rounded-2xl shadow-2xl p-5 w-full max-w-sm mx-4 max-h-[90vh] overflow-y-auto border border-gray-200 relative">
+        <div @click.stop class="modal-scroll overscroll-contain bg-white rounded-2xl shadow-2xl p-5 w-full max-w-sm mx-4 max-h-[90vh] overflow-y-auto border border-gray-200 relative">
             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-400"></div>
             <div class="flex items-center justify-between mb-4 mt-1">
-                <h3 class="text-lg font-semibold text-gray-900">
-                    <span x-text="editingId ? 'Edit' : 'Tambah'"></span> Pengguna
-                </h3>
+                <h3 class="text-lg font-semibold text-gray-900" x-text="editingId ? 'Edit User' : 'Tambah User'"></h3>
                 <button type="button" @click="showModal = false" title="Tutup" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
             </div>
             <form :action="editingId ? '/admin/' + editingId : '/admin'" method="POST" @submit="loading = true">
@@ -139,7 +141,7 @@
                     <div x-show="!editingId">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Role <span class="text-yellow-600">*</span></label>
                             <select name="role" x-model="selectedRole" :disabled="editingId"
-                                class="w-full px-3.5 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
+                                class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
                                 <option value="admin">Admin</option>
                                 @if(auth()->user()->isSuperAdmin())
                                 <option value="superadmin">SuperAdmin</option>
@@ -151,28 +153,28 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">Status <span class="text-yellow-600">*</span></label>
                         @if(auth()->user()->isSuperAdmin())
                         <select name="status" x-model="formData.status" :disabled="!editingId"
-                            class="w-full px-3.5 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
+                            class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
                             <option value="active">Aktif</option>
                             <option value="pending">Pending</option>
                             <option value="rejected">Ditolak</option>
                         </select>
                         @else
                         <input type="hidden" name="status" :value="formData.status">
-                        <p class="px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-500 capitalize" x-text="formData.status"></p>
+                        <p class="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-500 capitalize" x-text="formData.status"></p>
                         @endif
                         @error('status') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Nama <span class="text-yellow-600">*</span></label>
                         <input type="text" name="name" x-model="formData.name" required
-                            class="w-full px-3.5 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none @error('name') border-red-400 @enderror"
+                            class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none @error('name') border-red-400 @enderror"
                             placeholder="Nama lengkap">
                         @error('name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Email <span class="text-yellow-600">*</span></label>
                         <input type="email" name="email" x-model="formData.email" required
-                            class="w-full px-3.5 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none @error('email') border-red-400 @enderror"
+                            class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none @error('email') border-red-400 @enderror"
                             placeholder="email@example.com">
                         @error('email') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
@@ -181,14 +183,14 @@
                             Password <span class="text-yellow-600" x-text="editingId ? '(kosongkan jika tidak diubah)' : '*'"></span>
                         </label>
                         <input type="password" name="password" x-model="formData.password" minlength="6" :required="!editingId"
-                            class="w-full px-3.5 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none @error('password') border-red-400 @enderror"
+                            class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none @error('password') border-red-400 @enderror"
                             placeholder="Minimal 6 karakter">
                         @error('password') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password</label>
                         <input type="password" name="password_confirmation" x-model="formData.password_confirmation" minlength="6"
-                            class="w-full px-3.5 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none"
+                            class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none"
                             placeholder="Ulangi password">
                     </div>
                 </div>
@@ -207,3 +209,26 @@
     </div>
 </div>
 @endsection
+
+@push('styles')
+<style>
+    .modal-scroll {
+        scrollbar-width: thin;
+        scrollbar-color: #d1d5db transparent;
+    }
+    .modal-scroll::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+    .modal-scroll::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .modal-scroll::-webkit-scrollbar-thumb {
+        background-color: #d1d5db;
+        border-radius: 9999px;
+    }
+    .modal-scroll::-webkit-scrollbar-thumb:hover {
+        background-color: #9ca3af;
+    }
+</style>
+@endpush
