@@ -10,7 +10,13 @@ class AdminController extends Controller
 {
     public function index()
     {
-        $users = User::whereIn('role', ['admin', 'superadmin'])->orderBy('role')->orderBy('name')->get();
+        $users = User::query()
+            ->whereIn('role', [User::ROLE_ADMIN, User::ROLE_SUPERADMIN])
+            ->when(!auth()->user()->isSuperAdmin(), fn ($query) => $query->where('role', User::ROLE_ADMIN))
+            ->orderBy('role')
+            ->orderBy('name')
+            ->get();
+
         return view('admin.index', compact('users'));
     }
 
@@ -28,12 +34,14 @@ class AdminController extends Controller
             'role' => 'required|in:admin,superadmin',
         ]);
 
+        $this->ensureRoleAllowed($data['role']);
+
         $data['password'] = Hash::make($data['password']);
         $data['status'] = 'active';
 
         User::create($data);
 
-        $label = $data['role'] === 'superadmin' ? 'SuperAdmin' : 'Admin';
+        $label = $data['role'] === User::ROLE_SUPERADMIN ? 'SuperAdmin' : 'Admin';
         return redirect()->route('admin.index')->with('success', $label . ' berhasil ditambahkan');
     }
 
@@ -44,6 +52,8 @@ class AdminController extends Controller
 
     public function update(Request $request, User $admin)
     {
+        $this->ensureCanManage($admin);
+
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $admin->id,
@@ -52,6 +62,8 @@ class AdminController extends Controller
             'status' => 'required|in:active,pending,rejected',
         ]);
 
+        $this->ensureRoleAllowed($data['role']);
+
         $admin->name = $data['name'];
         $admin->email = $data['email'];
         $admin->role = $data['role'];
@@ -59,26 +71,54 @@ class AdminController extends Controller
         if (!empty($data['password'])) {
             $admin->password = Hash::make($data['password']);
         }
-        if (!empty($data['role'])) {
-            $admin->role = $data['role'];
-        }
-        if (!empty($data['status'])) {
-            $admin->status = $data['status'];
-        }
         $admin->save();
 
-        $label = $admin->role === 'superadmin' ? 'SuperAdmin' : 'Admin';
+        $label = $admin->role === User::ROLE_SUPERADMIN ? 'SuperAdmin' : 'Admin';
         return redirect()->route('admin.index')->with('success', $label . ' berhasil diperbarui');
     }
 
     public function destroy(User $admin)
     {
+        $this->ensureCanManage($admin);
+
         if ($admin->id === auth()->id()) {
             return back()->with('error', 'Tidak dapat menghapus akun sendiri');
         }
 
-        $label = $admin->role === 'superadmin' ? 'SuperAdmin' : 'Admin';
+        $label = $admin->role === User::ROLE_SUPERADMIN ? 'SuperAdmin' : 'Admin';
         $admin->delete();
         return redirect()->route('admin.index')->with('success', $label . ' berhasil dihapus');
+    }
+
+    /**
+     * Pastikan pengguna yang login boleh mengelola akun target.
+     * Admin hanya boleh mengelola akun admin, SuperAdmin boleh mengelola semua.
+     */
+    private function ensureCanManage(User $user): void
+    {
+        abort_unless(
+            in_array($user->role, [User::ROLE_ADMIN, User::ROLE_SUPERADMIN], true),
+            403,
+            'Akun ini tidak dapat dikelola.'
+        );
+
+        abort_unless(
+            auth()->user()->isSuperAdmin() || $user->role === User::ROLE_ADMIN,
+            403,
+            'Anda tidak memiliki izin untuk mengelola akun ini.'
+        );
+    }
+
+    /**
+     * Pastikan role yang diberikan sesuai dengan hak akses pengguna yang login.
+     * Admin hanya boleh membuat/menetapkan role admin.
+     */
+    private function ensureRoleAllowed(string $role): void
+    {
+        abort_unless(
+            auth()->user()->isSuperAdmin() || $role === User::ROLE_ADMIN,
+            403,
+            'Anda tidak memiliki izin untuk menetapkan role ini.'
+        );
     }
 }

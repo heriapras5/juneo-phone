@@ -60,11 +60,38 @@ class RoleMiddlewareTest extends TestCase
         $this->get('/settings')->assertStatus(200);
     }
 
-    public function test_admin_cannot_access_superadmin_only_routes(): void
+    public function test_admin_can_access_user_management(): void
     {
         $this->actingAs($this->admin);
 
-        $this->get('/admin')->assertStatus(403);
+        $this->get('/admin')->assertStatus(200);
+    }
+
+    public function test_admin_cannot_create_superadmin(): void
+    {
+        $this->actingAs($this->admin);
+
+        $this->post('/admin', [
+            'name' => 'New SuperAdmin',
+            'email' => 'new-superadmin@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+            'role' => 'superadmin',
+        ])->assertStatus(403);
+    }
+
+    public function test_admin_cannot_manage_superadmin_account(): void
+    {
+        $this->actingAs($this->admin);
+
+        $this->put('/admin/' . $this->owner->id, [
+            'name' => 'Diubah Admin',
+            'email' => 'diubah@example.com',
+            'role' => 'admin',
+            'status' => 'active',
+        ])->assertStatus(403);
+
+        $this->delete('/admin/' . $this->owner->id)->assertStatus(403);
     }
 
     public function test_guest_cannot_access_protected_routes(): void

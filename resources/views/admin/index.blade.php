@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Manajemen Admin')
-@section('page-title', 'Manajemen Admin')
+@section('title', 'Manajemen Pengguna')
+@section('page-title', 'Manajemen Pengguna')
 
 @section('content')
 <div x-data="{
@@ -9,17 +9,17 @@
     editingId: null,
     selectedRole: 'admin',
     loading: false,
-    formData: { name: '', email: '', password: '', password_confirmation: '' },
+    formData: { name: '', email: '', password: '', password_confirmation: '', status: 'active' },
     openCreateModal() {
         this.editingId = null;
         this.selectedRole = 'admin';
-        this.formData = { name: '', email: '', password: '', password_confirmation: '' };
+        this.formData = { name: '', email: '', password: '', password_confirmation: '', status: 'active' };
         this.showModal = true;
     },
     openEditModal(data) {
         this.editingId = data.id;
         this.selectedRole = data.role;
-        this.formData = { name: data.name, email: data.email, password: '', password_confirmation: '' };
+        this.formData = { name: data.name, email: data.email, password: '', password_confirmation: '', status: data.status || 'active' };
         this.showModal = true;
     }
 }" x-init="
@@ -34,6 +34,7 @@
         }
         formData.name = {{ Js::from(old('name', '')) }};
         formData.email = {{ Js::from(old('email', '')) }};
+        formData.status = {{ Js::from(old('status', 'active')) }};
     @endif
 ">
     {{-- Header --}}
@@ -71,7 +72,7 @@
                         </td>
                         <td class="px-5 py-4 text-right whitespace-nowrap">
                             <div class="flex items-center justify-end gap-1">
-                                <button @click="openEditModal({{ Js::from($user->only(['id', 'name', 'email', 'role'])) }})"
+                                <button @click="openEditModal({{ Js::from($user->only(['id', 'name', 'email', 'role', 'status'])) }})"
                                     title="Edit Data"
                                     class="p-2 text-gray-400 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg ">
                                     <i class="fas fa-edit"></i>
@@ -117,8 +118,7 @@
             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-400"></div>
             <div class="flex items-center justify-between mb-6 mt-2">
                 <h3 class="text-lg font-semibold text-gray-900">
-                    <span x-text="editingId ? 'Edit' : 'Tambah'"></span>
-                    <span x-text="selectedRole === 'owner' ? 'Owner' : 'Admin'"></span>
+                    <span x-text="editingId ? 'Edit' : 'Tambah'"></span> Pengguna
                 </h3>
                 <button @click="showModal = false" title="Tutup" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
             </div>
@@ -132,8 +132,21 @@
                             <select name="role" x-model="selectedRole" :disabled="editingId"
                                 class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
                                 <option value="admin">Admin</option>
+                                @if(auth()->user()->isSuperAdmin())
                                 <option value="superadmin">SuperAdmin</option>
+                                @endif
                             </select>
+                    </div>
+                    <input type="hidden" name="role" :value="selectedRole" :disabled="!editingId">
+                    <div x-show="editingId">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Status <span class="text-yellow-600">*</span></label>
+                        <select name="status" x-model="formData.status" :disabled="!editingId"
+                            class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
+                            <option value="active">Aktif</option>
+                            <option value="pending">Pending</option>
+                            <option value="rejected">Ditolak</option>
+                        </select>
+                        @error('status') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Nama <span class="text-yellow-600">*</span></label>
