@@ -12,7 +12,6 @@ class AdminController extends Controller
     {
         $users = User::query()
             ->whereIn('role', [User::ROLE_ADMIN, User::ROLE_SUPERADMIN])
-            ->when(!auth()->user()->isSuperAdmin(), fn ($query) => $query->where('role', User::ROLE_ADMIN))
             ->orderBy('role')
             ->orderBy('name')
             ->get();

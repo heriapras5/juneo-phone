@@ -67,6 +67,17 @@ class RoleMiddlewareTest extends TestCase
         $this->get('/admin')->assertStatus(200);
     }
 
+    public function test_admin_sees_superadmin_accounts_without_management_actions(): void
+    {
+        $this->actingAs($this->admin);
+
+        $this->get('/admin')
+            ->assertStatus(200)
+            ->assertSee($this->owner->name)
+            ->assertSee($this->owner->email)
+            ->assertDontSee(route('admin.destroy', $this->owner), false);
+    }
+
     public function test_admin_cannot_create_superadmin(): void
     {
         $this->actingAs($this->admin);

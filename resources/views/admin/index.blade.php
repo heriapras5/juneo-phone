@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Manajemen Pengguna')
-@section('page-title', 'Manajemen Pengguna')
+@section('title', 'Manajemen Users')
+@section('page-title', 'Manajemen Users')
 
 @section('content')
 <div x-data="{
@@ -72,6 +72,7 @@
                         </td>
                         <td class="px-5 py-4 text-right whitespace-nowrap">
                             <div class="flex items-center justify-end gap-1">
+                                @if(auth()->user()->isSuperAdmin() || $user->role !== 'superadmin')
                                 <button @click="openEditModal({{ Js::from($user->only(['id', 'name', 'email', 'role', 'status'])) }})"
                                     title="Edit Data"
                                     class="p-2 text-gray-400 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg ">
@@ -83,6 +84,12 @@
                                     class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg ">
                                     <i class="fas fa-trash"></i>
                                 </button>
+                                @endif
+                                @else
+                                <span title="Hanya SuperAdmin yang dapat mengelola akun ini"
+                                    class="p-2 text-gray-300 cursor-not-allowed">
+                                    <i class="fas fa-lock"></i>
+                                </span>
                                 @endif
                             </div>
                         </td>
