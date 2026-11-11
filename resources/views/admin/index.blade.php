@@ -115,7 +115,7 @@
     </div>
 
     {{-- Modal Form Admin/Owner --}}
-    <div x-show="showModal" x-cloak @click.self="showModal = false"
+    <div x-show="showModal" x-cloak
         x-transition:enter="transition-opacity duration-100"
         x-transition:enter-start="opacity-0"
         x-transition:enter-end="opacity-100"
@@ -123,9 +123,9 @@
         x-transition:leave-start="opacity-100"
         x-transition:leave-end="opacity-0"
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-        <div @click.stop class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4 border border-gray-200 relative overflow-hidden">
+        <div @click.stop class="bg-white rounded-2xl shadow-2xl p-5 w-full max-w-sm mx-4 max-h-[90vh] overflow-y-auto border border-gray-200 relative">
             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-400"></div>
-            <div class="flex items-center justify-between mb-6 mt-2">
+            <div class="flex items-center justify-between mb-4 mt-1">
                 <h3 class="text-lg font-semibold text-gray-900">
                     <span x-text="editingId ? 'Edit' : 'Tambah'"></span> Pengguna
                 </h3>
@@ -135,11 +135,11 @@
                 @csrf
                 <input type="hidden" name="_method" :value="editingId ? 'PUT' : 'POST'">
                 <input type="hidden" name="editing_id" :value="editingId || ''">
-                <div class="space-y-4">
+                <div class="space-y-3">
                     <div x-show="!editingId">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Role <span class="text-yellow-600">*</span></label>
                             <select name="role" x-model="selectedRole" :disabled="editingId"
-                                class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
+                                class="w-full px-3.5 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
                                 <option value="admin">Admin</option>
                                 @if(auth()->user()->isSuperAdmin())
                                 <option value="superadmin">SuperAdmin</option>
@@ -151,28 +151,28 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">Status <span class="text-yellow-600">*</span></label>
                         @if(auth()->user()->isSuperAdmin())
                         <select name="status" x-model="formData.status" :disabled="!editingId"
-                            class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
+                            class="w-full px-3.5 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none">
                             <option value="active">Aktif</option>
                             <option value="pending">Pending</option>
                             <option value="rejected">Ditolak</option>
                         </select>
                         @else
                         <input type="hidden" name="status" :value="formData.status">
-                        <p class="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-500 capitalize" x-text="formData.status"></p>
+                        <p class="px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-500 capitalize" x-text="formData.status"></p>
                         @endif
                         @error('status') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Nama <span class="text-yellow-600">*</span></label>
                         <input type="text" name="name" x-model="formData.name" required
-                            class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none @error('name') border-red-400 @enderror"
+                            class="w-full px-3.5 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none @error('name') border-red-400 @enderror"
                             placeholder="Nama lengkap">
                         @error('name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Email <span class="text-yellow-600">*</span></label>
                         <input type="email" name="email" x-model="formData.email" required
-                            class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none @error('email') border-red-400 @enderror"
+                            class="w-full px-3.5 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none @error('email') border-red-400 @enderror"
                             placeholder="email@example.com">
                         @error('email') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
@@ -181,26 +181,26 @@
                             Password <span class="text-yellow-600" x-text="editingId ? '(kosongkan jika tidak diubah)' : '*'"></span>
                         </label>
                         <input type="password" name="password" x-model="formData.password" minlength="6" :required="!editingId"
-                            class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none @error('password') border-red-400 @enderror"
+                            class="w-full px-3.5 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none @error('password') border-red-400 @enderror"
                             placeholder="Minimal 6 karakter">
                         @error('password') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password</label>
                         <input type="password" name="password_confirmation" x-model="formData.password_confirmation" minlength="6"
-                            class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none"
+                            class="w-full px-3.5 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-yellow-500/30 focus:border-yellow-500 text-gray-900 outline-none"
                             placeholder="Ulangi password">
                     </div>
                 </div>
                 <div class="flex items-center gap-3 mt-6 pt-4 border-t border-gray-100">
                     <button type="submit" :disabled="loading"
-                        class="px-6 py-2.5 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg  flex items-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                        class="px-5 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg  flex items-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
                         <i x-show="!loading" class="fas fa-save"></i>
                         <i x-show="loading" class="fas fa-spinner fa-spin"></i>
-                        <span x-text="editingId ? 'Simpan Perubahan' : 'Simpan'"></span>
+                        <span>Simpan</span>
                     </button>
                     <button type="button" @click="showModal = false"
-                        class="px-6 py-2.5 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 ">Batal</button>
+                        class="px-5 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 ">Batal</button>
                 </div>
             </form>
         </div>
