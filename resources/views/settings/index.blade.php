@@ -132,10 +132,10 @@
 
             <div class="mt-6 pt-4 border-t border-gray-100">
                 <button type="submit" :disabled="loading"
-                    class="px-6 py-2.5 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg  flex items-center gap-2 shadow-sm shadow-yellow-500/25 disabled:opacity-50 disabled:cursor-not-allowed">
+                    class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg flex items-center gap-2 shadow-sm shadow-yellow-500/25 disabled:opacity-50 disabled:cursor-not-allowed">
                     <i x-show="!loading" class="fas fa-save"></i>
                     <i x-show="loading" class="fas fa-spinner fa-spin"></i>
-                    <span x-text="loading ? 'Menyimpan...' : 'Simpan Pengaturan'"></span>
+                    <span x-text="loading ? 'Menyimpan...' : 'Simpan'"></span>
                 </button>
             </div>
         </form>
