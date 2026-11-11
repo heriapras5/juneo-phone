@@ -26,14 +26,14 @@ class AdminController extends Controller
 
     public function store(Request $request)
     {
+        $this->ensureSuperAdmin();
+
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
             'role' => 'required|in:admin,superadmin',
         ]);
-
-        $this->ensureRoleAllowed($data['role']);
 
         $data['password'] = Hash::make($data['password']);
         $data['status'] = 'active';
@@ -51,7 +51,7 @@ class AdminController extends Controller
 
     public function update(Request $request, User $admin)
     {
-        $this->ensureCanManage($admin);
+        $this->ensureSuperAdmin();
 
         $data = $request->validate([
             'name' => 'required|string|max:255',
@@ -60,8 +60,6 @@ class AdminController extends Controller
             'role' => 'required|in:admin,superadmin',
             'status' => 'required|in:active,pending,rejected',
         ]);
-
-        $this->ensureRoleAllowed($data['role']);
 
         $admin->name = $data['name'];
         $admin->email = $data['email'];
@@ -78,7 +76,7 @@ class AdminController extends Controller
 
     public function destroy(User $admin)
     {
-        $this->ensureCanManage($admin);
+        $this->ensureSuperAdmin();
 
         if ($admin->id === auth()->id()) {
             return back()->with('error', 'Tidak dapat menghapus akun sendiri');
@@ -90,34 +88,14 @@ class AdminController extends Controller
     }
 
     /**
-     * Pastikan pengguna yang login boleh mengelola akun target.
-     * Admin hanya boleh mengelola akun admin, SuperAdmin boleh mengelola semua.
+     * Manajemen pengguna (tambah/ubah/hapus) hanya boleh dilakukan Super Admin.
      */
-    private function ensureCanManage(User $user): void
+    private function ensureSuperAdmin(): void
     {
         abort_unless(
-            in_array($user->role, [User::ROLE_ADMIN, User::ROLE_SUPERADMIN], true),
+            auth()->user()->isSuperAdmin(),
             403,
-            'Akun ini tidak dapat dikelola.'
-        );
-
-        abort_unless(
-            auth()->user()->isSuperAdmin() || $user->role === User::ROLE_ADMIN,
-            403,
-            'Anda tidak memiliki izin untuk mengelola akun ini.'
-        );
-    }
-
-    /**
-     * Pastikan role yang diberikan sesuai dengan hak akses pengguna yang login.
-     * Admin hanya boleh membuat/menetapkan role admin.
-     */
-    private function ensureRoleAllowed(string $role): void
-    {
-        abort_unless(
-            auth()->user()->isSuperAdmin() || $role === User::ROLE_ADMIN,
-            403,
-            'Anda tidak memiliki izin untuk menetapkan role ini.'
+            'Hanya Super Admin yang dapat mengelola pengguna.'
         );
     }
 }

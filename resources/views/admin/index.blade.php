@@ -40,11 +40,18 @@
     {{-- Header --}}
     <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
         <div class="flex items-center justify-between px-5 py-3 border-b border-gray-100">
-            <h3 class="text-sm font-semibold text-gray-700">Daftar Pengguna</h3>
+            <div>
+                <h3 class="text-sm font-semibold text-gray-700">Daftar Pengguna</h3>
+                @unless(auth()->user()->isSuperAdmin())
+                <p class="text-xs text-gray-500 mt-0.5">Hanya Super Admin yang dapat mengelola pengguna.</p>
+                @endunless
+            </div>
+            @if(auth()->user()->isSuperAdmin())
             <button type="button" @click="openCreateModal()"
                 class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm">
                 <i class="fas fa-plus"></i> Tambah
             </button>
+            @endif
         </div>
 
         <div x-data="scrollSync">
@@ -72,7 +79,7 @@
                         </td>
                         <td class="px-5 py-4 text-right whitespace-nowrap">
                             <div class="flex items-center justify-end gap-1">
-                                @if(auth()->user()->isSuperAdmin() || $user->role !== 'superadmin')
+                                @if(auth()->user()->isSuperAdmin())
                                 <button @click="openEditModal({{ Js::from($user->only(['id', 'name', 'email', 'role', 'status'])) }})"
                                     title="Edit Data"
                                     class="p-2 text-gray-400 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg ">
@@ -86,7 +93,7 @@
                                 </button>
                                 @endif
                                 @else
-                                <span title="Hanya SuperAdmin yang dapat mengelola akun ini"
+                                <span title="Hanya Super Admin yang dapat mengelola pengguna"
                                     class="p-2 text-gray-300 cursor-not-allowed">
                                     <i class="fas fa-lock"></i>
                                 </span>

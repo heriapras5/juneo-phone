@@ -67,28 +67,49 @@ class RoleMiddlewareTest extends TestCase
         $this->get('/admin')->assertStatus(200);
     }
 
-    public function test_admin_sees_superadmin_accounts_without_management_actions(): void
+    public function test_admin_sees_users_without_management_actions(): void
     {
+        $otherAdmin = User::factory()->create(['role' => 'admin', 'status' => 'active']);
+
         $this->actingAs($this->admin);
 
         $this->get('/admin')
             ->assertStatus(200)
             ->assertSee($this->owner->name)
-            ->assertSee($this->owner->email)
-            ->assertDontSee(route('admin.destroy', $this->owner), false);
+            ->assertSee($otherAdmin->name)
+            ->assertSee('Hanya Super Admin yang dapat mengelola pengguna.')
+            ->assertDontSee(route('admin.destroy', $this->owner), false)
+            ->assertDontSee(route('admin.destroy', $otherAdmin), false)
+            ->assertDontSee(route('admin.destroy', $this->admin), false);
     }
 
-    public function test_admin_cannot_create_superadmin(): void
+    public function test_admin_cannot_create_users(): void
     {
         $this->actingAs($this->admin);
 
         $this->post('/admin', [
-            'name' => 'New SuperAdmin',
-            'email' => 'new-superadmin@example.com',
+            'name' => 'New Admin',
+            'email' => 'new-admin@example.com',
             'password' => 'password',
             'password_confirmation' => 'password',
-            'role' => 'superadmin',
+            'role' => 'admin',
         ])->assertStatus(403);
+    }
+
+    public function test_admin_cannot_manage_other_admins(): void
+    {
+        $otherAdmin = User::factory()->create(['role' => 'admin', 'status' => 'active']);
+
+        $this->actingAs($this->admin);
+
+        $this->put('/admin/' . $otherAdmin->id, [
+            'name' => 'Diubah Admin Lain',
+            'email' => 'diubah@example.com',
+            'role' => 'admin',
+            'status' => 'active',
+        ])->assertStatus(403);
+
+        $this->delete('/admin/' . $otherAdmin->id)->assertStatus(403);
     }
 
     public function test_admin_cannot_manage_superadmin_account(): void
@@ -103,6 +124,36 @@ class RoleMiddlewareTest extends TestCase
         ])->assertStatus(403);
 
         $this->delete('/admin/' . $this->owner->id)->assertStatus(403);
+    }
+
+    public function test_superadmin_can_manage_users(): void
+    {
+        $this->actingAs($this->owner);
+
+        $this->post('/admin', [
+            'name' => 'Admin Baru',
+            'email' => 'admin-baru@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+            'role' => 'admin',
+        ])->assertRedirect(route('admin.index'));
+
+        $newAdmin = User::where('email', 'admin-baru@example.com')->firstOrFail();
+
+        $this->put('/admin/' . $newAdmin->id, [
+            'name' => 'Admin Diperbarui',
+            'email' => 'admin-baru@example.com',
+            'role' => 'admin',
+            'status' => 'active',
+        ])->assertRedirect(route('admin.index'));
+
+        $this->assertDatabaseHas('users', [
+            'id' => $newAdmin->id,
+            'name' => 'Admin Diperbarui',
+        ]);
+
+        $this->delete('/admin/' . $newAdmin->id)->assertRedirect(route('admin.index'));
+        $this->assertDatabaseMissing('users', ['id' => $newAdmin->id]);
     }
 
     public function test_guest_cannot_access_protected_routes(): void
