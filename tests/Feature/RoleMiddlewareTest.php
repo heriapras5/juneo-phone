@@ -77,7 +77,6 @@ class RoleMiddlewareTest extends TestCase
             ->assertStatus(200)
             ->assertSee($this->owner->name)
             ->assertSee($otherAdmin->name)
-            ->assertSee('Anda hanya dapat mengelola akun Anda sendiri.')
             ->assertSee('data-edit-user="' . $this->admin->id . '"', false)
             ->assertDontSee('data-edit-user="' . $otherAdmin->id . '"', false)
             ->assertDontSee('data-edit-user="' . $this->owner->id . '"', false)

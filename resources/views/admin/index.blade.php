@@ -39,20 +39,14 @@
 ">
     {{-- Header --}}
     <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-        <div class="flex items-center justify-between px-5 py-3 border-b border-gray-100">
-            <div>
-                <h3 class="text-sm font-semibold text-gray-700">Daftar Pengguna</h3>
-                @unless(auth()->user()->isSuperAdmin())
-                <p class="text-xs text-gray-500 mt-0.5">Anda hanya dapat mengelola akun Anda sendiri.</p>
-                @endunless
-            </div>
-            @if(auth()->user()->isSuperAdmin())
+        @if(auth()->user()->isSuperAdmin())
+        <div class="flex items-center justify-end px-5 py-3 border-b border-gray-100">
             <button type="button" @click="openCreateModal()"
                 class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg text-sm flex items-center gap-2 shadow-sm">
                 <i class="fas fa-plus"></i> Tambah
             </button>
-            @endif
         </div>
+        @endif
 
         <div x-data="scrollSync">
             <div class="overflow-x-auto" x-ref="table" @scroll="syncFromTable">
@@ -80,7 +74,7 @@
                         <td class="px-5 py-4 text-right whitespace-nowrap">
                             <div class="flex items-center justify-end gap-1">
                                 @if(auth()->user()->isSuperAdmin() || $user->id === auth()->id())
-                                <button @click="openEditModal({{ Js::from($user->only(['id', 'name', 'email', 'role', 'status'])) }})"
+                                <button type="button" @click="openEditModal({{ Js::from($user->only(['id', 'name', 'email', 'role', 'status'])) }})"
                                     data-edit-user="{{ $user->id }}"
                                     title="Edit Data"
                                     class="p-2 text-gray-400 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg ">
@@ -88,7 +82,7 @@
                                 </button>
                                 @endif
                                 @if(auth()->user()->isSuperAdmin() && $user->id !== auth()->id())
-                                <button @click="confirmDelete = { url: '{{ route('admin.destroy', $user) }}', message: 'Yakin ingin menghapus {{ $user->role }} {{ $user->name }}?' }"
+                                <button type="button" @click="confirmDelete = { url: '{{ route('admin.destroy', $user) }}', message: 'Yakin ingin menghapus {{ $user->role }} {{ $user->name }}?' }"
                                     title="Hapus Data"
                                     class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg ">
                                     <i class="fas fa-trash"></i>
@@ -119,10 +113,9 @@
             </div>
         </div>
     </div>
-</div>
 
     {{-- Modal Form Admin/Owner --}}
-    <div x-show="showModal" x-cloak
+    <div x-show="showModal" x-cloak @click.self="showModal = false"
         x-transition:enter="transition-opacity duration-100"
         x-transition:enter-start="opacity-0"
         x-transition:enter-end="opacity-100"
@@ -136,7 +129,7 @@
                 <h3 class="text-lg font-semibold text-gray-900">
                     <span x-text="editingId ? 'Edit' : 'Tambah'"></span> Pengguna
                 </h3>
-                <button @click="showModal = false" title="Tutup" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+                <button type="button" @click="showModal = false" title="Tutup" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
             </div>
             <form :action="editingId ? '/admin/' + editingId : '/admin'" method="POST" @submit="loading = true">
                 @csrf
