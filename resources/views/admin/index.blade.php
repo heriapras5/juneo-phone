@@ -126,7 +126,7 @@
         x-transition:leave="transition-opacity duration-75"
         x-transition:leave-start="opacity-100"
         x-transition:leave-end="opacity-0"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
         <div @click.stop class="modal-scroll overscroll-contain bg-white rounded-2xl shadow-2xl p-5 w-full max-w-sm mx-4 max-h-[90vh] overflow-y-auto border border-gray-200 relative">
             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-400"></div>
             <div class="flex items-center justify-between mb-4 mt-1">
@@ -196,13 +196,13 @@
                 </div>
                 <div class="flex items-center gap-3 mt-6 pt-4 border-t border-gray-100">
                     <button type="submit" :disabled="loading"
-                        class="px-5 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg  flex items-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                        class="px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-white font-medium rounded-lg flex items-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
                         <i x-show="!loading" class="fas fa-save"></i>
                         <i x-show="loading" class="fas fa-spinner fa-spin"></i>
                         <span>Simpan</span>
                     </button>
                     <button type="button" @click="showModal = false"
-                        class="px-5 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 ">Batal</button>
+                        class="px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200">Batal</button>
                 </div>
             </form>
         </div>
